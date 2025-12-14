@@ -1,46 +1,17 @@
-import React, { useState } from 'react';
-import { Save, Plus, X } from 'lucide-react';
-import Card from '../../components/Card';
-import Button from '../../components/Button';
-import Textarea from '../../components/Textarea';
-import Select from '../../components/Select';
-import Input from '../../components/Input';
+import { useState } from 'react';
+import { Trash2, Plus } from 'lucide-react';
 
 export default function AIAssistant() {
-  const [greeting, setGreeting] = useState('Hello! Thank you for calling. How can I assist you today?');
-  const [voice, setVoice] = useState('female-1');
+  const [greeting, setGreeting] = useState('Hello! Thanks for calling...');
+  const [voice, setVoice] = useState('female-sarah');
   const [tone, setTone] = useState('professional');
-  const [language, setLanguage] = useState('en');
-  const [businessDescription, setBusinessDescription] = useState('We are a professional consulting firm providing expert advice and services to our clients.');
-  const [services, setServices] = useState(['Consultation', 'Follow-up Appointment', 'General Inquiry']);
+  const [language, setLanguage] = useState('en-uk');
+  const [businessDescription, setBusinessDescription] = useState('');
+  const [services, setServices] = useState(['Emergency Repair', 'Regular Maintenance', 'Installation']);
   const [newService, setNewService] = useState('');
-  const [minNotice, setMinNotice] = useState('2');
-  const [maxPerDay, setMaxPerDay] = useState('10');
-
-  const voiceOptions = [
-    { value: 'female-1', label: 'Female Voice 1 (Professional)' },
-    { value: 'female-2', label: 'Female Voice 2 (Friendly)' },
-    { value: 'male-1', label: 'Male Voice 1 (Professional)' },
-    { value: 'male-2', label: 'Male Voice 2 (Warm)' },
-  ];
-
-  const languageOptions = [
-    { value: 'en', label: 'English' },
-    { value: 'es', label: 'Spanish' },
-    { value: 'fr', label: 'French' },
-    { value: 'de', label: 'German' },
-    { value: 'it', label: 'Italian' },
-    { value: 'pt', label: 'Portuguese' },
-  ];
-
-  const toneButtons = [
-    { value: 'professional', label: 'Professional' },
-    { value: 'friendly', label: 'Friendly' },
-    { value: 'casual', label: 'Casual' },
-  ];
 
   const handleAddService = () => {
-    if (newService.trim() && !services.includes(newService.trim())) {
+    if (newService.trim()) {
       setServices([...services, newService.trim()]);
       setNewService('');
     }
@@ -51,158 +22,136 @@ export default function AIAssistant() {
   };
 
   const handleSave = () => {
-    console.log('Saving AI Assistant settings:', {
-      greeting,
-      voice,
-      tone,
-      language,
-      businessDescription,
-      services,
-      minNotice,
-      maxPerDay,
-    });
-    alert('Settings saved successfully!');
+    console.log('Saving AI Assistant settings...');
   };
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-white">AI Assistant Settings</h1>
-        <p className="text-gray-400 mt-1">Configure your AI assistant's behavior and responses</p>
-      </div>
+    <div className="max-w-5xl mx-auto">
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">AI Assistant</h1>
 
       {/* Greeting Message */}
-      <Card>
-        <h2 className="text-lg font-semibold text-white mb-4">Greeting Message</h2>
-        <Textarea
-          placeholder="Enter your greeting message..."
+      <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-[#1a1a1a] rounded-xl p-4 mb-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Greeting Message</h2>
+        <textarea
           value={greeting}
           onChange={(e) => setGreeting(e.target.value)}
-          rows={3}
+          className="w-full bg-gray-50 dark:bg-[#0a0a0a] border border-gray-300 dark:border-[#2a2a2a] rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:border-gray-400 dark:focus:border-gray-500 focus:outline-none resize-none"
+          rows={2}
+          placeholder="Hello! Thanks for calling..."
         />
-        <p className="text-sm text-gray-500 mt-2">
-          This is the first message callers will hear when they call
-        </p>
-      </Card>
+      </div>
 
-      {/* Voice & Language */}
-      <Card>
-        <h2 className="text-lg font-semibold text-white mb-4">Voice & Language</h2>
+      {/* Voice Settings */}
+      <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-[#1a1a1a] rounded-xl p-4 mb-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Voice Settings</h2>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Select
-            label="Voice"
-            options={voiceOptions}
-            value={voice}
-            onChange={(e) => setVoice(e.target.value)}
-          />
-          <Select
-            label="Language"
-            options={languageOptions}
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-          />
-        </div>
-      </Card>
-
-      {/* Tone */}
-      <Card>
-        <h2 className="text-lg font-semibold text-white mb-4">Conversation Tone</h2>
-        <div className="flex gap-3">
-          {toneButtons.map((button) => (
-            <button
-              key={button.value}
-              onClick={() => setTone(button.value)}
-              className={`px-6 py-3 rounded-lg font-medium transition-all ${
-                tone === button.value
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
-                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-              }`}
+          <div>
+            <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">Voice</label>
+            <select
+              value={voice}
+              onChange={(e) => setVoice(e.target.value)}
+              className="w-full bg-gray-50 dark:bg-[#0a0a0a] border border-gray-300 dark:border-[#2a2a2a] rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-400 dark:focus:border-gray-500 focus:outline-none"
             >
-              {button.label}
-            </button>
-          ))}
+              <option value="female-sarah">Female - Sarah</option>
+              <option value="male-james">Male - James</option>
+              <option value="female-emily">Female - Emily</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">Tone</label>
+            <select
+              value={tone}
+              onChange={(e) => setTone(e.target.value)}
+              className="w-full bg-gray-50 dark:bg-[#0a0a0a] border border-gray-300 dark:border-[#2a2a2a] rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-400 dark:focus:border-gray-500 focus:outline-none"
+            >
+              <option value="professional">Professional</option>
+              <option value="friendly">Friendly</option>
+              <option value="casual">Casual</option>
+            </select>
+          </div>
         </div>
-      </Card>
+      </div>
+
+      {/* Language */}
+      <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-[#1a1a1a] rounded-xl p-4 mb-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Language</h2>
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value)}
+          className="w-full bg-gray-50 dark:bg-[#0a0a0a] border border-gray-300 dark:border-[#2a2a2a] rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-400 dark:focus:border-gray-500 focus:outline-none"
+        >
+          <option value="en-uk">English (UK)</option>
+          <option value="en-us">English (US)</option>
+          <option value="tr">Turkish</option>
+          <option value="es">Spanish</option>
+        </select>
+      </div>
 
       {/* Business Description */}
-      <Card>
-        <h2 className="text-lg font-semibold text-white mb-4">Business Description</h2>
-        <Textarea
-          placeholder="Describe your business..."
+      <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-[#1a1a1a] rounded-xl p-4 mb-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Business Description</h2>
+        <p className="text-gray-600 dark:text-gray-500 text-sm mb-3">
+          Tell the AI about your business so it can answer questions accurately.
+        </p>
+        <textarea
           value={businessDescription}
           onChange={(e) => setBusinessDescription(e.target.value)}
-          rows={4}
+          className="w-full bg-gray-50 dark:bg-[#0a0a0a] border border-gray-300 dark:border-[#2a2a2a] rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:border-gray-400 dark:focus:border-gray-500 focus:outline-none resize-none"
+          rows={3}
+          placeholder="We are a plumbing company based in London..."
         />
-        <p className="text-sm text-gray-500 mt-2">
-          Help the AI understand your business to provide better responses
-        </p>
-      </Card>
+      </div>
 
       {/* Services */}
-      <Card>
-        <h2 className="text-lg font-semibold text-white mb-4">Available Services</h2>
-        <div className="space-y-3">
-          <div className="flex gap-2">
-            <Input
-              placeholder="Add a new service..."
+      <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-[#1a1a1a] rounded-xl p-4 mb-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Services</h2>
+        <p className="text-gray-600 dark:text-gray-500 text-sm mb-3">
+          List the services your AI can book appointments for.
+        </p>
+        <div className="space-y-2">
+          {services.map((service, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <input
+                className="flex-1 bg-gray-50 dark:bg-[#0a0a0a] border border-gray-300 dark:border-[#2a2a2a] rounded-lg px-4 py-2 text-gray-900 dark:text-white"
+                value={service}
+                readOnly
+              />
+              <button
+                onClick={() => handleRemoveService(index)}
+                className="p-2 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+          <div className="flex items-center gap-2">
+            <input
+              className="flex-1 bg-gray-50 dark:bg-[#0a0a0a] border border-gray-300 dark:border-[#2a2a2a] rounded-lg px-4 py-2 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600"
               value={newService}
               onChange={(e) => setNewService(e.target.value)}
+              placeholder="New service name"
               onKeyPress={(e) => e.key === 'Enter' && handleAddService()}
             />
-            <Button onClick={handleAddService}>
+            <button
+              onClick={handleAddService}
+              className="flex items-center gap-1.5 px-3 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors"
+            >
               <Plus className="w-4 h-4" />
-            </Button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {services.map((service, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-2 bg-gray-800 px-3 py-2 rounded-lg"
-              >
-                <span className="text-white">{service}</span>
-                <button
-                  onClick={() => handleRemoveService(index)}
-                  className="text-gray-400 hover:text-red-400 transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
+              Add
+            </button>
           </div>
         </div>
-      </Card>
-
-      {/* Booking Rules */}
-      <Card>
-        <h2 className="text-lg font-semibold text-white mb-4">Booking Rules</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="Minimum Notice (hours)"
-            type="number"
-            value={minNotice}
-            onChange={(e) => setMinNotice(e.target.value)}
-            placeholder="2"
-          />
-          <Input
-            label="Max Appointments per Day"
-            type="number"
-            value={maxPerDay}
-            onChange={(e) => setMaxPerDay(e.target.value)}
-            placeholder="10"
-          />
-        </div>
-        <p className="text-sm text-gray-500 mt-3">
-          Set minimum notice period and daily appointment limits for automatic booking
-        </p>
-      </Card>
+      </div>
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button onClick={handleSave} size="lg">
-          <Save className="w-4 h-4 mr-2" />
-          Save Settings
-        </Button>
+        <button
+          onClick={handleSave}
+          className="bg-gray-900 dark:bg-white text-white dark:text-black font-medium px-3 py-1.5 text-sm rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+        >
+          Save Changes
+        </button>
       </div>
     </div>
   );

@@ -13,6 +13,9 @@ export default {
           900: '#1a1a1a',
         },
       },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
     },
   },
   plugins: [],

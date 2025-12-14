@@ -74,16 +74,16 @@ export default function Business() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Business Settings</h1>
-        <p className="text-gray-400 mt-1">Manage your business information and operating hours</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Business Settings</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your business information and operating hours</p>
       </div>
 
       {/* Basic Information */}
-      <Card>
-        <h2 className="text-lg font-semibold text-white mb-4">Basic Information</h2>
+      <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-[#1a1a1a] rounded-xl p-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Basic Information</h2>
         <div className="space-y-4">
           <Input
             label="Business Name"
@@ -105,19 +105,19 @@ export default function Business() {
             rows={2}
           />
         </div>
-      </Card>
+      </div>
 
       {/* Working Hours */}
-      <Card>
-        <div className="flex items-center gap-2 mb-4">
-          <Clock className="w-5 h-5 text-blue-400" />
-          <h2 className="text-lg font-semibold text-white">Working Hours</h2>
+      <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-[#1a1a1a] rounded-xl p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Clock className="w-5 h-5 text-gray-600 dark:text-gray-400" strokeWidth={1.5} />
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Working Hours</h2>
         </div>
         <div className="space-y-3">
           {daysOfWeek.map(({ key, label }) => (
             <div
               key={key}
-              className="flex items-center gap-4 p-3 bg-gray-800/30 rounded-lg"
+              className="flex items-center gap-4 p-3 bg-gray-100 dark:bg-gray-800/30 rounded-lg"
             >
               <div className="flex items-center min-w-[120px]">
                 <input
@@ -125,9 +125,9 @@ export default function Business() {
                   id={`day-${key}`}
                   checked={workingHours[key].enabled}
                   onChange={(e) => handleHoursChange(key, 'enabled', e.target.checked)}
-                  className="w-4 h-4 bg-gray-700 border-gray-600 rounded text-blue-600 focus:ring-blue-500 focus:ring-2"
+                  className="w-4 h-4 bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white focus:ring-gray-400 dark:focus:ring-gray-500 focus:ring-2"
                 />
-                <label htmlFor={`day-${key}`} className="ml-2 text-white font-medium">
+                <label htmlFor={`day-${key}`} className="ml-2 text-gray-900 dark:text-white font-medium">
                   {label}
                 </label>
               </div>
@@ -137,44 +137,47 @@ export default function Business() {
                     type="time"
                     value={workingHours[key].start}
                     onChange={(e) => handleHoursChange(key, 'start', e.target.value)}
-                    className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500"
                   />
-                  <span className="text-gray-400">to</span>
+                  <span className="text-gray-500 dark:text-gray-400">to</span>
                   <input
                     type="time"
                     value={workingHours[key].end}
                     onChange={(e) => handleHoursChange(key, 'end', e.target.value)}
-                    className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500"
                   />
                 </div>
               ) : (
-                <span className="text-gray-500 text-sm">Closed</span>
+                <span className="text-gray-500 dark:text-gray-500 text-sm">Closed</span>
               )}
             </div>
           ))}
         </div>
-      </Card>
+      </div>
 
       {/* Timezone */}
-      <Card>
-        <h2 className="text-lg font-semibold text-white mb-4">Timezone</h2>
+      <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-[#1a1a1a] rounded-xl p-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Timezone</h2>
         <Select
           label="Select your timezone"
           options={timezoneOptions}
           value={timezone}
           onChange={(e) => setTimezone(e.target.value)}
         />
-        <p className="text-sm text-gray-500 mt-2">
+        <p className="text-sm text-gray-600 dark:text-gray-500 mt-2">
           This timezone will be used for scheduling appointments and displaying call times
         </p>
-      </Card>
+      </div>
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button onClick={handleSave} size="lg">
-          <Save className="w-4 h-4 mr-2" />
+        <button
+          onClick={handleSave}
+          className="flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-black font-medium px-3 py-1.5 text-sm rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+        >
+          <Save className="w-4 h-4" />
           Save Settings
-        </Button>
+        </button>
       </div>
     </div>
   );

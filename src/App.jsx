@@ -1,9 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/auth/Login';
-import { Register } from './pages/auth/Register';
+import Signup from './pages/auth/Signup';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import { Onboarding } from './pages/onboarding/Onboarding';
 import Layout from './components/Layout';
+import { AuthLayout } from './layouts/AuthLayout';
 
 // Dashboard pages
 import Overview from './pages/dashboard/Overview';
@@ -51,7 +52,19 @@ function App() {
           path="/auth/login"
           element={
             <AuthRoute>
-              <Login />
+              <AuthLayout>
+                <Login />
+              </AuthLayout>
+            </AuthRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <AuthRoute>
+              <AuthLayout>
+                <Login />
+              </AuthLayout>
             </AuthRoute>
           }
         />
@@ -59,7 +72,19 @@ function App() {
           path="/auth/register"
           element={
             <AuthRoute>
-              <Register />
+              <AuthLayout>
+                <Signup />
+              </AuthLayout>
+            </AuthRoute>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <AuthRoute>
+              <AuthLayout>
+                <Signup />
+              </AuthLayout>
             </AuthRoute>
           }
         />
@@ -67,7 +92,19 @@ function App() {
           path="/auth/forgot-password"
           element={
             <AuthRoute>
-              <ForgotPassword />
+              <AuthLayout>
+                <ForgotPassword />
+              </AuthLayout>
+            </AuthRoute>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <AuthRoute>
+              <AuthLayout>
+                <ForgotPassword />
+              </AuthLayout>
             </AuthRoute>
           }
         />

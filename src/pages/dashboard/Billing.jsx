@@ -117,27 +117,30 @@ export default function Billing() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Billing & Subscription</h1>
-        <p className="text-gray-400 mt-1">Manage your plan and payment methods</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Billing & Subscription</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your plan and payment methods</p>
       </div>
 
       {/* Current Plan */}
       <Card>
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h2 className="text-lg font-semibold text-white mb-2">Current Plan</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Current Plan</h2>
             <div className="flex items-center gap-3">
-              <Badge variant="blue">{currentPlan.name}</Badge>
-              <span className="text-2xl font-bold text-white">${currentPlan.price}/mo</span>
+              <Badge variant="default">{currentPlan.name}</Badge>
+              <span className="text-2xl font-bold text-gray-900 dark:text-white">${currentPlan.price}/mo</span>
             </div>
           </div>
-          <Button onClick={() => setIsUpgradeModalOpen(true)}>
-            <TrendingUp className="w-4 h-4 mr-2" />
+          <button
+            onClick={() => setIsUpgradeModalOpen(true)}
+            className="flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-black font-medium px-3 py-1.5 text-sm rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+          >
+            <TrendingUp className="w-4 h-4" />
             Upgrade Plan
-          </Button>
+          </button>
         </div>
 
         <div className="mt-6">
@@ -148,45 +151,45 @@ export default function Billing() {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-800">
+        <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-800">
           <div>
-            <p className="text-sm text-gray-400">Next Billing Date</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Next Billing Date</p>
             <div className="flex items-center gap-2 mt-1">
-              <Calendar className="w-4 h-4 text-gray-400" />
-              <span className="text-white font-medium">{currentPlan.nextBillingDate}</span>
+              <Calendar className="w-4 h-4 text-gray-500 dark:text-gray-400" strokeWidth={1.5} />
+              <span className="text-gray-900 dark:text-white font-medium">{currentPlan.nextBillingDate}</span>
             </div>
           </div>
           <div>
-            <p className="text-sm text-gray-400">Amount Due</p>
-            <span className="text-white font-medium text-lg">${currentPlan.price}.00</span>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Amount Due</p>
+            <span className="text-gray-900 dark:text-white font-medium text-lg">${currentPlan.price}.00</span>
           </div>
         </div>
       </Card>
 
       {/* Payment Method */}
       <Card>
-        <h2 className="text-lg font-semibold text-white mb-4">Payment Method</h2>
-        <div className="flex items-center justify-between bg-gray-800/50 rounded-lg p-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Payment Method</h2>
+        <div className="flex items-center justify-between bg-gray-100 dark:bg-gray-800/50 rounded-lg p-4">
           <div className="flex items-center gap-4">
-            <div className="bg-gray-700 p-3 rounded-lg">
-              <CreditCard className="w-6 h-6 text-gray-300" />
+            <div className="bg-gray-200 dark:bg-gray-700 p-3 rounded-lg">
+              <CreditCard className="w-6 h-6 text-gray-600 dark:text-gray-300" strokeWidth={1.5} />
             </div>
             <div>
-              <p className="text-white font-medium">
+              <p className="text-gray-900 dark:text-white font-medium">
                 {paymentMethod.type} ending in {paymentMethod.last4}
               </p>
-              <p className="text-sm text-gray-400">Expires {paymentMethod.expiry}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Expires {paymentMethod.expiry}</p>
             </div>
           </div>
-          <Button variant="outline" size="sm">
+          <button className="border border-gray-300 dark:border-[#2a2a2a] text-gray-700 dark:text-gray-300 px-3 py-1.5 text-sm rounded-lg hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
             Update
-          </Button>
+          </button>
         </div>
       </Card>
 
       {/* Billing History */}
       <div>
-        <h2 className="text-lg font-semibold text-white mb-4">Billing History</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Billing History</h2>
         <DataTable columns={columns} data={billingHistory} />
       </div>
 
@@ -203,15 +206,15 @@ export default function Billing() {
               key={plan.name}
               className={`relative ${
                 plan.popular
-                  ? 'border-blue-500 shadow-lg shadow-blue-500/20'
+                  ? 'border-gray-400 dark:border-gray-600 shadow-lg'
                   : plan.isCurrent
-                  ? 'border-green-500'
+                  ? 'border-gray-400 dark:border-green-500'
                   : ''
               }`}
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <Badge variant="blue">POPULAR</Badge>
+                  <Badge variant="default">POPULAR</Badge>
                 </div>
               )}
               {plan.isCurrent && (
@@ -221,30 +224,33 @@ export default function Billing() {
               )}
 
               <div className="text-center mb-6">
-                <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{plan.name}</h3>
                 <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-4xl font-bold text-white">${plan.price}</span>
-                  <span className="text-gray-400">/month</span>
+                  <span className="text-4xl font-bold text-gray-900 dark:text-white">${plan.price}</span>
+                  <span className="text-gray-600 dark:text-gray-400">/month</span>
                 </div>
-                <p className="text-sm text-gray-400 mt-2">{plan.minutes} minutes included</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{plan.minutes} minutes included</p>
               </div>
 
               <div className="space-y-3 mb-6">
                 {plan.features.map((feature, index) => (
                   <div key={index} className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-300 text-sm">{feature}</span>
+                    <Check className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" strokeWidth={1.5} />
+                    <span className="text-gray-700 dark:text-gray-300 text-sm">{feature}</span>
                   </div>
                 ))}
               </div>
 
-              <Button
-                variant={plan.isCurrent ? 'secondary' : plan.popular ? 'primary' : 'outline'}
-                className="w-full"
+              <button
+                className={`w-full px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                  plan.isCurrent
+                    ? 'bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-600 cursor-not-allowed'
+                    : 'bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200'
+                }`}
                 disabled={plan.isCurrent}
               >
                 {plan.isCurrent ? 'Current Plan' : 'Upgrade'}
-              </Button>
+              </button>
             </Card>
           ))}
         </div>

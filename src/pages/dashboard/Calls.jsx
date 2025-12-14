@@ -110,9 +110,9 @@ export default function Calls() {
       header: 'Status',
       accessor: 'status',
       render: (row) => (
-        <Badge variant={row.status === 'completed' ? 'green' : row.status === 'missed' ? 'red' : 'yellow'}>
+        <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-400 text-xs font-medium rounded">
           {row.status}
-        </Badge>
+        </span>
       ),
     },
     { header: 'Outcome', accessor: 'outcome' },
@@ -120,7 +120,7 @@ export default function Calls() {
     {
       header: 'Actions',
       render: (row) => (
-        <button className="text-gray-400 hover:text-white">
+        <button className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
           <MoreVertical className="w-5 h-5" />
         </button>
       ),
@@ -138,12 +138,11 @@ export default function Calls() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6">
       {/* Header with Filter */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Call History</h1>
-          <p className="text-gray-400 mt-1">Review and analyze your call activity</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Calls</h1>
         </div>
         <Select
           options={dateOptions}
@@ -154,28 +153,27 @@ export default function Calls() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard
-          title="Total Calls"
-          value="45"
-          change="+12%"
-          trend="up"
-          icon={Phone}
-        />
-        <StatCard
-          title="Avg Duration"
-          value="3:25"
-          change="+5%"
-          trend="up"
-          icon={Clock}
-        />
-        <StatCard
-          title="Success Rate"
-          value="87%"
-          change="+3%"
-          trend="up"
-          icon={TrendingUp}
-        />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Total Calls */}
+        <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-[#1a1a1a] rounded-xl p-4">
+          <p className="text-sm text-gray-600 dark:text-gray-500 mb-2">Total Calls</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">15</p>
+          <p className="text-sm text-gray-500 dark:text-gray-600">+12%</p>
+        </div>
+
+        {/* Avg Duration */}
+        <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-[#1a1a1a] rounded-xl p-4">
+          <p className="text-sm text-gray-600 dark:text-gray-500 mb-2">Avg Duration</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">3:24</p>
+          <p className="text-sm text-gray-500 dark:text-gray-600">+5%</p>
+        </div>
+
+        {/* Success Rate */}
+        <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-[#1a1a1a] rounded-xl p-4">
+          <p className="text-sm text-gray-600 dark:text-gray-500 mb-2">Success Rate</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">94%</p>
+          <p className="text-sm text-gray-500 dark:text-gray-600">+3%</p>
+        </div>
       </div>
 
       {/* Calls Table */}
@@ -216,17 +214,17 @@ export default function Calls() {
                 <p className="text-white font-medium">{selectedCall.datetime}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-400">Status</p>
-                <Badge variant={selectedCall.status === 'completed' ? 'green' : selectedCall.status === 'missed' ? 'red' : 'yellow'}>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Status</p>
+                <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-400 text-xs font-medium rounded">
                   {selectedCall.status}
-                </Badge>
+                </span>
               </div>
             </div>
 
             {/* AI Summary */}
-            <Card className="bg-blue-900/20 border-blue-800">
-              <h3 className="text-sm font-semibold text-blue-400 mb-2">AI Summary</h3>
-              <p className="text-gray-300">{selectedCall.summary}</p>
+            <Card className="bg-gray-100 dark:bg-gray-800/50 border-gray-200 dark:border-gray-800">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-400 mb-2">AI Summary</h3>
+              <p className="text-gray-700 dark:text-gray-300">{selectedCall.summary}</p>
             </Card>
 
             {/* Transcript */}

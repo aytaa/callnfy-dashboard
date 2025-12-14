@@ -115,9 +115,9 @@ export default function Customers() {
       header: 'Status',
       accessor: 'status',
       render: (row) => (
-        <Badge variant={row.status === 'active' ? 'green' : row.status === 'new' ? 'blue' : 'default'}>
+        <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-400 text-xs font-medium rounded">
           {row.status}
-        </Badge>
+        </span>
       ),
     },
   ];
@@ -133,13 +133,13 @@ export default function Customers() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Customers</h1>
-          <p className="text-gray-400 mt-1">Manage and view customer information</p>
-        </div>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Customers</h1>
+        <button className="bg-gray-900 dark:bg-white text-white dark:text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors">
+          Add Customer
+        </button>
       </div>
 
       {/* Search Bar */}
@@ -170,9 +170,12 @@ export default function Customers() {
         size="lg"
         footer={
           <>
-            <Button variant="secondary" onClick={closeModal}>
+            <button
+              onClick={closeModal}
+              className="border border-gray-300 dark:border-[#2a2a2a] text-gray-700 dark:text-gray-300 px-3 py-1.5 text-sm rounded-lg hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+            >
               Close
-            </Button>
+            </button>
           </>
         }
       >
@@ -187,9 +190,9 @@ export default function Customers() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-400 mb-1">Status</p>
-                  <Badge variant={selectedCustomer.status === 'active' ? 'green' : selectedCustomer.status === 'new' ? 'blue' : 'default'}>
+                  <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-400 text-xs font-medium rounded">
                     {selectedCustomer.status}
-                  </Badge>
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-gray-400" />
@@ -258,17 +261,9 @@ export default function Customers() {
                             {appointment.date} at {appointment.time}
                           </p>
                         </div>
-                        <Badge
-                          variant={
-                            appointment.status === 'confirmed'
-                              ? 'green'
-                              : appointment.status === 'completed'
-                              ? 'blue'
-                              : 'yellow'
-                          }
-                        >
+                        <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-400 text-xs font-medium rounded">
                           {appointment.status}
-                        </Badge>
+                        </span>
                       </div>
                     </Card>
                   ))

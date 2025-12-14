@@ -167,21 +167,20 @@ export default function Appointments() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Appointments</h1>
-          <p className="text-gray-400 mt-1">Manage your scheduled appointments</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Appointments</h1>
         </div>
         <div className="flex gap-3">
-          <div className="flex bg-gray-800 rounded-lg p-1">
+          <div className="flex bg-gray-100 dark:bg-[#1a1a1a] rounded-lg p-1">
             <button
               onClick={() => setView('calendar')}
               className={`px-4 py-2 rounded-md transition-colors ${
                 view === 'calendar'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-400 hover:text-white'
+                  ? 'bg-white dark:bg-[#2a2a2a] text-gray-900 dark:text-white'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               <CalendarIcon className="w-4 h-4" />
@@ -190,17 +189,20 @@ export default function Appointments() {
               onClick={() => setView('list')}
               className={`px-4 py-2 rounded-md transition-colors ${
                 view === 'list'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-400 hover:text-white'
+                  ? 'bg-white dark:bg-[#2a2a2a] text-gray-900 dark:text-white'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               <List className="w-4 h-4" />
             </button>
           </div>
-          <Button onClick={() => setIsModalOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
             Add Appointment
-          </Button>
+          </button>
         </div>
       </div>
 
@@ -236,15 +238,15 @@ export default function Appointments() {
             {getDaysInMonth(currentDate).map((day, index) => (
               <div
                 key={index}
-                className={`aspect-square p-2 border border-gray-800 rounded-lg ${
-                  day ? 'bg-gray-800/30 hover:bg-gray-800 cursor-pointer' : ''
-                } ${day === 14 ? 'border-blue-500' : ''}`}
+                className={`aspect-square p-2 border rounded-lg ${
+                  day ? 'border-gray-700 dark:border-gray-800 bg-gray-100 dark:bg-gray-800/30 hover:bg-gray-200 dark:hover:bg-gray-800 cursor-pointer' : 'border-transparent'
+                } ${day === 14 ? 'border-gray-900 dark:border-white' : ''}`}
               >
                 {day && (
                   <>
-                    <div className="text-sm text-white mb-1">{day}</div>
+                    <div className="text-sm text-gray-900 dark:text-white mb-1">{day}</div>
                     {hasAppointment(day) && (
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mx-auto" />
+                      <div className="w-2 h-2 bg-gray-900 dark:bg-white rounded-full mx-auto" />
                     )}
                   </>
                 )}
@@ -269,12 +271,18 @@ export default function Appointments() {
         title="Add New Appointment"
         footer={
           <>
-            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="border border-gray-300 dark:border-[#2a2a2a] text-gray-700 dark:text-gray-300 px-3 py-1.5 text-sm rounded-lg hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+            >
               Cancel
-            </Button>
-            <Button onClick={handleSubmit}>
+            </button>
+            <button
+              onClick={handleSubmit}
+              className="bg-gray-900 dark:bg-white text-white dark:text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+            >
               Create Appointment
-            </Button>
+            </button>
           </>
         }
       >

@@ -1,148 +1,178 @@
-import React, { useState } from 'react';
-import { Phone, Save, Plus } from 'lucide-react';
-import Card from '../../components/Card';
-import Button from '../../components/Button';
-import Input from '../../components/Input';
-import Toggle from '../../components/Toggle';
-import Badge from '../../components/Badge';
+import { useState } from 'react';
+import { Phone, Plus, Eye, Copy, Trash2, Check } from 'lucide-react';
 
 export default function PhoneNumbers() {
-  const [currentNumber, setCurrentNumber] = useState('+1 (555) 123-4567');
-  const [forwardTo, setForwardTo] = useState('+1 (555) 987-6543');
-  const [callRecording, setCallRecording] = useState(true);
-  const [voicemailEnabled, setVoicemailEnabled] = useState(true);
-  const [transcriptionEnabled, setTranscriptionEnabled] = useState(true);
+  const [copiedId, setCopiedId] = useState(null);
 
-  const handleSave = () => {
-    console.log('Saving phone settings:', {
-      currentNumber,
-      forwardTo,
-      callRecording,
-      voicemailEnabled,
-      transcriptionEnabled,
-    });
-    alert('Settings saved successfully!');
+  // Mock phone numbers data
+  const phoneNumbers = [
+    {
+      id: 1,
+      number: '+1 (555) 123-4567',
+      name: 'Main Reception',
+      status: 'active',
+      monthlyMinutes: 245,
+      totalCalls: 89,
+      createdAt: 'Nov 1, 2025',
+    },
+    {
+      id: 2,
+      number: '+1 (555) 987-6543',
+      name: 'Customer Support',
+      status: 'active',
+      monthlyMinutes: 178,
+      totalCalls: 52,
+      createdAt: 'Nov 15, 2025',
+    },
+  ];
+
+  const handleCopy = (number, id) => {
+    navigator.clipboard.writeText(number);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleGetNewNumber = () => {
-    alert('Get new number feature coming soon!');
+  const handleView = (id) => {
+    console.log('View details for phone number:', id);
+  };
+
+  const handleDelete = (id) => {
+    console.log('Delete phone number:', id);
+  };
+
+  const handleAddNumber = () => {
+    console.log('Add new phone number');
   };
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="max-w-5xl mx-auto">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-white">Phone Numbers</h1>
-        <p className="text-gray-400 mt-1">Manage your phone numbers and call settings</p>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Phone Numbers</h1>
+          <p className="text-gray-600 dark:text-gray-500 text-sm mt-1">
+            Manage your AI receptionist phone numbers
+          </p>
+        </div>
+        <button
+          onClick={handleAddNumber}
+          className="flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-black font-medium px-3 py-1.5 text-sm rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          Add Number
+        </button>
       </div>
 
-      {/* Current Number */}
-      <Card>
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <h2 className="text-lg font-semibold text-white mb-2">Current Number</h2>
-            <div className="flex items-center gap-3">
-              <Phone className="w-5 h-5 text-blue-400" />
-              <span className="text-2xl font-bold text-white">{currentNumber}</span>
-            </div>
-          </div>
-          <Badge variant="green">Active</Badge>
-        </div>
-        <div className="bg-gray-800/50 rounded-lg p-4 mt-4">
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <p className="text-gray-400">Status</p>
-              <p className="text-white font-medium">Active</p>
-            </div>
-            <div>
-              <p className="text-gray-400">Type</p>
-              <p className="text-white font-medium">AI-Powered</p>
-            </div>
-            <div>
-              <p className="text-gray-400">Monthly Cost</p>
-              <p className="text-white font-medium">$15/month</p>
-            </div>
-            <div>
-              <p className="text-gray-400">Activated</p>
-              <p className="text-white font-medium">Nov 1, 2025</p>
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      {/* Call Forwarding */}
-      <Card>
-        <h2 className="text-lg font-semibold text-white mb-4">Call Forwarding</h2>
-        <Input
-          label="Forward calls to"
-          type="tel"
-          value={forwardTo}
-          onChange={(e) => setForwardTo(e.target.value)}
-          placeholder="+1 (555) 000-0000"
-        />
-        <p className="text-sm text-gray-500 mt-2">
-          When AI cannot handle a call, it will be forwarded to this number
-        </p>
-      </Card>
-
-      {/* Call Settings */}
-      <Card>
-        <h2 className="text-lg font-semibold text-white mb-4">Call Settings</h2>
+      {/* Phone Number Cards */}
+      {phoneNumbers.length > 0 ? (
         <div className="space-y-4">
-          <div className="flex items-center justify-between py-3 border-b border-gray-800">
-            <div>
-              <h3 className="text-white font-medium">Call Recording</h3>
-              <p className="text-sm text-gray-400">Record all incoming calls for quality and training</p>
-            </div>
-            <Toggle
-              checked={callRecording}
-              onChange={setCallRecording}
-            />
-          </div>
+          {phoneNumbers.map((phone) => (
+            <div
+              key={phone.id}
+              className="bg-white dark:bg-[#111] border border-gray-200 dark:border-[#1a1a1a] rounded-xl p-4"
+            >
+              <div className="flex items-start justify-between">
+                {/* Left side - Number info */}
+                <div className="flex items-start gap-3 flex-1">
+                  <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1a1a1a] flex items-center justify-center">
+                    <Phone className="w-5 h-5 text-gray-600 dark:text-gray-400" strokeWidth={1.5} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-1">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {phone.number}
+                      </h3>
+                      <span
+                        className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                          phone.status === 'active'
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                            : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+                        }`}
+                      >
+                        {phone.status}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{phone.name}</p>
 
-          <div className="flex items-center justify-between py-3 border-b border-gray-800">
-            <div>
-              <h3 className="text-white font-medium">Voicemail</h3>
-              <p className="text-sm text-gray-400">Enable voicemail for missed or declined calls</p>
-            </div>
-            <Toggle
-              checked={voicemailEnabled}
-              onChange={setVoicemailEnabled}
-            />
-          </div>
+                    {/* Stats */}
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-600 mb-1">Total Calls</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                          {phone.totalCalls}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-600 mb-1">Monthly Minutes</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                          {phone.monthlyMinutes}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-600 mb-1">Created</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                          {phone.createdAt}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-          <div className="flex items-center justify-between py-3">
-            <div>
-              <h3 className="text-white font-medium">Call Transcription</h3>
-              <p className="text-sm text-gray-400">Automatically transcribe all call recordings</p>
+                {/* Right side - Action icons */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleView(phone.id)}
+                    className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#1a1a1a] rounded-lg transition-colors"
+                    title="View details"
+                  >
+                    <Eye className="w-4 h-4" strokeWidth={1.5} />
+                  </button>
+                  <button
+                    onClick={() => handleCopy(phone.number, phone.id)}
+                    className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#1a1a1a] rounded-lg transition-colors"
+                    title="Copy number"
+                  >
+                    {copiedId === phone.id ? (
+                      <Check className="w-4 h-4 text-green-600 dark:text-green-400" strokeWidth={1.5} />
+                    ) : (
+                      <Copy className="w-4 h-4" strokeWidth={1.5} />
+                    )}
+                  </button>
+                  <button
+                    onClick={() => handleDelete(phone.id)}
+                    className="p-2 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-[#1a1a1a] rounded-lg transition-colors"
+                    title="Delete number"
+                  >
+                    <Trash2 className="w-4 h-4" strokeWidth={1.5} />
+                  </button>
+                </div>
+              </div>
             </div>
-            <Toggle
-              checked={transcriptionEnabled}
-              onChange={setTranscriptionEnabled}
-            />
+          ))}
+        </div>
+      ) : (
+        /* Empty State */
+        <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-[#1a1a1a] rounded-xl p-12">
+          <div className="flex flex-col items-center justify-center text-center">
+            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-[#1a1a1a] flex items-center justify-center mb-4">
+              <Phone className="w-8 h-8 text-gray-400 dark:text-gray-600" strokeWidth={1.5} />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+              No phone numbers yet
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-500 mb-6">
+              Get started by adding your first AI-powered phone number
+            </p>
+            <button
+              onClick={handleAddNumber}
+              className="flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-black font-medium px-3 py-1.5 text-sm rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Add Number
+            </button>
           </div>
         </div>
-      </Card>
-
-      {/* Get New Number */}
-      <Card>
-        <h2 className="text-lg font-semibold text-white mb-2">Need Another Number?</h2>
-        <p className="text-gray-400 mb-4">
-          Add additional phone numbers to your account for different departments or locations.
-        </p>
-        <Button variant="outline" onClick={handleGetNewNumber}>
-          <Plus className="w-4 h-4 mr-2" />
-          Get New Number
-        </Button>
-      </Card>
-
-      {/* Save Button */}
-      <div className="flex justify-end">
-        <Button onClick={handleSave} size="lg">
-          <Save className="w-4 h-4 mr-2" />
-          Save Settings
-        </Button>
-      </div>
+      )}
     </div>
   );
 }

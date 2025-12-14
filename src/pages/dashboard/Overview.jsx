@@ -1,13 +1,13 @@
 import React from 'react';
-import { Phone, Clock, Calendar, Users, TrendingUp } from 'lucide-react';
-import StatCard from '../../components/StatCard';
-import Card from '../../components/Card';
-import ProgressBar from '../../components/ProgressBar';
+import { Phone, TrendingUp } from 'lucide-react';
 import DataTable from '../../components/DataTable';
-import Badge from '../../components/Badge';
+import Card from '../../components/Card';
 
 export default function Overview() {
-  const userName = 'John';
+  // Get user data from localStorage
+  const user = JSON.parse(localStorage.getItem('user') || '{" email":"aytac@callnfy.com","name":"Aytac"}');
+  const userName = user.name || 'User';
+  const userEmail = user.email || 'aytac@callnfy.com';
 
   // Mock data for recent calls
   const recentCalls = [
@@ -94,9 +94,9 @@ export default function Overview() {
       header: 'Status',
       accessor: 'status',
       render: (row) => (
-        <Badge variant={row.status === 'completed' ? 'green' : row.status === 'missed' ? 'red' : 'yellow'}>
+        <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
           {row.status}
-        </Badge>
+        </span>
       ),
     },
     { header: 'Outcome', accessor: 'outcome' },
@@ -104,91 +104,119 @@ export default function Overview() {
   ];
 
   return (
-    <div className="space-y-8">
-      {/* Welcome Message */}
-      <div>
-        <h1 className="text-3xl font-bold text-white">Welcome back, {userName}!</h1>
-        <p className="text-gray-400 mt-2">Here's what's happening with your calls today.</p>
-      </div>
+    <div className="p-6">
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Welcome Section */}
+        <div>
+          <p className="text-gray-500 text-sm mb-1">{userEmail}'s Org</p>
+          <h1 className="text-3xl font-bold text-white">Welcome {userName}</h1>
+        </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          title="Today's Calls"
-          value="45"
-          change="+12%"
-          trend="up"
-          icon={Phone}
-        />
-        <Card>
+        {/* Metrics Section */}
+        <div>
           <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-sm text-gray-400">Minutes Used</p>
-              <p className="text-2xl font-bold text-white mt-1">125/150</p>
-            </div>
-            <div className="bg-gray-800 p-3 rounded-lg">
-              <Clock className="w-6 h-6 text-blue-400" />
+            <h2 className="text-lg font-semibold text-white">Metrics</h2>
+            <div className="flex gap-2">
+              <button className="px-3 py-1.5 text-sm border border-[#2a2a2a] rounded-lg text-gray-400 hover:border-[#3a3a3a] hover:text-gray-300 transition-colors">
+                All Assistants
+              </button>
+              <button className="px-3 py-1.5 text-sm border border-[#2a2a2a] rounded-lg text-gray-400 hover:border-[#3a3a3a] hover:text-gray-300 transition-colors">
+                Last Month
+              </button>
             </div>
           </div>
-          <ProgressBar current={125} max={150} showPercentage={false} />
-        </Card>
-        <StatCard
-          title="Appointments"
-          value="8"
-          icon={Calendar}
-        />
-        <StatCard
-          title="New Customers"
-          value="12"
-          change="+8%"
-          trend="up"
-          icon={Users}
-        />
-      </div>
 
-      {/* Recent Calls Table */}
-      <div>
-        <h2 className="text-xl font-semibold text-white mb-4">Recent Calls</h2>
-        <DataTable
-          columns={callsColumns}
-          data={recentCalls}
-        />
-      </div>
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Card 1: Today's Calls */}
+            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+              <p className="text-sm text-gray-500 mb-2">Today's Calls</p>
+              <p className="text-2xl font-bold text-white mb-1">0</p>
+              <p className="text-sm text-gray-600">— 0.0%</p>
+            </div>
 
-      {/* Upcoming Appointments */}
-      <div>
-        <h2 className="text-xl font-semibold text-white mb-4">Upcoming Appointments</h2>
-        <div className="grid gap-4">
-          {upcomingAppointments.map((appointment) => (
-            <Card key={appointment.id}>
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-semibold text-white">{appointment.customer}</h3>
-                    <Badge variant={appointment.status === 'confirmed' ? 'green' : 'yellow'}>
-                      {appointment.status}
-                    </Badge>
+            {/* Card 2: Minutes Used */}
+            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+              <p className="text-sm text-gray-500 mb-2">Minutes Used</p>
+              <p className="text-2xl font-bold text-white mb-1">0:00</p>
+              <p className="text-sm text-gray-600">— 0.0%</p>
+            </div>
+
+            {/* Card 3: Appointments */}
+            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+              <p className="text-sm text-gray-500 mb-2">Appointments</p>
+              <p className="text-2xl font-bold text-white mb-1">0</p>
+              <p className="text-sm text-gray-600">— 0.0%</p>
+            </div>
+
+            {/* Card 4: New Customers */}
+            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+              <p className="text-sm text-gray-500 mb-2">New Customers</p>
+              <p className="text-2xl font-bold text-white mb-1">0</p>
+              <p className="text-sm text-gray-600">— 0.0%</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Call Success Section */}
+        <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-white">Call Success</h3>
+            <span className="text-2xl font-bold text-white">--</span>
+          </div>
+          <div className="flex flex-col items-center justify-center py-8">
+            <div className="w-16 h-16 rounded-full bg-[#1a1a1a] flex items-center justify-center mb-4">
+              <Phone className="w-8 h-8 text-gray-500" strokeWidth={1.5} />
+            </div>
+            <p className="text-white font-semibold mb-1">Oops...</p>
+            <p className="text-sm text-gray-500">You don't have any calls yet</p>
+          </div>
+        </div>
+
+        {/* Recent Calls Table */}
+        <div>
+          <h2 className="text-xl font-semibold text-white mb-4">Recent Calls</h2>
+          <DataTable
+            columns={callsColumns}
+            data={recentCalls}
+          />
+        </div>
+
+        {/* Upcoming Appointments */}
+        <div>
+          <h2 className="text-xl font-semibold text-white mb-4">Upcoming Appointments</h2>
+          <div className="grid gap-4">
+            {upcomingAppointments.map((appointment) => (
+              <Card key={appointment.id}>
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-lg font-semibold text-white">{appointment.customer}</h3>
+                      <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
+                        {appointment.status}
+                      </span>
+                    </div>
+                    <p className="text-gray-400">{appointment.service}</p>
                   </div>
-                  <p className="text-gray-400">{appointment.service}</p>
+                  <div className="text-right">
+                    <p className="text-white font-medium">{appointment.date}</p>
+                    <p className="text-gray-400 text-sm">{appointment.time}</p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-white font-medium">{appointment.date}</p>
-                  <p className="text-gray-400 text-sm">{appointment.time}</p>
-                </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Chart Placeholder */}
-      <Card>
-        <div className="text-center py-12">
-          <TrendingUp className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-400">Call Success Chart - Coming Soon</h3>
-          <p className="text-gray-500 mt-2">Advanced analytics and visualizations will be available here.</p>
-        </div>
-      </Card>
+        {/* Chart Placeholder */}
+        <Card>
+          <div className="text-center py-12">
+            <TrendingUp className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-400">Call Success Chart - Coming Soon</h3>
+            <p className="text-gray-500 mt-2">Advanced analytics and visualizations will be available here.</p>
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }
