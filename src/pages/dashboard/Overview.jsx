@@ -94,7 +94,7 @@ export default function Overview() {
       header: 'Status',
       accessor: 'status',
       render: (row) => (
-        <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
+        <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded">
           {row.status}
         </span>
       ),
@@ -192,15 +192,15 @@ export default function Overview() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-lg font-semibold text-white">{appointment.customer}</h3>
-                      <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
+                      <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded">
                         {appointment.status}
                       </span>
                     </div>
-                    <p className="text-gray-400">{appointment.service}</p>
+                    <p className="text-white opacity-60">{appointment.service}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-white font-medium">{appointment.date}</p>
-                    <p className="text-gray-400 text-sm">{appointment.time}</p>
+                    <p className="text-white opacity-60 text-sm">{appointment.time}</p>
                   </div>
                 </div>
               </Card>
@@ -212,7 +212,7 @@ export default function Overview() {
         <Card>
           <div className="text-center py-12">
             <TrendingUp className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-400">Call Success Chart - Coming Soon</h3>
+            <h3 className="text-lg font-semibold text-white">Call Success Chart - Coming Soon</h3>
             <p className="text-gray-500 mt-2">Advanced analytics and visualizations will be available here.</p>
           </div>
         </Card>

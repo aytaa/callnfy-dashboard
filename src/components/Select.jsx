@@ -19,7 +19,7 @@ export default function Select({
       <select
         value={value}
         onChange={onChange}
-        className={`w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[#3a3a3a] ${className}`}
+        className={`w-full bg-black border border-[#2a2a2a] rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[#3a3a3a] ${className}`}
         {...props}
       >
         {placeholder && <option value="">{placeholder}</option>}

@@ -51,7 +51,7 @@ export default function PhoneNumbers() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-white">Phone Numbers</h1>
-            <p className="text-gray-400 text-sm mt-1">
+            <p className="text-white opacity-60 text-sm mt-1">
               Manage your AI receptionist phone numbers
             </p>
           </div>
@@ -83,11 +83,11 @@ export default function PhoneNumbers() {
                         <h3 className="text-lg font-semibold text-white">
                           {phone.number}
                         </h3>
-                        <span className="px-2 py-0.5 text-xs font-medium bg-[#1a1a1a] text-gray-400 rounded">
+                        <span className="px-2 py-0.5 text-xs font-medium bg-[#1a1a1a] text-white rounded">
                           {phone.status}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-400 mb-3">{phone.name}</p>
+                      <p className="text-sm text-white opacity-60 mb-3">{phone.name}</p>
 
                       {/* Stats */}
                       <div className="grid grid-cols-3 gap-3">
@@ -155,7 +155,7 @@ export default function PhoneNumbers() {
               <h3 className="text-lg font-semibold text-white mb-1">
                 No phone numbers yet
               </h3>
-              <p className="text-sm text-gray-400 mb-6">
+              <p className="text-sm text-white opacity-60 mb-6">
                 Get started by adding your first AI-powered phone number
               </p>
               <button

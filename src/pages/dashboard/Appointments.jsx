@@ -102,7 +102,7 @@ export default function Appointments() {
       header: 'Status',
       accessor: 'status',
       render: (row) => (
-        <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
+        <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded">
           {row.status}
         </span>
       ),
@@ -266,7 +266,7 @@ export default function Appointments() {
             <>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="border border-[#2a2a2a] text-gray-300 px-3 py-1.5 text-sm rounded-lg hover:border-[#3a3a3a] transition-colors"
+                className="border border-[#2a2a2a] text-white px-3 py-1.5 text-sm rounded-lg hover:border-[#3a3a3a] transition-colors"
               >
                 Cancel
               </button>

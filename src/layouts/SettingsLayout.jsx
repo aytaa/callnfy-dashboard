@@ -55,7 +55,11 @@ export default function SettingsLayout() {
 
       {/* Settings Content */}
       <div className="flex-1 overflow-y-auto">
-        <Outlet />
+        <div className="p-6">
+          <div className="max-w-2xl mx-auto">
+            <Outlet />
+          </div>
+        </div>
       </div>
     </div>
   );

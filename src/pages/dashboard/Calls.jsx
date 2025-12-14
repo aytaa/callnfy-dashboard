@@ -110,7 +110,7 @@ export default function Calls() {
       header: 'Status',
       accessor: 'status',
       render: (row) => (
-        <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
+        <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded">
           {row.status}
         </span>
       ),
@@ -215,8 +215,8 @@ export default function Calls() {
                   <p className="text-white font-medium">{selectedCall.datetime}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">Status</p>
-                  <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
+                  <p className="text-sm text-white opacity-60">Status</p>
+                  <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded">
                     {selectedCall.status}
                   </span>
                 </div>
@@ -224,27 +224,27 @@ export default function Calls() {
 
               {/* AI Summary */}
               <div className="bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg p-4">
-                <h3 className="text-sm font-semibold text-gray-400 mb-2">AI Summary</h3>
-                <p className="text-gray-300">{selectedCall.summary}</p>
+                <h3 className="text-sm font-semibold text-white opacity-60 mb-2">AI Summary</h3>
+                <p className="text-white">{selectedCall.summary}</p>
               </div>
 
               {/* Transcript */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-300 mb-2">Transcript</h3>
+                <h3 className="text-sm font-semibold text-white mb-2">Transcript</h3>
                 <div className="bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg p-4 max-h-64 overflow-y-auto">
-                  <p className="text-gray-300 whitespace-pre-wrap">{selectedCall.transcript}</p>
+                  <p className="text-white whitespace-pre-wrap">{selectedCall.transcript}</p>
                 </div>
               </div>
 
               {/* Audio Player Placeholder */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-300 mb-2">Recording</h3>
+                <h3 className="text-sm font-semibold text-white mb-2">Recording</h3>
                 <div className="bg-[#111] border border-[#1a1a1a] rounded-lg p-4 flex items-center justify-center gap-3">
-                  <Play className="w-5 h-5 text-gray-400" />
+                  <Play className="w-5 h-5 text-white opacity-60" />
                   <div className="flex-1 h-2 bg-[#2a2a2a] rounded-full">
                     <div className="w-1/3 h-full bg-white rounded-full" />
                   </div>
-                  <span className="text-sm text-gray-400">{selectedCall.duration}</span>
+                  <span className="text-sm text-white">{selectedCall.duration}</span>
                 </div>
               </div>
             </div>

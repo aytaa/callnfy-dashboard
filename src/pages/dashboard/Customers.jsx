@@ -115,7 +115,7 @@ export default function Customers() {
       header: 'Status',
       accessor: 'status',
       render: (row) => (
-        <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
+        <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded">
           {row.status}
         </span>
       ),
@@ -173,7 +173,7 @@ export default function Customers() {
             <>
               <button
                 onClick={closeModal}
-                className="border border-[#2a2a2a] text-gray-300 px-3 py-1.5 text-sm rounded-lg hover:border-[#3a3a3a] transition-colors"
+                className="border border-[#2a2a2a] text-white px-3 py-1.5 text-sm rounded-lg hover:border-[#3a3a3a] transition-colors"
               >
                 Close
               </button>
@@ -186,35 +186,35 @@ export default function Customers() {
               <div className="bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg p-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-gray-400 mb-1">Name</p>
+                    <p className="text-sm text-white opacity-60 mb-1">Name</p>
                     <p className="text-white font-medium">{selectedCustomer.name}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-400 mb-1">Status</p>
-                    <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
+                    <p className="text-sm text-white opacity-60 mb-1">Status</p>
+                    <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded">
                       {selectedCustomer.status}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-gray-400" />
+                    <Phone className="w-4 h-4 text-white opacity-60" />
                     <div>
-                      <p className="text-sm text-gray-400">Phone</p>
+                      <p className="text-sm text-white opacity-60">Phone</p>
                       <p className="text-white">{selectedCustomer.phone}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-gray-400" />
+                    <Mail className="w-4 h-4 text-white opacity-60" />
                     <div>
-                      <p className="text-sm text-gray-400">Email</p>
+                      <p className="text-sm text-white opacity-60">Email</p>
                       <p className="text-white">{selectedCustomer.email}</p>
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-400">Join Date</p>
+                    <p className="text-sm text-white opacity-60">Join Date</p>
                     <p className="text-white">{selectedCustomer.joinDate}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-400">Total Calls</p>
+                    <p className="text-sm text-white opacity-60">Total Calls</p>
                     <p className="text-white font-semibold">{selectedCustomer.totalCalls}</p>
                   </div>
                 </div>
@@ -233,9 +233,9 @@ export default function Customers() {
                         <div className="flex justify-between items-center">
                           <div>
                             <p className="text-white font-medium">{call.outcome}</p>
-                            <p className="text-sm text-gray-400">{call.date}</p>
+                            <p className="text-sm text-white opacity-60">{call.date}</p>
                           </div>
-                          <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
+                          <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded">
                             {call.duration}
                           </span>
                         </div>
@@ -260,11 +260,11 @@ export default function Customers() {
                         <div className="flex justify-between items-center">
                           <div>
                             <p className="text-white font-medium">{appointment.service}</p>
-                            <p className="text-sm text-gray-400">
+                            <p className="text-sm text-white opacity-60">
                               {appointment.date} at {appointment.time}
                             </p>
                           </div>
-                          <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
+                          <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded">
                             {appointment.status}
                           </span>
                         </div>

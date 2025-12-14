@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
 import { CreditCard, Calendar, TrendingUp, Check } from 'lucide-react';
-import ProgressBar from '../../components/ProgressBar';
-import DataTable from '../../components/DataTable';
-import Modal from '../../components/Modal';
 
 export default function Billing() {
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
@@ -52,213 +49,99 @@ export default function Billing() {
     },
   ];
 
-  const plans = [
-    {
-      name: 'STARTER',
-      price: 49,
-      minutes: 150,
-      features: [
-        '1 Phone Number',
-        'AI Assistant',
-        'Call Recording',
-        'Email Support',
-        'Basic Analytics',
-      ],
-      isCurrent: true,
-    },
-    {
-      name: 'PROFESSIONAL',
-      price: 99,
-      minutes: 500,
-      features: [
-        '3 Phone Numbers',
-        'Advanced AI Assistant',
-        'Call Recording & Transcription',
-        'Priority Support',
-        'Advanced Analytics',
-        'Custom Integrations',
-      ],
-      isCurrent: false,
-      popular: true,
-    },
-    {
-      name: 'ENTERPRISE',
-      price: 249,
-      minutes: 2000,
-      features: [
-        'Unlimited Phone Numbers',
-        'Premium AI Assistant',
-        'Full Call Suite',
-        '24/7 Dedicated Support',
-        'Custom Analytics',
-        'API Access',
-        'White Label Options',
-      ],
-      isCurrent: false,
-    },
-  ];
-
-  const columns = [
-    { header: 'Date', accessor: 'date' },
-    { header: 'Description', accessor: 'description' },
-    { header: 'Amount', accessor: 'amount' },
-    {
-      header: 'Status',
-      accessor: 'status',
-      render: (row) => (
-        <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
-          {row.status}
-        </span>
-      ),
-    },
-  ];
+  const percentage = Math.min((currentPlan.minutesUsed / currentPlan.minutesIncluded) * 100, 100);
 
   return (
-    <div className="p-6 pt-8">
-      <div className="max-w-5xl mx-auto space-y-4">
-        {/* Header */}
-        <div className="mb-4">
-          <h1 className="text-2xl font-bold text-white">Billing & Subscription</h1>
-          <p className="text-gray-400 text-sm mt-1">Manage your plan and payment methods</p>
+    <div>
+      <h1 className="text-lg font-semibold text-white mb-4">Billing & Add-Ons</h1>
+
+      {/* Current Plan */}
+      <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4 mb-4">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <p className="text-white text-sm opacity-60 mb-1">Current Plan</p>
+            <div className="flex items-center gap-2">
+              <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded">
+                {currentPlan.name}
+              </span>
+              <span className="text-xl font-bold text-white">${currentPlan.price}/mo</span>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsUpgradeModalOpen(true)}
+            className="bg-white text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Upgrade
+          </button>
         </div>
 
-        {/* Current Plan */}
-        <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h2 className="text-lg font-semibold text-white mb-2">Current Plan</h2>
-              <div className="flex items-center gap-3">
-                <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
-                  {currentPlan.name}
-                </span>
-                <span className="text-2xl font-bold text-white">${currentPlan.price}/mo</span>
-              </div>
-            </div>
-            <button
-              onClick={() => setIsUpgradeModalOpen(true)}
-              className="flex items-center gap-2 bg-white text-black font-medium px-3 py-1.5 text-sm rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              <TrendingUp className="w-4 h-4" />
-              Upgrade Plan
-            </button>
+        {/* Usage */}
+        <div className="pt-3 border-t border-[#1a1a1a]">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-white text-sm">Minutes Used</span>
+            <span className="text-white text-sm">{currentPlan.minutesUsed}/{currentPlan.minutesIncluded}</span>
           </div>
-
-          <div className="mt-6">
-            <ProgressBar
-              label="Minutes Used"
-              current={currentPlan.minutesUsed}
-              max={currentPlan.minutesIncluded}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-[#1a1a1a]">
-            <div>
-              <p className="text-sm text-gray-400">Next Billing Date</p>
-              <div className="flex items-center gap-2 mt-1">
-                <Calendar className="w-4 h-4 text-gray-400" strokeWidth={1.5} />
-                <span className="text-white font-medium">{currentPlan.nextBillingDate}</span>
-              </div>
-            </div>
-            <div>
-              <p className="text-sm text-gray-400">Amount Due</p>
-              <span className="text-white font-medium text-lg">${currentPlan.price}.00</span>
-            </div>
+          <div className="h-2 bg-[#2a2a2a] rounded-full">
+            <div className="h-2 bg-white rounded-full transition-all duration-300" style={{ width: `${percentage}%` }}></div>
           </div>
         </div>
 
-        {/* Payment Method */}
-        <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
-          <h2 className="text-lg font-semibold text-white mb-4">Payment Method</h2>
-          <div className="flex items-center justify-between bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg p-4">
-            <div className="flex items-center gap-4">
-              <div className="bg-[#1a1a1a] p-3 rounded-lg">
-                <CreditCard className="w-6 h-6 text-gray-400" strokeWidth={1.5} />
-              </div>
-              <div>
-                <p className="text-white font-medium">
-                  {paymentMethod.type} ending in {paymentMethod.last4}
-                </p>
-                <p className="text-sm text-gray-400">Expires {paymentMethod.expiry}</p>
-              </div>
+        <div className="grid grid-cols-2 gap-4 mt-4 pt-3 border-t border-[#1a1a1a]">
+          <div>
+            <p className="text-sm text-white opacity-60">Next Billing Date</p>
+            <div className="flex items-center gap-2 mt-1">
+              <Calendar className="w-4 h-4 text-white opacity-60" strokeWidth={1.5} />
+              <span className="text-white font-medium">{currentPlan.nextBillingDate}</span>
             </div>
-            <button className="border border-[#2a2a2a] text-gray-400 px-3 py-1.5 text-sm rounded-lg hover:border-[#3a3a3a] hover:text-white transition-colors">
-              Update
-            </button>
+          </div>
+          <div>
+            <p className="text-sm text-white opacity-60">Amount Due</p>
+            <span className="text-white font-medium text-lg">${currentPlan.price}.00</span>
           </div>
         </div>
+      </div>
 
-        {/* Billing History */}
-        <div>
-          <h2 className="text-lg font-semibold text-white mb-4">Billing History</h2>
-          <DataTable columns={columns} data={billingHistory} />
+      {/* Payment Method */}
+      <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4 mb-4">
+        <h2 className="text-base font-semibold text-white mb-3">Payment Method</h2>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-[#1a1a1a] p-2 rounded">
+              <CreditCard className="w-4 h-4 text-white" strokeWidth={1.5} />
+            </div>
+            <span className="text-white text-sm">•••• •••• •••• {paymentMethod.last4}</span>
+          </div>
+          <button className="text-white text-sm opacity-60 hover:opacity-100">Update</button>
         </div>
+      </div>
 
-        {/* Upgrade Modal */}
-        <Modal
-          isOpen={isUpgradeModalOpen}
-          onClose={() => setIsUpgradeModalOpen(false)}
-          title="Choose Your Plan"
-          size="xl"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {plans.map((plan) => (
-              <div
-                key={plan.name}
-                className={`relative bg-[#111] border rounded-xl p-4 ${
-                  plan.popular
-                    ? 'border-[#2a2a2a] shadow-lg'
-                    : plan.isCurrent
-                    ? 'border-[#2a2a2a]'
-                    : 'border-[#1a1a1a]'
-                }`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
-                      POPULAR
-                    </span>
-                  </div>
-                )}
-                {plan.isCurrent && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
-                      CURRENT PLAN
-                    </span>
-                  </div>
-                )}
-
-                <div className="text-center mb-6">
-                  <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
-                  <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-4xl font-bold text-white">${plan.price}</span>
-                    <span className="text-gray-400">/month</span>
-                  </div>
-                  <p className="text-sm text-gray-400 mt-2">{plan.minutes} minutes included</p>
-                </div>
-
-                <div className="space-y-3 mb-6">
-                  {plan.features.map((feature, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <Check className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" strokeWidth={1.5} />
-                      <span className="text-gray-300 text-sm">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <button
-                  className={`w-full px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                    plan.isCurrent
-                      ? 'bg-[#1a1a1a] text-gray-500 cursor-not-allowed'
-                      : 'bg-white text-black hover:bg-gray-200'
-                  }`}
-                  disabled={plan.isCurrent}
-                >
-                  {plan.isCurrent ? 'Current Plan' : 'Upgrade'}
-                </button>
-              </div>
+      {/* Billing History */}
+      <div className="bg-[#111] border border-[#1a1a1a] rounded-xl overflow-hidden">
+        <h2 className="text-base font-semibold text-white p-4 pb-3">Billing History</h2>
+        <table className="w-full">
+          <thead className="bg-black">
+            <tr>
+              <th className="px-4 py-2 text-left text-xs text-gray-400 uppercase tracking-wider">Date</th>
+              <th className="px-4 py-2 text-left text-xs text-gray-400 uppercase tracking-wider">Description</th>
+              <th className="px-4 py-2 text-left text-xs text-gray-400 uppercase tracking-wider">Amount</th>
+              <th className="px-4 py-2 text-left text-xs text-gray-400 uppercase tracking-wider">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {billingHistory.map((row) => (
+              <tr key={row.id} className="border-t border-[#1a1a1a]">
+                <td className="px-4 py-3 text-white text-sm">{row.date}</td>
+                <td className="px-4 py-3 text-white text-sm">{row.description}</td>
+                <td className="px-4 py-3 text-white text-sm">{row.amount}</td>
+                <td className="px-4 py-3">
+                  <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded">
+                    {row.status}
+                  </span>
+                </td>
+              </tr>
             ))}
-          </div>
-        </Modal>
+          </tbody>
+        </table>
       </div>
     </div>
   );
