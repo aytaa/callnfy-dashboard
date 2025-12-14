@@ -102,17 +102,9 @@ export default function Appointments() {
       header: 'Status',
       accessor: 'status',
       render: (row) => (
-        <Badge
-          variant={
-            row.status === 'confirmed'
-              ? 'green'
-              : row.status === 'pending'
-              ? 'yellow'
-              : 'red'
-          }
-        >
+        <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
           {row.status}
-        </Badge>
+        </span>
       ),
     },
   ];
@@ -167,166 +159,168 @@ export default function Appointments() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Appointments</h1>
-        </div>
-        <div className="flex gap-3">
-          <div className="flex bg-gray-100 dark:bg-[#1a1a1a] rounded-lg p-1">
-            <button
-              onClick={() => setView('calendar')}
-              className={`px-4 py-2 rounded-md transition-colors ${
-                view === 'calendar'
-                  ? 'bg-white dark:bg-[#2a2a2a] text-gray-900 dark:text-white'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-              }`}
-            >
-              <CalendarIcon className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setView('list')}
-              className={`px-4 py-2 rounded-md transition-colors ${
-                view === 'list'
-                  ? 'bg-white dark:bg-[#2a2a2a] text-gray-900 dark:text-white'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-              }`}
-            >
-              <List className="w-4 h-4" />
-            </button>
+    <div className="p-6 pt-8">
+      <div className="max-w-5xl mx-auto space-y-4">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-white">Appointments</h1>
           </div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Add Appointment
-          </button>
-        </div>
-      </div>
-
-      {/* Calendar View */}
-      {view === 'calendar' && (
-        <Card>
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-white">
-              {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-            </h2>
-            <div className="flex gap-2">
+          <div className="flex gap-3">
+            <div className="flex bg-[#1a1a1a] rounded-lg p-1">
               <button
-                onClick={handlePrevMonth}
-                className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+                onClick={() => setView('calendar')}
+                className={`px-3 py-1.5 rounded-md transition-colors ${
+                  view === 'calendar'
+                    ? 'bg-[#2a2a2a] text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
               >
-                <ChevronLeft className="w-5 h-5" />
+                <CalendarIcon className="w-4 h-4" />
               </button>
               <button
-                onClick={handleNextMonth}
-                className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+                onClick={() => setView('list')}
+                className={`px-3 py-1.5 rounded-md transition-colors ${
+                  view === 'list'
+                    ? 'bg-[#2a2a2a] text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
               >
-                <ChevronRight className="w-5 h-5" />
+                <List className="w-4 h-4" />
               </button>
             </div>
-          </div>
-
-          <div className="grid grid-cols-7 gap-2">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-              <div key={day} className="text-center text-sm font-semibold text-gray-400 py-2">
-                {day}
-              </div>
-            ))}
-            {getDaysInMonth(currentDate).map((day, index) => (
-              <div
-                key={index}
-                className={`aspect-square p-2 border rounded-lg ${
-                  day ? 'border-gray-700 dark:border-gray-800 bg-gray-100 dark:bg-gray-800/30 hover:bg-gray-200 dark:hover:bg-gray-800 cursor-pointer' : 'border-transparent'
-                } ${day === 14 ? 'border-gray-900 dark:border-white' : ''}`}
-              >
-                {day && (
-                  <>
-                    <div className="text-sm text-gray-900 dark:text-white mb-1">{day}</div>
-                    {hasAppointment(day) && (
-                      <div className="w-2 h-2 bg-gray-900 dark:bg-white rounded-full mx-auto" />
-                    )}
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
-
-      {/* List View */}
-      {view === 'list' && (
-        <DataTable
-          columns={columns}
-          data={appointments.filter(apt => apt.status !== 'cancelled')}
-        />
-      )}
-
-      {/* Add Appointment Modal */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Add New Appointment"
-        footer={
-          <>
             <button
-              onClick={() => setIsModalOpen(false)}
-              className="border border-gray-300 dark:border-[#2a2a2a] text-gray-700 dark:text-gray-300 px-3 py-1.5 text-sm rounded-lg hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+              onClick={() => setIsModalOpen(true)}
+              className="flex items-center gap-2 bg-white text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
             >
-              Cancel
+              <Plus className="w-4 h-4" />
+              Add Appointment
             </button>
-            <button
-              onClick={handleSubmit}
-              className="bg-gray-900 dark:bg-white text-white dark:text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
-            >
-              Create Appointment
-            </button>
-          </>
-        }
-      >
-        <div className="space-y-4">
-          <Input
-            label="Customer Name"
-            name="customer"
-            value={formData.customer}
-            onChange={handleInputChange}
-            placeholder="Enter customer name"
-          />
-          <Select
-            label="Service"
-            name="service"
-            options={serviceOptions}
-            value={formData.service}
-            onChange={handleInputChange}
-          />
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label="Date"
-              name="date"
-              type="date"
-              value={formData.date}
-              onChange={handleInputChange}
-            />
-            <Input
-              label="Time"
-              name="time"
-              type="time"
-              value={formData.time}
-              onChange={handleInputChange}
-            />
           </div>
-          <Textarea
-            label="Notes (Optional)"
-            name="notes"
-            value={formData.notes}
-            onChange={handleInputChange}
-            placeholder="Add any additional notes"
-            rows={3}
-          />
         </div>
-      </Modal>
+
+        {/* Calendar View */}
+        {view === 'calendar' && (
+          <Card>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-white">
+                {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+              </h2>
+              <div className="flex gap-2">
+                <button
+                  onClick={handlePrevMonth}
+                  className="p-2 text-gray-400 hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={handleNextMonth}
+                  className="p-2 text-gray-400 hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-7 gap-2">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                <div key={day} className="text-center text-sm font-semibold text-gray-400 py-2">
+                  {day}
+                </div>
+              ))}
+              {getDaysInMonth(currentDate).map((day, index) => (
+                <div
+                  key={index}
+                  className={`aspect-square p-2 border rounded-lg ${
+                    day ? 'border-[#2a2a2a] bg-[#0a0a0a] hover:bg-[#1a1a1a] cursor-pointer' : 'border-transparent'
+                  } ${day === 14 ? 'border-white' : ''}`}
+                >
+                  {day && (
+                    <>
+                      <div className="text-sm text-white mb-1">{day}</div>
+                      {hasAppointment(day) && (
+                        <div className="w-2 h-2 bg-white rounded-full mx-auto" />
+                      )}
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* List View */}
+        {view === 'list' && (
+          <DataTable
+            columns={columns}
+            data={appointments.filter(apt => apt.status !== 'cancelled')}
+          />
+        )}
+
+        {/* Add Appointment Modal */}
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          title="Add New Appointment"
+          footer={
+            <>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="border border-[#2a2a2a] text-gray-300 px-3 py-1.5 text-sm rounded-lg hover:border-[#3a3a3a] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                className="bg-white text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Create Appointment
+              </button>
+            </>
+          }
+        >
+          <div className="space-y-3">
+            <Input
+              label="Customer Name"
+              name="customer"
+              value={formData.customer}
+              onChange={handleInputChange}
+              placeholder="Enter customer name"
+            />
+            <Select
+              label="Service"
+              name="service"
+              options={serviceOptions}
+              value={formData.service}
+              onChange={handleInputChange}
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <Input
+                label="Date"
+                name="date"
+                type="date"
+                value={formData.date}
+                onChange={handleInputChange}
+              />
+              <Input
+                label="Time"
+                name="time"
+                type="time"
+                value={formData.time}
+                onChange={handleInputChange}
+              />
+            </div>
+            <Textarea
+              label="Notes (Optional)"
+              name="notes"
+              value={formData.notes}
+              onChange={handleInputChange}
+              placeholder="Add any additional notes"
+              rows={2}
+            />
+          </div>
+        </Modal>
+      </div>
     </div>
   );
 }

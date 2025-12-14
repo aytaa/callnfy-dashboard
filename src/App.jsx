@@ -5,18 +5,21 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 import { Onboarding } from './pages/onboarding/Onboarding';
 import Layout from './components/Layout';
 import { AuthLayout } from './layouts/AuthLayout';
+import SettingsLayout from './layouts/SettingsLayout';
 
 // Dashboard pages
 import Overview from './pages/dashboard/Overview';
 import Calls from './pages/dashboard/Calls';
 import Appointments from './pages/dashboard/Appointments';
 import Customers from './pages/dashboard/Customers';
-
-// Settings pages
 import AIAssistant from './pages/dashboard/AIAssistant';
 import PhoneNumbers from './pages/dashboard/PhoneNumbers';
-import Business from './pages/dashboard/Business';
-import Billing from './pages/dashboard/Billing';
+
+// Settings pages
+import Organization from './pages/settings/Organization';
+import Billing from './pages/settings/Billing';
+import Members from './pages/settings/Members';
+import Profile from './pages/settings/Profile';
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
@@ -160,10 +163,8 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* Settings Routes (Protected) */}
         <Route
-          path="/settings/ai-assistant"
+          path="/dashboard/ai-assistant"
           element={
             <ProtectedRoute>
               <Layout>
@@ -173,7 +174,7 @@ function App() {
           }
         />
         <Route
-          path="/settings/phone-numbers"
+          path="/dashboard/phone-numbers"
           element={
             <ProtectedRoute>
               <Layout>
@@ -182,26 +183,24 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Settings Routes (Protected with SettingsLayout) */}
         <Route
-          path="/settings/business"
+          path="/settings"
           element={
             <ProtectedRoute>
               <Layout>
-                <Business />
+                <SettingsLayout />
               </Layout>
             </ProtectedRoute>
           }
-        />
-        <Route
-          path="/settings/billing"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Billing />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
+        >
+          <Route index element={<Navigate to="/settings/organization" replace />} />
+          <Route path="organization" element={<Organization />} />
+          <Route path="billing" element={<Billing />} />
+          <Route path="members" element={<Members />} />
+          <Route path="profile" element={<Profile />} />
+        </Route>
 
         {/* 404 Fallback */}
         <Route path="*" element={<Navigate to="/auth/login" replace />} />

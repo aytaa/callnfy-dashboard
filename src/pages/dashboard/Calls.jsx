@@ -110,7 +110,7 @@ export default function Calls() {
       header: 'Status',
       accessor: 'status',
       render: (row) => (
-        <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-400 text-xs font-medium rounded">
+        <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
           {row.status}
         </span>
       ),
@@ -120,7 +120,7 @@ export default function Calls() {
     {
       header: 'Actions',
       render: (row) => (
-        <button className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+        <button className="text-gray-400 hover:text-white">
           <MoreVertical className="w-5 h-5" />
         </button>
       ),
@@ -138,117 +138,119 @@ export default function Calls() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      {/* Header with Filter */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Calls</h1>
-        </div>
-        <Select
-          options={dateOptions}
-          value={dateFilter}
-          onChange={(e) => setDateFilter(e.target.value)}
-          className="w-48"
-        />
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Total Calls */}
-        <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-[#1a1a1a] rounded-xl p-4">
-          <p className="text-sm text-gray-600 dark:text-gray-500 mb-2">Total Calls</p>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">15</p>
-          <p className="text-sm text-gray-500 dark:text-gray-600">+12%</p>
-        </div>
-
-        {/* Avg Duration */}
-        <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-[#1a1a1a] rounded-xl p-4">
-          <p className="text-sm text-gray-600 dark:text-gray-500 mb-2">Avg Duration</p>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">3:24</p>
-          <p className="text-sm text-gray-500 dark:text-gray-600">+5%</p>
-        </div>
-
-        {/* Success Rate */}
-        <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-[#1a1a1a] rounded-xl p-4">
-          <p className="text-sm text-gray-600 dark:text-gray-500 mb-2">Success Rate</p>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">94%</p>
-          <p className="text-sm text-gray-500 dark:text-gray-600">+3%</p>
-        </div>
-      </div>
-
-      {/* Calls Table */}
-      <DataTable
-        columns={columns}
-        data={calls}
-        onRowClick={handleRowClick}
-      />
-
-      {/* Call Details Modal */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        title={`Call Details - ${selectedCall?.caller}`}
-        size="lg"
-        footer={
-          <>
-            <Button variant="secondary" onClick={closeModal}>
-              Close
-            </Button>
-          </>
-        }
-      >
-        {selectedCall && (
-          <div className="space-y-6">
-            {/* Call Info */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-400">Phone Number</p>
-                <p className="text-white font-medium">{selectedCall.phone}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-400">Duration</p>
-                <p className="text-white font-medium">{selectedCall.duration}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-400">Date & Time</p>
-                <p className="text-white font-medium">{selectedCall.datetime}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Status</p>
-                <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-400 text-xs font-medium rounded">
-                  {selectedCall.status}
-                </span>
-              </div>
-            </div>
-
-            {/* AI Summary */}
-            <Card className="bg-gray-100 dark:bg-gray-800/50 border-gray-200 dark:border-gray-800">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-400 mb-2">AI Summary</h3>
-              <p className="text-gray-700 dark:text-gray-300">{selectedCall.summary}</p>
-            </Card>
-
-            {/* Transcript */}
-            <div>
-              <h3 className="text-sm font-semibold text-gray-300 mb-2">Transcript</h3>
-              <div className="bg-gray-800/50 rounded-lg p-4 max-h-64 overflow-y-auto">
-                <p className="text-gray-300 whitespace-pre-wrap">{selectedCall.transcript}</p>
-              </div>
-            </div>
-
-            {/* Audio Player Placeholder */}
-            <div>
-              <h3 className="text-sm font-semibold text-gray-300 mb-2">Recording</h3>
-              <div className="bg-gray-800 rounded-lg p-6 flex items-center justify-center gap-3">
-                <Play className="w-5 h-5 text-gray-400" />
-                <div className="flex-1 h-2 bg-gray-700 rounded-full">
-                  <div className="w-1/3 h-full bg-blue-500 rounded-full" />
-                </div>
-                <span className="text-sm text-gray-400">{selectedCall.duration}</span>
-              </div>
-            </div>
+    <div className="p-6 pt-8">
+      <div className="max-w-5xl mx-auto space-y-4">
+        {/* Header with Filter */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-white">Calls</h1>
           </div>
-        )}
-      </Modal>
+          <Select
+            options={dateOptions}
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            className="w-48"
+          />
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Total Calls */}
+          <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+            <p className="text-sm text-gray-500 mb-2">Total Calls</p>
+            <p className="text-2xl font-bold text-white mb-1">15</p>
+            <p className="text-sm text-gray-600">+12%</p>
+          </div>
+
+          {/* Avg Duration */}
+          <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+            <p className="text-sm text-gray-500 mb-2">Avg Duration</p>
+            <p className="text-2xl font-bold text-white mb-1">3:24</p>
+            <p className="text-sm text-gray-600">+5%</p>
+          </div>
+
+          {/* Success Rate */}
+          <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+            <p className="text-sm text-gray-500 mb-2">Success Rate</p>
+            <p className="text-2xl font-bold text-white mb-1">94%</p>
+            <p className="text-sm text-gray-600">+3%</p>
+          </div>
+        </div>
+
+        {/* Calls Table */}
+        <DataTable
+          columns={columns}
+          data={calls}
+          onRowClick={handleRowClick}
+        />
+
+        {/* Call Details Modal */}
+        <Modal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          title={`Call Details - ${selectedCall?.caller}`}
+          size="lg"
+          footer={
+            <>
+              <Button variant="secondary" onClick={closeModal}>
+                Close
+              </Button>
+            </>
+          }
+        >
+          {selectedCall && (
+            <div className="space-y-6">
+              {/* Call Info */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-400">Phone Number</p>
+                  <p className="text-white font-medium">{selectedCall.phone}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400">Duration</p>
+                  <p className="text-white font-medium">{selectedCall.duration}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400">Date & Time</p>
+                  <p className="text-white font-medium">{selectedCall.datetime}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400">Status</p>
+                  <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
+                    {selectedCall.status}
+                  </span>
+                </div>
+              </div>
+
+              {/* AI Summary */}
+              <div className="bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg p-4">
+                <h3 className="text-sm font-semibold text-gray-400 mb-2">AI Summary</h3>
+                <p className="text-gray-300">{selectedCall.summary}</p>
+              </div>
+
+              {/* Transcript */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-300 mb-2">Transcript</h3>
+                <div className="bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg p-4 max-h-64 overflow-y-auto">
+                  <p className="text-gray-300 whitespace-pre-wrap">{selectedCall.transcript}</p>
+                </div>
+              </div>
+
+              {/* Audio Player Placeholder */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-300 mb-2">Recording</h3>
+                <div className="bg-[#111] border border-[#1a1a1a] rounded-lg p-4 flex items-center justify-center gap-3">
+                  <Play className="w-5 h-5 text-gray-400" />
+                  <div className="flex-1 h-2 bg-[#2a2a2a] rounded-full">
+                    <div className="w-1/3 h-full bg-white rounded-full" />
+                  </div>
+                  <span className="text-sm text-gray-400">{selectedCall.duration}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </Modal>
+      </div>
     </div>
   );
 }

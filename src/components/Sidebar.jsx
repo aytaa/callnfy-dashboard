@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import {
   Home,
   Phone as PhoneIcon,
@@ -7,23 +7,37 @@ import {
   Users,
   Bot,
   Hash,
-  Building2,
-  CreditCard,
+  Settings,
   ChevronDown,
   ChevronUp,
   Search,
   X,
 } from 'lucide-react';
 import clsx from 'clsx';
+import SearchModal from './SearchModal';
 
 function Sidebar({ isOpen, onClose }) {
   const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const location = useLocation();
 
   // Get user email and name from localStorage
   const user = JSON.parse(localStorage.getItem('user') || '{"email":"aytac@callnfy.com","name":"Aytac"}');
   const userEmail = user.email || 'aytac@callnfy.com';
   const userName = user.name || 'User';
   const userInitial = userName.charAt(0).toUpperCase();
+
+  // Global keyboard shortcut for Command+K
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchModalOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const menuSections = [
     {
@@ -33,15 +47,14 @@ function Sidebar({ isOpen, onClose }) {
         { icon: PhoneIcon, label: 'Calls', path: '/dashboard/calls' },
         { icon: Calendar, label: 'Appointments', path: '/dashboard/appointments' },
         { icon: Users, label: 'Customers', path: '/dashboard/customers' },
+        { icon: Bot, label: 'AI Assistant', path: '/dashboard/ai-assistant' },
+        { icon: Hash, label: 'Phone Numbers', path: '/dashboard/phone-numbers' },
       ],
     },
     {
       title: 'SETTINGS',
       items: [
-        { icon: Bot, label: 'AI Assistant', path: '/settings/ai-assistant' },
-        { icon: Hash, label: 'Phone Numbers', path: '/settings/phone-numbers' },
-        { icon: Building2, label: 'Business Settings', path: '/settings/business' },
-        { icon: CreditCard, label: 'Billing', path: '/settings/billing' },
+        { icon: Settings, label: 'Settings', path: '/settings/organization' },
       ],
     },
   ];
@@ -99,7 +112,10 @@ function Sidebar({ isOpen, onClose }) {
           </button>
 
           {/* Search Bar */}
-          <button className="w-full h-9 flex items-center justify-between px-3 rounded-lg border border-[#2a2a2a] bg-transparent hover:bg-[#1a1a1a] transition-colors">
+          <button
+            onClick={() => setSearchModalOpen(true)}
+            className="w-full h-9 flex items-center justify-between px-3 rounded-lg border border-[#2a2a2a] bg-transparent hover:bg-[#1a1a1a] transition-colors"
+          >
             <div className="flex items-center gap-2">
               <Search className="w-4 h-4 text-gray-500" />
               <span className="text-sm text-gray-600">Search</span>
@@ -119,6 +135,7 @@ function Sidebar({ isOpen, onClose }) {
               <ul className="space-y-0.5">
                 {section.items.map((item) => {
                   const Icon = item.icon;
+                  const isSettingsActive = item.path === '/settings/organization' && location.pathname.startsWith('/settings');
                   return (
                     <li key={item.path}>
                       <NavLink
@@ -127,7 +144,7 @@ function Sidebar({ isOpen, onClose }) {
                         className={({ isActive }) =>
                           clsx(
                             'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors',
-                            isActive
+                            (isActive || isSettingsActive)
                               ? 'bg-[#1a1a1a] text-white'
                               : 'text-gray-500 hover:bg-[#1a1a1a] hover:text-gray-300'
                           )
@@ -162,6 +179,9 @@ function Sidebar({ isOpen, onClose }) {
           </button>
         </div>
       </aside>
+
+      {/* Search Modal */}
+      <SearchModal isOpen={searchModalOpen} onClose={() => setSearchModalOpen(false)} />
     </>
   );
 }

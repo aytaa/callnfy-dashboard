@@ -45,134 +45,130 @@ export default function PhoneNumbers() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Phone Numbers</h1>
-          <p className="text-gray-600 dark:text-gray-500 text-sm mt-1">
-            Manage your AI receptionist phone numbers
-          </p>
+    <div className="p-6 pt-8">
+      <div className="max-w-5xl mx-auto space-y-4">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-white">Phone Numbers</h1>
+            <p className="text-gray-400 text-sm mt-1">
+              Manage your AI receptionist phone numbers
+            </p>
+          </div>
+          <button
+            onClick={handleAddNumber}
+            className="flex items-center gap-2 bg-white text-black font-medium px-3 py-1.5 text-sm rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Add Number
+          </button>
         </div>
-        <button
-          onClick={handleAddNumber}
-          className="flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-black font-medium px-3 py-1.5 text-sm rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Add Number
-        </button>
-      </div>
 
-      {/* Phone Number Cards */}
-      {phoneNumbers.length > 0 ? (
-        <div className="space-y-4">
-          {phoneNumbers.map((phone) => (
-            <div
-              key={phone.id}
-              className="bg-white dark:bg-[#111] border border-gray-200 dark:border-[#1a1a1a] rounded-xl p-4"
-            >
-              <div className="flex items-start justify-between">
-                {/* Left side - Number info */}
-                <div className="flex items-start gap-3 flex-1">
-                  <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1a1a1a] flex items-center justify-center">
-                    <Phone className="w-5 h-5 text-gray-600 dark:text-gray-400" strokeWidth={1.5} />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-1">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {phone.number}
-                      </h3>
-                      <span
-                        className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                          phone.status === 'active'
-                            ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                            : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
-                        }`}
-                      >
-                        {phone.status}
-                      </span>
+        {/* Phone Number Cards */}
+        {phoneNumbers.length > 0 ? (
+          <div className="space-y-4">
+            {phoneNumbers.map((phone) => (
+              <div
+                key={phone.id}
+                className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4"
+              >
+                <div className="flex items-start justify-between">
+                  {/* Left side - Number info */}
+                  <div className="flex items-start gap-3 flex-1">
+                    <div className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center">
+                      <Phone className="w-4 h-4 text-gray-400" strokeWidth={1.5} />
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{phone.name}</p>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-1">
+                        <h3 className="text-lg font-semibold text-white">
+                          {phone.number}
+                        </h3>
+                        <span className="px-2 py-0.5 text-xs font-medium bg-[#1a1a1a] text-gray-400 rounded">
+                          {phone.status}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-400 mb-3">{phone.name}</p>
 
-                    {/* Stats */}
-                    <div className="grid grid-cols-3 gap-3">
-                      <div>
-                        <p className="text-xs text-gray-500 dark:text-gray-600 mb-1">Total Calls</p>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                          {phone.totalCalls}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 dark:text-gray-600 mb-1">Monthly Minutes</p>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                          {phone.monthlyMinutes}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 dark:text-gray-600 mb-1">Created</p>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                          {phone.createdAt}
-                        </p>
+                      {/* Stats */}
+                      <div className="grid grid-cols-3 gap-3">
+                        <div>
+                          <p className="text-xs text-gray-500 mb-1">Total Calls</p>
+                          <p className="text-sm font-semibold text-white">
+                            {phone.totalCalls}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 mb-1">Monthly Minutes</p>
+                          <p className="text-sm font-semibold text-white">
+                            {phone.monthlyMinutes}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 mb-1">Created</p>
+                          <p className="text-sm font-semibold text-white">
+                            {phone.createdAt}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Right side - Action icons */}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleView(phone.id)}
-                    className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#1a1a1a] rounded-lg transition-colors"
-                    title="View details"
-                  >
-                    <Eye className="w-4 h-4" strokeWidth={1.5} />
-                  </button>
-                  <button
-                    onClick={() => handleCopy(phone.number, phone.id)}
-                    className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#1a1a1a] rounded-lg transition-colors"
-                    title="Copy number"
-                  >
-                    {copiedId === phone.id ? (
-                      <Check className="w-4 h-4 text-green-600 dark:text-green-400" strokeWidth={1.5} />
-                    ) : (
-                      <Copy className="w-4 h-4" strokeWidth={1.5} />
-                    )}
-                  </button>
-                  <button
-                    onClick={() => handleDelete(phone.id)}
-                    className="p-2 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-[#1a1a1a] rounded-lg transition-colors"
-                    title="Delete number"
-                  >
-                    <Trash2 className="w-4 h-4" strokeWidth={1.5} />
-                  </button>
+                  {/* Right side - Action icons */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleView(phone.id)}
+                      className="p-2 text-gray-400 hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors"
+                      title="View details"
+                    >
+                      <Eye className="w-4 h-4" strokeWidth={1.5} />
+                    </button>
+                    <button
+                      onClick={() => handleCopy(phone.number, phone.id)}
+                      className="p-2 text-gray-400 hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors"
+                      title="Copy number"
+                    >
+                      {copiedId === phone.id ? (
+                        <Check className="w-4 h-4 text-white" strokeWidth={1.5} />
+                      ) : (
+                        <Copy className="w-4 h-4" strokeWidth={1.5} />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => handleDelete(phone.id)}
+                      className="p-2 text-gray-400 hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors"
+                      title="Delete number"
+                    >
+                      <Trash2 className="w-4 h-4" strokeWidth={1.5} />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        /* Empty State */
-        <div className="bg-white dark:bg-[#111] border border-gray-200 dark:border-[#1a1a1a] rounded-xl p-12">
-          <div className="flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-[#1a1a1a] flex items-center justify-center mb-4">
-              <Phone className="w-8 h-8 text-gray-400 dark:text-gray-600" strokeWidth={1.5} />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-              No phone numbers yet
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-500 mb-6">
-              Get started by adding your first AI-powered phone number
-            </p>
-            <button
-              onClick={handleAddNumber}
-              className="flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-black font-medium px-3 py-1.5 text-sm rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Add Number
-            </button>
+            ))}
           </div>
-        </div>
-      )}
+        ) : (
+          /* Empty State */
+          <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-12">
+            <div className="flex flex-col items-center justify-center text-center">
+              <div className="w-16 h-16 rounded-full bg-[#1a1a1a] flex items-center justify-center mb-4">
+                <Phone className="w-8 h-8 text-gray-400" strokeWidth={1.5} />
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-1">
+                No phone numbers yet
+              </h3>
+              <p className="text-sm text-gray-400 mb-6">
+                Get started by adding your first AI-powered phone number
+              </p>
+              <button
+                onClick={handleAddNumber}
+                className="flex items-center gap-2 bg-white text-black font-medium px-3 py-1.5 text-sm rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                Add Number
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
