@@ -27,7 +27,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
     }),
     refreshToken: builder.mutation({
       query: (refreshToken) => ({
-        url: '/auth/refresh-token',
+        url: '/auth/refresh',
         method: 'POST',
         body: { refreshToken },
       }),
@@ -35,20 +35,6 @@ export const authApiSlice = apiSlice.injectEndpoints({
     getMe: builder.query({
       query: () => '/auth/me',
       providesTags: ['User'],
-    }),
-    forgotPassword: builder.mutation({
-      query: (email) => ({
-        url: '/auth/forgot-password',
-        method: 'POST',
-        body: email,
-      }),
-    }),
-    resetPassword: builder.mutation({
-      query: (resetData) => ({
-        url: '/auth/reset-password',
-        method: 'POST',
-        body: resetData,
-      }),
     }),
     verifyEmail: builder.mutation({
       query: (token) => ({
@@ -65,6 +51,20 @@ export const authApiSlice = apiSlice.injectEndpoints({
         body: { email },
       }),
     }),
+    forgotPassword: builder.mutation({
+      query: (email) => ({
+        url: '/auth/forgot-password',
+        method: 'POST',
+        body: { email },
+      }),
+    }),
+    resetPassword: builder.mutation({
+      query: ({ token, password }) => ({
+        url: '/auth/reset-password',
+        method: 'POST',
+        body: { token, password },
+      }),
+    }),
   }),
 });
 
@@ -74,8 +74,8 @@ export const {
   useLogoutMutation,
   useRefreshTokenMutation,
   useGetMeQuery,
-  useForgotPasswordMutation,
-  useResetPasswordMutation,
   useVerifyEmailMutation,
   useResendVerificationMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
 } = authApiSlice;

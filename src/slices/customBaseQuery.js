@@ -22,7 +22,7 @@ export const customBaseQuery = async (args, api, extraOptions) => {
     if (refreshToken) {
       const refreshResult = await baseQuery(
         {
-          url: '/auth/refresh-token',
+          url: '/auth/refresh',
           method: 'POST',
           body: { refreshToken },
         },

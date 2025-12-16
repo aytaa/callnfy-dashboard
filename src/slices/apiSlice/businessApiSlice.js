@@ -2,7 +2,7 @@ import { apiSlice } from '../apiSlice';
 
 export const businessApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getBusiness: builder.query({
+    getBusinesses: builder.query({
       query: () => '/businesses',
       providesTags: (result) =>
         result
@@ -12,7 +12,7 @@ export const businessApiSlice = apiSlice.injectEndpoints({
             ]
           : [{ type: 'Business', id: 'LIST' }],
     }),
-    getBusinessDetail: builder.query({
+    getBusiness: builder.query({
       query: (id) => `/businesses/${id}`,
       providesTags: (result, error, id) => [{ type: 'Business', id }],
     }),
@@ -35,12 +35,68 @@ export const businessApiSlice = apiSlice.injectEndpoints({
         { type: 'Business', id: 'LIST' },
       ],
     }),
+    deleteBusiness: builder.mutation({
+      query: (id) => ({
+        url: `/businesses/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, id) => [
+        { type: 'Business', id },
+        { type: 'Business', id: 'LIST' },
+      ],
+    }),
+    updateOnboarding: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/businesses/${id}/onboarding`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'Business', id }],
+    }),
+    updateServices: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/businesses/${id}/services`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'Business', id }],
+    }),
+    updateWorkingHours: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/businesses/${id}/working-hours`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'Business', id }],
+    }),
+    updateAiSettings: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/businesses/${id}/ai-settings`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'Business', id }],
+    }),
+    setupAi: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/businesses/${id}/setup-ai`,
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'Business', id }],
+    }),
   }),
 });
 
 export const {
+  useGetBusinessesQuery,
   useGetBusinessQuery,
-  useGetBusinessDetailQuery,
   useCreateBusinessMutation,
   useUpdateBusinessMutation,
+  useDeleteBusinessMutation,
+  useUpdateOnboardingMutation,
+  useUpdateServicesMutation,
+  useUpdateWorkingHoursMutation,
+  useUpdateAiSettingsMutation,
+  useSetupAiMutation,
 } = businessApiSlice;
