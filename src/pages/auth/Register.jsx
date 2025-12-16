@@ -4,8 +4,7 @@ import { useRegisterMutation } from '../../slices/apiSlice/authApiSlice';
 
 function Register() {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     password: ''
   });
@@ -32,9 +31,8 @@ function Register() {
 
     try {
       await register({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
         email: formData.email,
+        name: formData.name,
         password: formData.password,
       }).unwrap();
 
@@ -98,36 +96,19 @@ function Register() {
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
-              First Name
-            </label>
-            <input
-              type="text"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-              className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent outline-none transition-all"
-              placeholder="John"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
-              Last Name
-            </label>
-            <input
-              type="text"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent outline-none transition-all"
-              placeholder="Doe"
-              required
-            />
-          </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+            Full name
+          </label>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent outline-none transition-all"
+            placeholder="John Doe"
+            required
+          />
         </div>
 
         <div>
