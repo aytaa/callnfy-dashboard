@@ -1,226 +1,191 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { AuthLayout } from '../../layouts/AuthLayout';
-import { Button } from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
-import Select from '../../components/ui/Select';
+import { Link } from 'react-router-dom';
+import { useRegisterMutation } from '../../slices/apiSlice/authApiSlice';
 
-const INDUSTRIES = [
-  { value: 'healthcare', label: 'Healthcare' },
-  { value: 'retail', label: 'Retail' },
-  { value: 'hospitality', label: 'Hospitality' },
-  { value: 'professional-services', label: 'Professional Services' },
-  { value: 'real-estate', label: 'Real Estate' },
-  { value: 'automotive', label: 'Automotive' },
-  { value: 'education', label: 'Education' },
-  { value: 'finance', label: 'Finance' },
-  { value: 'technology', label: 'Technology' },
-  { value: 'other', label: 'Other' }
-];
-
-const COUNTRIES = [
-  { value: 'us', label: 'United States' },
-  { value: 'ca', label: 'Canada' },
-  { value: 'uk', label: 'United Kingdom' },
-  { value: 'au', label: 'Australia' },
-  { value: 'de', label: 'Germany' },
-  { value: 'fr', label: 'France' },
-  { value: 'es', label: 'Spain' },
-  { value: 'it', label: 'Italy' },
-  { value: 'nl', label: 'Netherlands' },
-  { value: 'tr', label: 'Turkey' },
-  { value: 'other', label: 'Other' }
-];
-
-export function Register() {
-  const navigate = useNavigate();
+function Register() {
   const [formData, setFormData] = useState({
-    businessName: '',
+    firstName: '',
+    lastName: '',
     email: '',
-    password: '',
-    confirmPassword: '',
-    industry: '',
-    country: ''
+    password: ''
   });
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+  const [register, { isLoading }] = useRegisterMutation();
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear error for this field
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  const validate = () => {
-    const newErrors = {};
-
-    if (!formData.businessName.trim()) {
-      newErrors.businessName = 'Business name is required';
-    }
-
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
-    }
-
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-    }
-
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-
-    if (!formData.industry) {
-      newErrors.industry = 'Please select an industry';
-    }
-
-    if (!formData.country) {
-      newErrors.country = 'Please select a country';
-    }
-
-    return newErrors;
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+    if (error) setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
 
-    const newErrors = validate();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters');
       return;
     }
 
-    setLoading(true);
-
-    // Mock registration - simulate API call
-    setTimeout(() => {
-      // Save user data to localStorage
-      const userData = {
-        businessName: formData.businessName,
+    try {
+      await register({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
-        industry: formData.industry,
-        country: formData.country,
-        registeredAt: new Date().toISOString(),
-        onboardingComplete: false
-      };
-      localStorage.setItem('callnfy_user', JSON.stringify(userData));
-      localStorage.setItem('callnfy_auth_token', 'mock_token_' + Date.now());
+        password: formData.password,
+      }).unwrap();
 
-      setLoading(false);
-
-      // Redirect to onboarding
-      navigate('/onboarding');
-    }, 1000);
+      setSuccess(true);
+    } catch (err) {
+      setError(err?.data?.message || 'Failed to create account. Please try again.');
+    }
   };
 
-  return (
-    <AuthLayout
-      title="Create Account"
-      subtitle="Start your AI calling journey with Callnfy"
-    >
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Business Name */}
-        <Input
-          label="Business Name"
-          type="text"
-          name="businessName"
-          value={formData.businessName}
-          onChange={handleChange}
-          placeholder="Acme Corporation"
-          error={errors.businessName}
-          required
-        />
+  if (success) {
+    return (
+      <div className="text-center">
+        <div className="mb-8">
+          <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            Check your email
+          </h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            We've sent a verification link to
+          </p>
+          <p className="text-gray-900 dark:text-white font-semibold mt-1">
+            {formData.email}
+          </p>
+        </div>
 
-        {/* Email */}
-        <Input
-          label="Email Address"
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="you@business.com"
-          error={errors.email}
-          required
-        />
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Click the link in the email to verify your account and complete registration.
+          </p>
 
-        {/* Password */}
-        <Input
-          label="Password"
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          placeholder="••••••••"
-          error={errors.password}
-          required
-        />
-
-        {/* Confirm Password */}
-        <Input
-          label="Confirm Password"
-          type="password"
-          name="confirmPassword"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          placeholder="••••••••"
-          error={errors.confirmPassword}
-          required
-        />
-
-        {/* Industry */}
-        <Select
-          label="Industry"
-          name="industry"
-          value={formData.industry}
-          onChange={handleChange}
-          options={INDUSTRIES}
-          placeholder="Select your industry"
-          error={errors.industry}
-          required
-        />
-
-        {/* Country */}
-        <Select
-          label="Country"
-          name="country"
-          value={formData.country}
-          onChange={handleChange}
-          options={COUNTRIES}
-          placeholder="Select your country"
-          error={errors.country}
-          required
-        />
-
-        {/* Submit Button */}
-        <Button
-          type="submit"
-          variant="primary"
-          className="w-full mt-6"
-          loading={loading}
-        >
-          Create Account
-        </Button>
-
-        {/* Login Link */}
-        <div className="text-center text-sm text-gray-400">
-          Already have an account?{' '}
           <Link
-            to="/auth/login"
-            className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
+            to="/login"
+            className="inline-block w-full bg-black dark:bg-white text-white dark:text-black py-2.5 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors text-center"
           >
-            Login
+            Back to sign in
           </Link>
         </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          Create your account
+        </h1>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          Get started with Callnfy today
+        </p>
+      </div>
+
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        {error && (
+          <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+              First Name
+            </label>
+            <input
+              type="text"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent outline-none transition-all"
+              placeholder="John"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+              Last Name
+            </label>
+            <input
+              type="text"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent outline-none transition-all"
+              placeholder="Doe"
+              required
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+            Email
+          </label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent outline-none transition-all"
+            placeholder="you@example.com"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+            Password
+          </label>
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent outline-none transition-all"
+            placeholder="••••••••"
+            required
+            minLength={8}
+          />
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            Must be at least 8 characters
+          </p>
+        </div>
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full bg-black dark:bg-white text-white dark:text-black py-2.5 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isLoading ? 'Creating account...' : 'Create account'}
+        </button>
       </form>
-    </AuthLayout>
+
+      <div className="mt-6 text-center">
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          Already have an account?{' '}
+          <Link
+            to="/login"
+            className="text-gray-900 dark:text-white font-semibold hover:underline"
+          >
+            Sign in
+          </Link>
+        </p>
+      </div>
+    </div>
   );
 }
+
+export default Register;

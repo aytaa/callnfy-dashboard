@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { Phone, Check } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { BusinessInfo } from './steps/BusinessInfo';
@@ -8,6 +9,8 @@ import { Services } from './steps/Services';
 import { AISettings } from './steps/AISettings';
 import { PhoneNumber } from './steps/PhoneNumber';
 import { TestCall } from './steps/TestCall';
+import { useCreateBusinessMutation } from '../../slices/apiSlice/businessApiSlice';
+import { setCredentials, selectCurrentUser } from '../../slices/authSlice';
 
 const STEPS = [
   { id: 1, name: 'Business Info', component: BusinessInfo, canSkip: false },
@@ -20,12 +23,16 @@ const STEPS = [
 
 export function Onboarding() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const currentUser = useSelector(selectCurrentUser);
   const [currentStep, setCurrentStep] = useState(1);
+  const [error, setError] = useState('');
   const [onboardingData, setOnboardingData] = useState(() => {
     // Load from localStorage if exists
     const saved = localStorage.getItem('callnfy_onboarding');
     return saved ? JSON.parse(saved) : {};
   });
+  const [createBusiness, { isLoading: isCreatingBusiness }] = useCreateBusinessMutation();
 
   // Save to localStorage whenever data changes
   useEffect(() => {
@@ -61,17 +68,38 @@ export function Onboarding() {
     }
   };
 
-  const handleFinish = () => {
-    // Mark onboarding as complete
-    const userData = JSON.parse(localStorage.getItem('callnfy_user') || '{}');
-    userData.onboardingComplete = true;
-    localStorage.setItem('callnfy_user', JSON.stringify(userData));
+  const handleFinish = async () => {
+    setError('');
 
-    // Clear onboarding data
-    localStorage.removeItem('callnfy_onboarding');
+    try {
+      const businessData = {
+        name: onboardingData.businessName,
+        industry: onboardingData.industry,
+        country: onboardingData.country,
+        workingHours: onboardingData.workingHours,
+        services: onboardingData.services,
+        assistantName: onboardingData.assistantName,
+        assistantGreeting: onboardingData.greeting,
+        voice: onboardingData.voice,
+        tone: onboardingData.tone,
+        phoneNumber: onboardingData.newNumber || onboardingData.existingNumber,
+      };
 
-    // Redirect to dashboard
-    navigate('/dashboard');
+      const result = await createBusiness(businessData).unwrap();
+
+      dispatch(setCredentials({
+        user: { ...currentUser, business: result },
+        accessToken: currentUser.accessToken,
+        refreshToken: currentUser.refreshToken,
+      }));
+
+      localStorage.removeItem('callnfy_onboarding');
+
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err?.data?.message || 'Failed to complete onboarding. Please try again.');
+      console.error('Onboarding error:', err);
+    }
   };
 
   const CurrentStepComponent = STEPS[currentStep - 1].component;
@@ -146,6 +174,12 @@ export function Onboarding() {
       {/* Main Content */}
       <main className="px-6 py-8">
         <div className="max-w-2xl mx-auto">
+          {error && (
+            <div className="mb-6 p-4 bg-red-900/20 border border-red-800 rounded-lg">
+              <p className="text-sm text-red-400">{error}</p>
+            </div>
+          )}
+
           <CurrentStepComponent
             data={onboardingData}
             onNext={handleNext}
@@ -154,6 +188,7 @@ export function Onboarding() {
             onFinish={handleFinish}
             isFirstStep={currentStep === 1}
             isLastStep={currentStep === STEPS.length}
+            isLoading={isCreatingBusiness}
           />
         </div>
       </main>

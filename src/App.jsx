@@ -1,7 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { selectIsAuthenticated, selectCurrentUser } from './slices/authSlice';
 import Login from './pages/auth/Login';
-import Signup from './pages/auth/Signup';
+import Register from './pages/auth/Register';
 import ForgotPassword from './pages/auth/ForgotPassword';
+import ResetPassword from './pages/auth/ResetPassword';
 import { Onboarding } from './pages/onboarding/Onboarding';
 import Layout from './components/Layout';
 import { AuthLayout } from './layouts/AuthLayout';
@@ -22,11 +25,16 @@ import Members from './pages/settings/Members';
 import Profile from './pages/settings/Profile';
 
 // Protected Route Component
-function ProtectedRoute({ children }) {
-  const token = localStorage.getItem('callnfy_auth_token');
+function ProtectedRoute({ children, requireBusiness = false }) {
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const user = useSelector(selectCurrentUser);
 
-  if (!token) {
+  if (!isAuthenticated) {
     return <Navigate to="/auth/login" replace />;
+  }
+
+  if (requireBusiness && !user?.business) {
+    return <Navigate to="/onboarding" replace />;
   }
 
   return children;
@@ -34,9 +42,9 @@ function ProtectedRoute({ children }) {
 
 // Auth Route Component (redirect if already logged in)
 function AuthRoute({ children }) {
-  const token = localStorage.getItem('callnfy_auth_token');
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
-  if (token) {
+  if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -76,7 +84,17 @@ function App() {
           element={
             <AuthRoute>
               <AuthLayout>
-                <Signup />
+                <Register />
+              </AuthLayout>
+            </AuthRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <AuthRoute>
+              <AuthLayout>
+                <Register />
               </AuthLayout>
             </AuthRoute>
           }
@@ -86,7 +104,7 @@ function App() {
           element={
             <AuthRoute>
               <AuthLayout>
-                <Signup />
+                <Register />
               </AuthLayout>
             </AuthRoute>
           }
@@ -111,6 +129,26 @@ function App() {
             </AuthRoute>
           }
         />
+        <Route
+          path="/auth/reset-password"
+          element={
+            <AuthRoute>
+              <AuthLayout>
+                <ResetPassword />
+              </AuthLayout>
+            </AuthRoute>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <AuthRoute>
+              <AuthLayout>
+                <ResetPassword />
+              </AuthLayout>
+            </AuthRoute>
+          }
+        />
 
         {/* Onboarding Route */}
         <Route
@@ -126,7 +164,7 @@ function App() {
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requireBusiness={true}>
               <Layout>
                 <Overview />
               </Layout>
@@ -136,7 +174,7 @@ function App() {
         <Route
           path="/dashboard/calls"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requireBusiness={true}>
               <Layout>
                 <Calls />
               </Layout>
@@ -146,7 +184,7 @@ function App() {
         <Route
           path="/dashboard/appointments"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requireBusiness={true}>
               <Layout>
                 <Appointments />
               </Layout>
@@ -156,7 +194,7 @@ function App() {
         <Route
           path="/dashboard/customers"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requireBusiness={true}>
               <Layout>
                 <Customers />
               </Layout>
@@ -166,7 +204,7 @@ function App() {
         <Route
           path="/dashboard/ai-assistant"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requireBusiness={true}>
               <Layout>
                 <AIAssistant />
               </Layout>
@@ -176,7 +214,7 @@ function App() {
         <Route
           path="/dashboard/phone-numbers"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requireBusiness={true}>
               <Layout>
                 <PhoneNumbers />
               </Layout>
@@ -188,7 +226,7 @@ function App() {
         <Route
           path="/settings"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requireBusiness={true}>
               <Layout>
                 <SettingsLayout />
               </Layout>

@@ -10,7 +10,7 @@ const CALL_STATES = {
   FAILED: 'failed'
 };
 
-export function TestCall({ data, onBack, onFinish }) {
+export function TestCall({ data, onBack, onFinish, isLoading = false }) {
   const [callState, setCallState] = useState(CALL_STATES.IDLE);
   const [callDuration, setCallDuration] = useState(0);
 
@@ -183,9 +183,10 @@ export function TestCall({ data, onBack, onFinish }) {
             variant="primary"
             size="lg"
             onClick={onFinish}
-            disabled={callState !== CALL_STATES.SUCCESS}
+            disabled={callState !== CALL_STATES.SUCCESS || isLoading}
+            loading={isLoading}
           >
-            Finish Setup
+            {isLoading ? 'Setting up...' : 'Finish Setup'}
           </Button>
         </div>
 

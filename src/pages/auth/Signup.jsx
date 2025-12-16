@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { Github } from 'lucide-react';
+import { useRegisterMutation } from '../../slices/apiSlice/authApiSlice';
+import { setCredentials } from '../../slices/authSlice';
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -9,45 +12,55 @@ function Signup() {
     password: '',
     confirmPassword: ''
   });
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [register, { isLoading }] = useRegisterMutation();
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
+    if (error) setError('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
 
-    // Create mock user object
-    const mockUser = {
-      email: formData.email || 'user@example.com',
-      name: formData.fullName || 'Demo User',
-      id: 'user_' + Date.now(),
-      isAuthenticated: true
-    };
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
 
-    // Store in localStorage
-    localStorage.setItem('user', JSON.stringify(mockUser));
-    localStorage.setItem('isAuthenticated', 'true');
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters');
+      return;
+    }
 
-    // Redirect to dashboard
-    navigate('/dashboard');
+    try {
+      const result = await register({
+        name: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+      }).unwrap();
+
+      dispatch(setCredentials({
+        user: result.user,
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
+      }));
+
+      navigate('/onboarding');
+    } catch (err) {
+      setError(err?.data?.message || 'Failed to create account. Please try again.');
+    }
   };
 
   const handleSocialSignup = (provider) => {
-    // Mock social signup
-    const mockUser = {
-      email: `user@${provider}.com`,
-      name: 'Demo User',
-      id: 'user_' + Date.now(),
-      isAuthenticated: true
-    };
-    localStorage.setItem('user', JSON.stringify(mockUser));
-    localStorage.setItem('isAuthenticated', 'true');
-    navigate('/dashboard');
+    console.log(`${provider} signup not implemented yet`);
+    setError('Social signup is not available yet. Please use email/password.');
   };
 
   return (
@@ -101,6 +114,12 @@ function Signup() {
 
       {/* Signup Form */}
       <form className="space-y-4" onSubmit={handleSubmit}>
+        {error && (
+          <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          </div>
+        )}
+
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
             Full Name
@@ -112,6 +131,7 @@ function Signup() {
             onChange={handleChange}
             className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
             placeholder="John Doe"
+            required
           />
         </div>
 
@@ -126,6 +146,7 @@ function Signup() {
             onChange={handleChange}
             className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
             placeholder="you@example.com"
+            required
           />
         </div>
 
@@ -140,6 +161,8 @@ function Signup() {
             onChange={handleChange}
             className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
             placeholder="••••••••"
+            required
+            minLength={8}
           />
         </div>
 
@@ -154,14 +177,16 @@ function Signup() {
             onChange={handleChange}
             className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
             placeholder="••••••••"
+            required
           />
         </div>
 
         <button
           type="submit"
-          className="w-full bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white py-2.5 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all"
+          disabled={isLoading}
+          className="w-full bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white py-2.5 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Create account
+          {isLoading ? 'Creating account...' : 'Create account'}
         </button>
       </form>
 
