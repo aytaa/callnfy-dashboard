@@ -1,12 +1,11 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { selectIsAuthenticated, selectCurrentUser } from './slices/authSlice';
+import { selectIsAuthenticated } from './slices/authSlice';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
 import VerifyEmail from './pages/auth/VerifyEmail';
-import { Onboarding } from './pages/onboarding/Onboarding';
 import Layout from './components/Layout';
 import { AuthLayout } from './layouts/AuthLayout';
 import SettingsLayout from './layouts/SettingsLayout';
@@ -26,16 +25,11 @@ import Members from './pages/settings/Members';
 import Profile from './pages/settings/Profile';
 
 // Protected Route Component
-function ProtectedRoute({ children, requireBusiness = false }) {
+function ProtectedRoute({ children }) {
   const isAuthenticated = useSelector(selectIsAuthenticated);
-  const user = useSelector(selectCurrentUser);
 
   if (!isAuthenticated) {
     return <Navigate to="/auth/login" replace />;
-  }
-
-  if (requireBusiness && !user?.business) {
-    return <Navigate to="/onboarding" replace />;
   }
 
   return children;
@@ -171,21 +165,11 @@ function App() {
           }
         />
 
-        {/* Onboarding Route */}
-        <Route
-          path="/onboarding"
-          element={
-            <ProtectedRoute>
-              <Onboarding />
-            </ProtectedRoute>
-          }
-        />
-
         {/* Dashboard Routes (Protected) */}
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute requireBusiness={true}>
+            <ProtectedRoute>
               <Layout>
                 <Overview />
               </Layout>
@@ -195,7 +179,7 @@ function App() {
         <Route
           path="/dashboard/calls"
           element={
-            <ProtectedRoute requireBusiness={true}>
+            <ProtectedRoute>
               <Layout>
                 <Calls />
               </Layout>
@@ -205,7 +189,7 @@ function App() {
         <Route
           path="/dashboard/appointments"
           element={
-            <ProtectedRoute requireBusiness={true}>
+            <ProtectedRoute>
               <Layout>
                 <Appointments />
               </Layout>
@@ -215,7 +199,7 @@ function App() {
         <Route
           path="/dashboard/customers"
           element={
-            <ProtectedRoute requireBusiness={true}>
+            <ProtectedRoute>
               <Layout>
                 <Customers />
               </Layout>
@@ -225,7 +209,7 @@ function App() {
         <Route
           path="/dashboard/ai-assistant"
           element={
-            <ProtectedRoute requireBusiness={true}>
+            <ProtectedRoute>
               <Layout>
                 <AIAssistant />
               </Layout>
@@ -235,7 +219,7 @@ function App() {
         <Route
           path="/dashboard/phone-numbers"
           element={
-            <ProtectedRoute requireBusiness={true}>
+            <ProtectedRoute>
               <Layout>
                 <PhoneNumbers />
               </Layout>
@@ -247,7 +231,7 @@ function App() {
         <Route
           path="/settings"
           element={
-            <ProtectedRoute requireBusiness={true}>
+            <ProtectedRoute>
               <Layout>
                 <SettingsLayout />
               </Layout>
