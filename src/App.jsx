@@ -5,6 +5,7 @@ import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
+import VerifyEmail from './pages/auth/VerifyEmail';
 import { Onboarding } from './pages/onboarding/Onboarding';
 import Layout from './components/Layout';
 import { AuthLayout } from './layouts/AuthLayout';
@@ -145,6 +146,26 @@ function App() {
             <AuthRoute>
               <AuthLayout>
                 <ResetPassword />
+              </AuthLayout>
+            </AuthRoute>
+          }
+        />
+        <Route
+          path="/auth/verify-email"
+          element={
+            <AuthRoute>
+              <AuthLayout>
+                <VerifyEmail />
+              </AuthLayout>
+            </AuthRoute>
+          }
+        />
+        <Route
+          path="/verify-email"
+          element={
+            <AuthRoute>
+              <AuthLayout>
+                <VerifyEmail />
               </AuthLayout>
             </AuthRoute>
           }
