@@ -17,7 +17,7 @@ function ForgotPassword() {
       await forgotPassword({ email }).unwrap();
       setSubmitted(true);
     } catch (err) {
-      setError(err?.data?.message || 'Failed to send reset link. Please try again.');
+      setError(err?.data?.error?.message || err?.data?.message || 'Failed to send reset link. Please try again.');
     }
   };
 

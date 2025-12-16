@@ -3,11 +3,17 @@ import { apiSlice } from '../apiSlice';
 export const phoneApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getPhoneNumbers: builder.query({
-      query: () => '/phone-numbers',
+      query: ({ page = 1, limit = 10 } = {}) => ({
+        url: '/phone-numbers',
+        params: {
+          page: Number(page),
+          limit: Number(limit),
+        },
+      }),
       providesTags: (result) =>
-        result
+        result?.phoneNumbers
           ? [
-              ...result.map(({ id }) => ({ type: 'PhoneNumber', id })),
+              ...result.phoneNumbers.map(({ id }) => ({ type: 'PhoneNumber', id })),
               { type: 'PhoneNumber', id: 'LIST' },
             ]
           : [{ type: 'PhoneNumber', id: 'LIST' }],
@@ -20,7 +26,28 @@ export const phoneApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'PhoneNumber', id: 'LIST' }],
     }),
+    assignPhoneNumber: builder.mutation({
+      query: ({ id, businessId }) => ({
+        url: `/phone-numbers/${id}/assign`,
+        method: 'POST',
+        body: { businessId },
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'PhoneNumber', id },
+        { type: 'PhoneNumber', id: 'LIST' },
+      ],
+    }),
     releasePhoneNumber: builder.mutation({
+      query: (id) => ({
+        url: `/phone-numbers/${id}/release`,
+        method: 'POST',
+      }),
+      invalidatesTags: (result, error, id) => [
+        { type: 'PhoneNumber', id },
+        { type: 'PhoneNumber', id: 'LIST' },
+      ],
+    }),
+    deletePhoneNumber: builder.mutation({
       query: (id) => ({
         url: `/phone-numbers/${id}`,
         method: 'DELETE',
@@ -36,5 +63,7 @@ export const phoneApiSlice = apiSlice.injectEndpoints({
 export const {
   useGetPhoneNumbersQuery,
   usePurchasePhoneNumberMutation,
+  useAssignPhoneNumberMutation,
   useReleasePhoneNumberMutation,
+  useDeletePhoneNumberMutation,
 } = phoneApiSlice;

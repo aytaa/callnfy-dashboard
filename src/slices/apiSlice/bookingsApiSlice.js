@@ -3,14 +3,16 @@ import { apiSlice } from '../apiSlice';
 export const bookingsApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getBookings: builder.query({
-      query: (params) => {
-        const queryParams = new URLSearchParams();
-        if (params?.page) queryParams.append('page', params.page);
-        if (params?.status) queryParams.append('status', params.status);
-        if (params?.startDate) queryParams.append('startDate', params.startDate);
-        if (params?.endDate) queryParams.append('endDate', params.endDate);
-        return `/bookings?${queryParams.toString()}`;
-      },
+      query: ({ page = 1, limit = 10, status, startDate, endDate } = {}) => ({
+        url: '/bookings',
+        params: {
+          page: Number(page),
+          limit: Number(limit),
+          ...(status && { status }),
+          ...(startDate && { startDate }),
+          ...(endDate && { endDate }),
+        },
+      }),
       providesTags: (result) =>
         result?.bookings
           ? [
@@ -24,12 +26,13 @@ export const bookingsApiSlice = apiSlice.injectEndpoints({
       providesTags: (result, error, id) => [{ type: 'Booking', id }],
     }),
     getAvailability: builder.query({
-      query: (params) => {
-        const queryParams = new URLSearchParams();
-        if (params?.date) queryParams.append('date', params.date);
-        if (params?.serviceId) queryParams.append('serviceId', params.serviceId);
-        return `/bookings/availability?${queryParams.toString()}`;
-      },
+      query: ({ date, serviceId } = {}) => ({
+        url: '/bookings/availability',
+        params: {
+          ...(date && { date }),
+          ...(serviceId && { serviceId }),
+        },
+      }),
     }),
     createBooking: builder.mutation({
       query: (booking) => ({

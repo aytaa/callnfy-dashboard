@@ -29,7 +29,7 @@ function VerifyEmail() {
         setStatus('success');
       } catch (err) {
         setStatus('error');
-        setError(err?.data?.message || 'Failed to verify email. The link may have expired.');
+        setError(err?.data?.error?.message || err?.data?.message || 'Failed to verify email. The link may have expired.');
       }
     };
 
@@ -46,7 +46,7 @@ function VerifyEmail() {
       setResendSuccess(true);
       setShowResendForm(false);
     } catch (err) {
-      setError(err?.data?.message || 'Failed to resend verification email. Please try again.');
+      setError(err?.data?.error?.message || err?.data?.message || 'Failed to resend verification email. Please try again.');
     }
   };
 

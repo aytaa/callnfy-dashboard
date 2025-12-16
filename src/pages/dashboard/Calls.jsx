@@ -1,17 +1,27 @@
 import React, { useState } from 'react';
-import { Phone, Clock, TrendingUp, MoreVertical, Play } from 'lucide-react';
-import StatCard from '../../components/StatCard';
+import { Phone, MoreVertical } from 'lucide-react';
+import { useGetCallsQuery, useGetCallStatsQuery } from '../../slices/apiSlice/callsApiSlice';
 import DataTable from '../../components/DataTable';
-import Badge from '../../components/Badge';
 import Select from '../../components/Select';
 import Modal from '../../components/Modal';
 import Button from '../../components/Button';
-import Card from '../../components/Card';
 
 export default function Calls() {
+  const [page, setPage] = useState(1);
   const [dateFilter, setDateFilter] = useState('today');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [selectedCall, setSelectedCall] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { data: callsData, isLoading: callsLoading } = useGetCallsQuery({
+    page,
+    dateRange: dateFilter,
+    status: statusFilter !== 'all' ? statusFilter : undefined
+  });
+  const { data: stats, isLoading: statsLoading } = useGetCallStatsQuery({ dateRange: dateFilter });
+
+  const calls = callsData?.calls || [];
+  const pagination = callsData?.pagination || {};
 
   const dateOptions = [
     { value: 'today', label: 'Today' },
@@ -21,106 +31,55 @@ export default function Calls() {
     { value: 'all', label: 'All Time' },
   ];
 
-  // Mock data for calls
-  const calls = [
-    {
-      id: 1,
-      caller: 'Sarah Johnson',
-      phone: '(555) 123-4567',
-      duration: '3:45',
-      status: 'completed',
-      outcome: 'Appointment Booked',
-      datetime: 'Dec 14, 2025 10:30 AM',
-      transcript: 'Customer called to schedule a consultation appointment. Discussed available time slots and confirmed booking for December 15th at 2:00 PM.',
-      summary: 'Successfully booked consultation appointment. Customer expressed interest in our premium services.',
-    },
-    {
-      id: 2,
-      caller: 'Mike Chen',
-      phone: '(555) 234-5678',
-      duration: '2:15',
-      status: 'completed',
-      outcome: 'Info Provided',
-      datetime: 'Dec 14, 2025 11:15 AM',
-      transcript: 'Customer inquired about pricing and service packages. Provided detailed information about our starter and professional plans.',
-      summary: 'Information request about pricing. Customer is considering professional plan upgrade.',
-    },
-    {
-      id: 3,
-      caller: 'Emily Davis',
-      phone: '(555) 345-6789',
-      duration: '0:00',
-      status: 'missed',
-      outcome: 'No Answer',
-      datetime: 'Dec 14, 2025 1:45 PM',
-      transcript: 'Call was not answered. No voicemail left.',
-      summary: 'Missed call - no action taken.',
-    },
-    {
-      id: 4,
-      caller: 'Robert Wilson',
-      phone: '(555) 456-7890',
-      duration: '1:30',
-      status: 'voicemail',
-      outcome: 'Left Message',
-      datetime: 'Dec 14, 2025 2:30 PM',
-      transcript: 'Customer left a message requesting callback about rescheduling their appointment.',
-      summary: 'Callback requested for appointment rescheduling.',
-    },
-    {
-      id: 5,
-      caller: 'Lisa Anderson',
-      phone: '(555) 567-8901',
-      duration: '4:20',
-      status: 'completed',
-      outcome: 'Question Answered',
-      datetime: 'Dec 14, 2025 3:15 PM',
-      transcript: 'Customer had questions about our refund policy and service guarantees. All questions were answered satisfactorily.',
-      summary: 'Policy inquiry resolved. Customer satisfied with explanations provided.',
-    },
-    {
-      id: 6,
-      caller: 'David Martinez',
-      phone: '(555) 678-9012',
-      duration: '5:10',
-      status: 'completed',
-      outcome: 'Appointment Booked',
-      datetime: 'Dec 14, 2025 4:00 PM',
-      transcript: 'New customer calling for initial consultation. Discussed services, pricing, and scheduled first appointment.',
-      summary: 'New customer onboarded. Initial consultation scheduled for December 16th.',
-    },
-    {
-      id: 7,
-      caller: 'Jennifer Lee',
-      phone: '(555) 789-0123',
-      duration: '2:45',
-      status: 'completed',
-      outcome: 'Follow-up Scheduled',
-      datetime: 'Dec 14, 2025 4:45 PM',
-      transcript: 'Follow-up call after previous service. Customer satisfied, scheduled next appointment.',
-      summary: 'Successful follow-up. Customer retention confirmed.',
-    },
+  const statusOptions = [
+    { value: 'all', label: 'All Status' },
+    { value: 'completed', label: 'Completed' },
+    { value: 'missed', label: 'Missed' },
+    { value: 'voicemail', label: 'Voicemail' },
   ];
 
   const columns = [
-    { header: 'Caller', accessor: 'caller' },
+    { header: 'Customer', accessor: 'caller' },
     { header: 'Phone', accessor: 'phone' },
-    { header: 'Duration', accessor: 'duration' },
+    {
+      header: 'Duration',
+      accessor: 'duration',
+      render: (row) => {
+        const mins = Math.floor(row.duration / 60);
+        const secs = row.duration % 60;
+        return `${mins}:${String(secs).padStart(2, '0')}`;
+      }
+    },
     {
       header: 'Status',
       accessor: 'status',
       render: (row) => (
-        <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded">
+        <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded capitalize">
           {row.status}
         </span>
       ),
     },
-    { header: 'Outcome', accessor: 'outcome' },
-    { header: 'Date/Time', accessor: 'datetime' },
+    {
+      header: 'Date',
+      accessor: 'createdAt',
+      render: (row) => new Date(row.createdAt).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    },
     {
       header: 'Actions',
       render: (row) => (
-        <button className="text-gray-400 hover:text-white">
+        <button
+          className="text-gray-400 hover:text-white"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRowClick(row);
+          }}
+        >
           <MoreVertical className="w-5 h-5" />
         </button>
       ),
@@ -137,119 +96,190 @@ export default function Calls() {
     setSelectedCall(null);
   };
 
+  if (callsLoading && page === 1) {
+    return (
+      <div className="p-6 flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading calls...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 pt-8">
       <div className="max-w-5xl mx-auto space-y-4">
-        {/* Header with Filter */}
+        {/* Header with Filters */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-2xl font-bold text-white">Calls</h1>
           </div>
-          <Select
-            options={dateOptions}
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-            className="w-48"
-          />
+          <div className="flex gap-2">
+            <Select
+              options={statusOptions}
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-40"
+            />
+            <Select
+              options={dateOptions}
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="w-48"
+            />
+          </div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Total Calls */}
-          <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
-            <p className="text-sm text-gray-500 mb-2">Total Calls</p>
-            <p className="text-2xl font-bold text-white mb-1">15</p>
-            <p className="text-sm text-gray-600">+12%</p>
+        {statsLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4 animate-pulse">
+                <div className="h-4 bg-gray-700 rounded w-20 mb-2"></div>
+                <div className="h-8 bg-gray-700 rounded w-12"></div>
+              </div>
+            ))}
           </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Total Calls */}
+            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+              <p className="text-sm text-gray-500 mb-2">Total Calls</p>
+              <p className="text-2xl font-bold text-white mb-1">{stats?.totalCalls || 0}</p>
+              <p className="text-sm text-gray-600">
+                {stats?.percentChange > 0 ? '+' : ''}{stats?.percentChange || 0}%
+              </p>
+            </div>
 
-          {/* Avg Duration */}
-          <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
-            <p className="text-sm text-gray-500 mb-2">Avg Duration</p>
-            <p className="text-2xl font-bold text-white mb-1">3:24</p>
-            <p className="text-sm text-gray-600">+5%</p>
-          </div>
+            {/* Avg Duration */}
+            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+              <p className="text-sm text-gray-500 mb-2">Avg Duration</p>
+              <p className="text-2xl font-bold text-white mb-1">
+                {stats?.avgDuration ? `${Math.floor(stats.avgDuration / 60)}:${String(stats.avgDuration % 60).padStart(2, '0')}` : '0:00'}
+              </p>
+              <p className="text-sm text-gray-600">Average call time</p>
+            </div>
 
-          {/* Success Rate */}
-          <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
-            <p className="text-sm text-gray-500 mb-2">Success Rate</p>
-            <p className="text-2xl font-bold text-white mb-1">94%</p>
-            <p className="text-sm text-gray-600">+3%</p>
+            {/* Completed */}
+            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+              <p className="text-sm text-gray-500 mb-2">Completed</p>
+              <p className="text-2xl font-bold text-white mb-1">{stats?.completedCalls || 0}</p>
+              <p className="text-sm text-gray-600">Successful calls</p>
+            </div>
+
+            {/* Missed */}
+            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+              <p className="text-sm text-gray-500 mb-2">Missed</p>
+              <p className="text-2xl font-bold text-white mb-1">{stats?.missedCalls || 0}</p>
+              <p className="text-sm text-gray-600">Missed calls</p>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Calls Table */}
-        <DataTable
-          columns={columns}
-          data={calls}
-          onRowClick={handleRowClick}
-        />
+        {callsLoading ? (
+          <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+          </div>
+        ) : calls.length > 0 ? (
+          <>
+            <DataTable
+              columns={columns}
+              data={calls}
+              onRowClick={handleRowClick}
+            />
+            {pagination.totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-4">
+                <Button
+                  variant="secondary"
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  Previous
+                </Button>
+                <span className="flex items-center px-4 text-white">
+                  Page {page} of {pagination.totalPages}
+                </span>
+                <Button
+                  variant="secondary"
+                  onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
+                  disabled={page === pagination.totalPages}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-8">
+            <div className="flex flex-col items-center justify-center">
+              <div className="w-16 h-16 rounded-full bg-[#1a1a1a] flex items-center justify-center mb-4">
+                <Phone className="w-8 h-8 text-gray-500" strokeWidth={1.5} />
+              </div>
+              <p className="text-white font-semibold mb-1">No calls found</p>
+              <p className="text-sm text-gray-500">Try adjusting your filters</p>
+            </div>
+          </div>
+        )}
 
         {/* Call Details Modal */}
-        <Modal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          title={`Call Details - ${selectedCall?.caller}`}
-          size="lg"
-          footer={
-            <>
+        {selectedCall && (
+          <Modal
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            title={`Call Details - ${selectedCall?.caller || 'Unknown'}`}
+            size="lg"
+            footer={
               <Button variant="secondary" onClick={closeModal}>
                 Close
               </Button>
-            </>
-          }
-        >
-          {selectedCall && (
-            <div className="space-y-6">
-              {/* Call Info */}
+            }
+          >
+            <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-400">Phone Number</p>
+                  <p className="text-sm text-gray-400">Customer</p>
+                  <p className="text-white font-medium">{selectedCall.caller || 'Unknown'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400">Phone</p>
                   <p className="text-white font-medium">{selectedCall.phone}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-400">Duration</p>
-                  <p className="text-white font-medium">{selectedCall.duration}</p>
+                  <p className="text-white font-medium">
+                    {Math.floor(selectedCall.duration / 60)}:{String(selectedCall.duration % 60).padStart(2, '0')}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">Date & Time</p>
-                  <p className="text-white font-medium">{selectedCall.datetime}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-white opacity-60">Status</p>
-                  <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded">
+                  <p className="text-sm text-gray-400">Status</p>
+                  <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded capitalize">
                     {selectedCall.status}
                   </span>
                 </div>
               </div>
 
-              {/* AI Summary */}
-              <div className="bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg p-4">
-                <h3 className="text-sm font-semibold text-white opacity-60 mb-2">AI Summary</h3>
-                <p className="text-white">{selectedCall.summary}</p>
-              </div>
-
-              {/* Transcript */}
-              <div>
-                <h3 className="text-sm font-semibold text-white mb-2">Transcript</h3>
-                <div className="bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg p-4 max-h-64 overflow-y-auto">
-                  <p className="text-white whitespace-pre-wrap">{selectedCall.transcript}</p>
-                </div>
-              </div>
-
-              {/* Audio Player Placeholder */}
-              <div>
-                <h3 className="text-sm font-semibold text-white mb-2">Recording</h3>
-                <div className="bg-[#111] border border-[#1a1a1a] rounded-lg p-4 flex items-center justify-center gap-3">
-                  <Play className="w-5 h-5 text-white opacity-60" />
-                  <div className="flex-1 h-2 bg-[#2a2a2a] rounded-full">
-                    <div className="w-1/3 h-full bg-white rounded-full" />
+              {selectedCall.transcript && (
+                <div>
+                  <p className="text-sm text-gray-400 mb-2">Transcript</p>
+                  <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-4">
+                    <p className="text-white text-sm">{selectedCall.transcript}</p>
                   </div>
-                  <span className="text-sm text-white">{selectedCall.duration}</span>
                 </div>
-              </div>
+              )}
+
+              {selectedCall.summary && (
+                <div>
+                  <p className="text-sm text-gray-400 mb-2">Summary</p>
+                  <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-lg p-4">
+                    <p className="text-white text-sm">{selectedCall.summary}</p>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </Modal>
+          </Modal>
+        )}
       </div>
     </div>
   );

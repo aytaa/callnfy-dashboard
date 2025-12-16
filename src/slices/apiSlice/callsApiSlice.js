@@ -3,7 +3,15 @@ import { apiSlice } from '../apiSlice';
 export const callsApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getCalls: builder.query({
-      query: (page = 1) => `/calls?page=${page}`,
+      query: ({ page = 1, limit = 10, dateRange, status } = {}) => ({
+        url: '/calls',
+        params: {
+          page: Number(page),
+          limit: Number(limit),
+          ...(dateRange && { dateRange }),
+          ...(status && { status }),
+        },
+      }),
       providesTags: (result) =>
         result?.calls
           ? [
@@ -17,7 +25,10 @@ export const callsApiSlice = apiSlice.injectEndpoints({
       providesTags: (result, error, id) => [{ type: 'Call', id }],
     }),
     getCallStats: builder.query({
-      query: () => '/calls/stats',
+      query: ({ dateRange } = {}) => ({
+        url: '/calls/stats',
+        params: dateRange ? { dateRange } : undefined,
+      }),
       providesTags: [{ type: 'Call', id: 'STATS' }],
     }),
   }),

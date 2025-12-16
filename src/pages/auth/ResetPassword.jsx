@@ -59,7 +59,7 @@ function ResetPassword() {
         state: { message: 'Password reset successful! Please sign in with your new password.' }
       });
     } catch (err) {
-      setError(err?.data?.message || 'Failed to reset password. The link may have expired.');
+      setError(err?.data?.error?.message || err?.data?.message || 'Failed to reset password. The link may have expired.');
     }
   };
 

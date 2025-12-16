@@ -1,39 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const loadFromLocalStorage = () => {
-  try {
-    const serializedState = localStorage.getItem('auth');
-    if (serializedState === null) {
-      return {
-        user: null,
-        accessToken: null,
-        refreshToken: null,
-        isAuthenticated: false,
-      };
-    }
-    return JSON.parse(serializedState);
-  } catch (err) {
-    return {
-      user: null,
-      accessToken: null,
-      refreshToken: null,
-      isAuthenticated: false,
-    };
-  }
-};
-
-const saveToLocalStorage = (state) => {
-  try {
-    const serializedState = JSON.stringify(state);
-    localStorage.setItem('auth', serializedState);
-  } catch (err) {
-    console.error('Error saving to localStorage:', err);
-  }
+const initialState = {
+  user: JSON.parse(localStorage.getItem('user')) || null,
+  accessToken: localStorage.getItem('accessToken') || null,
+  refreshToken: localStorage.getItem('refreshToken') || null,
+  isAuthenticated: !!localStorage.getItem('accessToken'),
 };
 
 const authSlice = createSlice({
   name: 'auth',
-  initialState: loadFromLocalStorage(),
+  initialState,
   reducers: {
     setCredentials: (state, action) => {
       const { user, accessToken, refreshToken } = action.payload;
@@ -41,19 +17,24 @@ const authSlice = createSlice({
       state.accessToken = accessToken;
       state.refreshToken = refreshToken;
       state.isAuthenticated = true;
-      saveToLocalStorage(state);
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('user', JSON.stringify(user));
     },
     token: (state, action) => {
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
-      saveToLocalStorage(state);
+      localStorage.setItem('accessToken', action.payload.accessToken);
+      localStorage.setItem('refreshToken', action.payload.refreshToken);
     },
     logout: (state) => {
       state.user = null;
       state.accessToken = null;
       state.refreshToken = null;
       state.isAuthenticated = false;
-      localStorage.removeItem('auth');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
     },
   },
 });

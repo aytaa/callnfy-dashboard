@@ -38,7 +38,7 @@ function Register() {
 
       setSuccess(true);
     } catch (err) {
-      setError(err?.data?.message || 'Failed to create account. Please try again.');
+      setError(err?.data?.error?.message || err?.data?.message || 'Failed to create account. Please try again.');
     }
   };
 

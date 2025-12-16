@@ -29,14 +29,14 @@ function Login() {
       const result = await login({ email, password }).unwrap();
 
       dispatch(setCredentials({
-        user: result.user,
-        accessToken: result.accessToken,
-        refreshToken: result.refreshToken,
+        user: result.data.user,
+        accessToken: result.data.accessToken,
+        refreshToken: result.data.refreshToken,
       }));
 
       navigate('/dashboard');
     } catch (err) {
-      setError(err?.data?.message || 'Failed to login. Please try again.');
+      setError(err?.data?.error?.message || err?.data?.message || 'Failed to login. Please try again.');
     }
   };
 

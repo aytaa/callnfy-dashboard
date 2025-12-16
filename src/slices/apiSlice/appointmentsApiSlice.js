@@ -3,7 +3,16 @@ import { apiSlice } from '../apiSlice';
 export const appointmentsApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getAppointments: builder.query({
-      query: (page = 1) => `/appointments?page=${page}`,
+      query: ({ page = 1, limit = 10, status, startDate, endDate } = {}) => ({
+        url: '/appointments',
+        params: {
+          page: Number(page),
+          limit: Number(limit),
+          ...(status && { status }),
+          ...(startDate && { startDate }),
+          ...(endDate && { endDate }),
+        },
+      }),
       providesTags: (result) =>
         result?.appointments
           ? [

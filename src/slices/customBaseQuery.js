@@ -11,6 +11,17 @@ const baseQuery = fetchBaseQuery({
     }
     return headers;
   },
+  paramsSerializer: (params) => {
+    // Convert page and limit to numbers
+    const serializedParams = { ...params };
+    if (serializedParams.page !== undefined) {
+      serializedParams.page = Number(serializedParams.page);
+    }
+    if (serializedParams.limit !== undefined) {
+      serializedParams.limit = Number(serializedParams.limit);
+    }
+    return new URLSearchParams(serializedParams).toString();
+  },
 });
 
 export const customBaseQuery = async (args, api, extraOptions) => {
@@ -30,12 +41,12 @@ export const customBaseQuery = async (args, api, extraOptions) => {
         extraOptions
       );
 
-      if (refreshResult?.data) {
+      if (refreshResult?.data?.data) {
         api.dispatch(
           setCredentials({
-            user: refreshResult.data.user,
-            accessToken: refreshResult.data.accessToken,
-            refreshToken: refreshResult.data.refreshToken,
+            user: refreshResult.data.data.user,
+            accessToken: refreshResult.data.data.accessToken,
+            refreshToken: refreshResult.data.data.refreshToken,
           })
         );
         result = await baseQuery(args, api, extraOptions);
