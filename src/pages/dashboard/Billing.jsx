@@ -106,7 +106,7 @@ export default function Billing() {
       header: 'Status',
       accessor: 'status',
       render: (row) => (
-        <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
+        <span className="inline-block px-2 py-0.5 bg-[#262626] text-gray-400 text-xs font-medium rounded">
           {row.status}
         </span>
       ),
@@ -123,12 +123,12 @@ export default function Billing() {
         </div>
 
         {/* Current Plan */}
-        <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+        <div className="bg-[#171717] border border-[#303030] rounded-xl p-4">
           <div className="flex items-start justify-between mb-4">
             <div>
               <h2 className="text-lg font-semibold text-white mb-2">Current Plan</h2>
               <div className="flex items-center gap-3">
-                <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
+                <span className="inline-block px-2 py-0.5 bg-[#262626] text-gray-400 text-xs font-medium rounded">
                   {currentPlan.name}
                 </span>
                 <span className="text-2xl font-bold text-white">${currentPlan.price}/mo</span>
@@ -151,7 +151,7 @@ export default function Billing() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-[#1a1a1a]">
+          <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-[#303030]">
             <div>
               <p className="text-sm text-gray-400">Next Billing Date</p>
               <div className="flex items-center gap-2 mt-1">
@@ -167,11 +167,11 @@ export default function Billing() {
         </div>
 
         {/* Payment Method */}
-        <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+        <div className="bg-[#171717] border border-[#303030] rounded-xl p-4">
           <h2 className="text-lg font-semibold text-white mb-4">Payment Method</h2>
-          <div className="flex items-center justify-between bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg p-4">
+          <div className="flex items-center justify-between bg-[#212121] border border-[#303030] rounded-lg p-4">
             <div className="flex items-center gap-4">
-              <div className="bg-[#1a1a1a] p-3 rounded-lg">
+              <div className="bg-[#262626] p-3 rounded-lg">
                 <CreditCard className="w-6 h-6 text-gray-400" strokeWidth={1.5} />
               </div>
               <div>
@@ -181,7 +181,7 @@ export default function Billing() {
                 <p className="text-sm text-gray-400">Expires {paymentMethod.expiry}</p>
               </div>
             </div>
-            <button className="border border-[#2a2a2a] text-gray-400 px-3 py-1.5 text-sm rounded-lg hover:border-[#3a3a3a] hover:text-white transition-colors">
+            <button className="border border-[#303030] text-gray-400 px-3 py-1.5 text-sm rounded-lg hover:border-[#3a3a3a] hover:text-white transition-colors">
               Update
             </button>
           </div>
@@ -204,24 +204,24 @@ export default function Billing() {
             {plans.map((plan) => (
               <div
                 key={plan.name}
-                className={`relative bg-[#111] border rounded-xl p-4 ${
+                className={`relative bg-[#171717] border rounded-xl p-4 ${
                   plan.popular
-                    ? 'border-[#2a2a2a] shadow-lg'
+                    ? 'border-[#303030] shadow-lg'
                     : plan.isCurrent
-                    ? 'border-[#2a2a2a]'
-                    : 'border-[#1a1a1a]'
+                    ? 'border-[#303030]'
+                    : 'border-[#303030]'
                 }`}
               >
                 {plan.popular && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
+                    <span className="inline-block px-2 py-0.5 bg-[#262626] text-gray-400 text-xs font-medium rounded">
                       POPULAR
                     </span>
                   </div>
                 )}
                 {plan.isCurrent && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-gray-400 text-xs font-medium rounded">
+                    <span className="inline-block px-2 py-0.5 bg-[#262626] text-gray-400 text-xs font-medium rounded">
                       CURRENT PLAN
                     </span>
                   </div>
@@ -248,7 +248,7 @@ export default function Billing() {
                 <button
                   className={`w-full px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                     plan.isCurrent
-                      ? 'bg-[#1a1a1a] text-gray-500 cursor-not-allowed'
+                      ? 'bg-[#262626] text-gray-500 cursor-not-allowed'
                       : 'bg-white text-black hover:bg-gray-200'
                   }`}
                   disabled={plan.isCurrent}

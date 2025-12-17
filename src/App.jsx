@@ -40,7 +40,7 @@ function AuthRoute({ children }) {
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/overview" replace />;
   }
 
   return children;
@@ -165,9 +165,9 @@ function App() {
           }
         />
 
-        {/* Dashboard Routes (Protected) */}
+        {/* Dashboard Routes (Protected) - Flat Structure */}
         <Route
-          path="/dashboard"
+          path="/overview"
           element={
             <ProtectedRoute>
               <Layout>
@@ -177,7 +177,7 @@ function App() {
           }
         />
         <Route
-          path="/dashboard/calls"
+          path="/calls"
           element={
             <ProtectedRoute>
               <Layout>
@@ -187,7 +187,7 @@ function App() {
           }
         />
         <Route
-          path="/dashboard/appointments"
+          path="/appointments"
           element={
             <ProtectedRoute>
               <Layout>
@@ -197,7 +197,7 @@ function App() {
           }
         />
         <Route
-          path="/dashboard/customers"
+          path="/customers"
           element={
             <ProtectedRoute>
               <Layout>
@@ -207,7 +207,7 @@ function App() {
           }
         />
         <Route
-          path="/dashboard/ai-assistant"
+          path="/ai-assistant"
           element={
             <ProtectedRoute>
               <Layout>
@@ -217,7 +217,7 @@ function App() {
           }
         />
         <Route
-          path="/dashboard/phone-numbers"
+          path="/phone-numbers"
           element={
             <ProtectedRoute>
               <Layout>
@@ -226,6 +226,14 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Redirects for old dashboard routes */}
+        <Route path="/dashboard" element={<Navigate to="/overview" replace />} />
+        <Route path="/dashboard/calls" element={<Navigate to="/calls" replace />} />
+        <Route path="/dashboard/appointments" element={<Navigate to="/appointments" replace />} />
+        <Route path="/dashboard/customers" element={<Navigate to="/customers" replace />} />
+        <Route path="/dashboard/ai-assistant" element={<Navigate to="/ai-assistant" replace />} />
+        <Route path="/dashboard/phone-numbers" element={<Navigate to="/phone-numbers" replace />} />
 
         {/* Settings Routes (Protected with SettingsLayout) */}
         <Route

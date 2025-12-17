@@ -6,119 +6,52 @@ import Input from '../../components/Input';
 import Modal from '../../components/Modal';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
+import {
+  useGetCustomersQuery,
+  useCreateCustomerMutation,
+  useUpdateCustomerMutation,
+  useDeleteCustomerMutation,
+} from '../../slices/apiSlice/customersApiSlice';
 
 export default function Customers() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [formData, setFormData] = useState({ name: '', phone: '', email: '' });
+  const [error, setError] = useState('');
 
-  // Mock customers data
-  const customers = [
-    {
-      id: 1,
-      name: 'Sarah Johnson',
-      phone: '(555) 123-4567',
-      email: 'sarah.j@email.com',
-      totalCalls: 8,
-      lastContact: 'Dec 14, 2025',
-      status: 'active',
-      joinDate: 'Nov 1, 2025',
-      callHistory: [
-        { date: 'Dec 14, 2025', duration: '3:45', outcome: 'Appointment Booked' },
-        { date: 'Dec 10, 2025', duration: '2:15', outcome: 'Info Provided' },
-        { date: 'Dec 5, 2025', duration: '4:20', outcome: 'Question Answered' },
-      ],
-      appointments: [
-        { date: 'Dec 15, 2025', time: '2:00 PM', service: 'Consultation', status: 'confirmed' },
-        { date: 'Nov 28, 2025', time: '10:30 AM', service: 'Follow-up', status: 'completed' },
-      ],
-    },
-    {
-      id: 2,
-      name: 'Mike Chen',
-      phone: '(555) 234-5678',
-      email: 'mike.chen@email.com',
-      totalCalls: 12,
-      lastContact: 'Dec 14, 2025',
-      status: 'active',
-      joinDate: 'Oct 15, 2025',
-      callHistory: [
-        { date: 'Dec 14, 2025', duration: '2:15', outcome: 'Info Provided' },
-        { date: 'Dec 12, 2025', duration: '1:30', outcome: 'Follow-up' },
-      ],
-      appointments: [
-        { date: 'Dec 20, 2025', time: '11:00 AM', service: 'Check-up', status: 'confirmed' },
-      ],
-    },
-    {
-      id: 3,
-      name: 'Emily Davis',
-      phone: '(555) 345-6789',
-      email: 'emily.d@email.com',
-      totalCalls: 3,
-      lastContact: 'Dec 14, 2025',
-      status: 'new',
-      joinDate: 'Dec 10, 2025',
-      callHistory: [
-        { date: 'Dec 14, 2025', duration: '0:00', outcome: 'Missed Call' },
-        { date: 'Dec 13, 2025', duration: '5:10', outcome: 'Inquiry' },
-      ],
-      appointments: [],
-    },
-    {
-      id: 4,
-      name: 'Robert Wilson',
-      phone: '(555) 456-7890',
-      email: 'r.wilson@email.com',
-      totalCalls: 15,
-      lastContact: 'Dec 14, 2025',
-      status: 'active',
-      joinDate: 'Sep 20, 2025',
-      callHistory: [
-        { date: 'Dec 14, 2025', duration: '1:30', outcome: 'Left Message' },
-        { date: 'Dec 8, 2025', duration: '3:00', outcome: 'Consultation' },
-      ],
-      appointments: [
-        { date: 'Dec 22, 2025', time: '3:00 PM', service: 'Follow-up', status: 'pending' },
-      ],
-    },
-    {
-      id: 5,
-      name: 'Lisa Anderson',
-      phone: '(555) 567-8901',
-      email: 'lisa.anderson@email.com',
-      totalCalls: 6,
-      lastContact: 'Dec 14, 2025',
-      status: 'active',
-      joinDate: 'Nov 5, 2025',
-      callHistory: [
-        { date: 'Dec 14, 2025', duration: '4:20', outcome: 'Question Answered' },
-        { date: 'Dec 7, 2025', duration: '2:45', outcome: 'Info Request' },
-      ],
-      appointments: [],
-    },
-  ];
+  const { data: customersData, isLoading } = useGetCustomersQuery({
+    page: Number(page),
+    limit: 10,
+    search: searchQuery,
+  });
 
-  const filteredCustomers = customers.filter(customer =>
-    customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    customer.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    customer.phone.includes(searchQuery)
-  );
+  const [createCustomer, { isLoading: isCreating }] = useCreateCustomerMutation();
+  const [updateCustomer, { isLoading: isUpdating }] = useUpdateCustomerMutation();
+  const [deleteCustomer, { isLoading: isDeleting }] = useDeleteCustomerMutation();
+
+  const customers = customersData?.customers || [];
+  const pagination = customersData?.pagination || {};
 
   const columns = [
     { header: 'Name', accessor: 'name' },
     { header: 'Phone', accessor: 'phone' },
     { header: 'Email', accessor: 'email' },
-    { header: 'Total Calls', accessor: 'totalCalls' },
-    { header: 'Last Contact', accessor: 'lastContact' },
     {
-      header: 'Status',
-      accessor: 'status',
-      render: (row) => (
-        <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded">
-          {row.status}
-        </span>
-      ),
+      header: 'Total Calls',
+      accessor: 'totalCalls',
+      render: (row) => row.totalCalls || 0
+    },
+    {
+      header: 'Last Contact',
+      accessor: 'lastContact',
+      render: (row) => row.lastContact ? new Date(row.lastContact).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      }) : 'N/A'
     },
   ];
 
@@ -132,13 +65,52 @@ export default function Customers() {
     setSelectedCustomer(null);
   };
 
+  const handleAddCustomer = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    try {
+      await createCustomer(formData).unwrap();
+      setIsAddModalOpen(false);
+      setFormData({ name: '', phone: '', email: '' });
+    } catch (err) {
+      setError(err?.data?.error?.message || err?.data?.message || 'Failed to create customer');
+    }
+  };
+
+  const handleDeleteCustomer = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this customer?')) return;
+
+    try {
+      await deleteCustomer(id).unwrap();
+      setIsModalOpen(false);
+      setSelectedCustomer(null);
+    } catch (err) {
+      setError(err?.data?.error?.message || err?.data?.message || 'Failed to delete customer');
+    }
+  };
+
+  if (isLoading && page === 1) {
+    return (
+      <div className="p-6 flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading customers...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 pt-8">
       <div className="max-w-5xl mx-auto space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-white">Customers</h1>
-          <button className="bg-white text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="bg-white text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+          >
             Add Customer
           </button>
         </div>
@@ -156,12 +128,59 @@ export default function Customers() {
         </div>
 
         {/* Customers Table */}
-        <DataTable
-          columns={columns}
-          data={filteredCustomers}
-          onRowClick={handleRowClick}
-          emptyMessage="No customers found"
-        />
+        {isLoading ? (
+          <div className="bg-[#171717] border border-[#303030] rounded-xl p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+          </div>
+        ) : customers.length > 0 ? (
+          <>
+            <DataTable
+              columns={columns}
+              data={customers}
+              onRowClick={handleRowClick}
+              emptyMessage="No customers found"
+            />
+            {pagination.totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-4">
+                <Button
+                  variant="secondary"
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  Previous
+                </Button>
+                <span className="flex items-center px-4 text-white">
+                  Page {page} of {pagination.totalPages}
+                </span>
+                <Button
+                  variant="secondary"
+                  onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
+                  disabled={page === pagination.totalPages}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="bg-[#171717] border border-[#303030] rounded-xl p-12">
+            <div className="flex flex-col items-center justify-center text-center">
+              <div className="w-16 h-16 rounded-full bg-[#262626] flex items-center justify-center mb-4">
+                <Phone className="w-8 h-8 text-gray-400" strokeWidth={1.5} />
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-1">No customers yet</h3>
+              <p className="text-sm text-white opacity-60 mb-6">
+                Get started by adding your first customer
+              </p>
+              <button
+                onClick={() => setIsAddModalOpen(true)}
+                className="bg-white text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Add Customer
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Customer Details Modal */}
         <Modal
@@ -172,8 +191,15 @@ export default function Customers() {
           footer={
             <>
               <button
+                onClick={() => handleDeleteCustomer(selectedCustomer?.id)}
+                disabled={isDeleting}
+                className="border border-red-600 text-red-600 px-3 py-1.5 text-sm rounded-lg hover:bg-red-600 hover:text-white transition-colors disabled:opacity-50"
+              >
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+              <button
                 onClick={closeModal}
-                className="border border-[#2a2a2a] text-white px-3 py-1.5 text-sm rounded-lg hover:border-[#3a3a3a] transition-colors"
+                className="border border-[#303030] text-white px-3 py-1.5 text-sm rounded-lg hover:border-[#3a3a3a] transition-colors"
               >
                 Close
               </button>
@@ -183,7 +209,7 @@ export default function Customers() {
           {selectedCustomer && (
             <div className="space-y-6">
               {/* Customer Info */}
-              <div className="bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg p-4">
+              <div className="bg-[#212121] border border-[#303030] rounded-lg p-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-white opacity-60 mb-1">Name</p>
@@ -191,7 +217,7 @@ export default function Customers() {
                   </div>
                   <div>
                     <p className="text-sm text-white opacity-60 mb-1">Status</p>
-                    <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded">
+                    <span className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded">
                       {selectedCustomer.status}
                     </span>
                   </div>
@@ -229,13 +255,13 @@ export default function Customers() {
                 <div className="space-y-2">
                   {selectedCustomer.callHistory.length > 0 ? (
                     selectedCustomer.callHistory.map((call, index) => (
-                      <div key={index} className="bg-[#111] border border-[#1a1a1a] rounded-lg p-4">
+                      <div key={index} className="bg-[#171717] border border-[#303030] rounded-lg p-4">
                         <div className="flex justify-between items-center">
                           <div>
                             <p className="text-white font-medium">{call.outcome}</p>
                             <p className="text-sm text-white opacity-60">{call.date}</p>
                           </div>
-                          <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded">
+                          <span className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded">
                             {call.duration}
                           </span>
                         </div>
@@ -256,7 +282,7 @@ export default function Customers() {
                 <div className="space-y-2">
                   {selectedCustomer.appointments.length > 0 ? (
                     selectedCustomer.appointments.map((appointment, index) => (
-                      <div key={index} className="bg-[#111] border border-[#1a1a1a] rounded-lg p-4">
+                      <div key={index} className="bg-[#171717] border border-[#303030] rounded-lg p-4">
                         <div className="flex justify-between items-center">
                           <div>
                             <p className="text-white font-medium">{appointment.service}</p>
@@ -264,7 +290,7 @@ export default function Customers() {
                               {appointment.date} at {appointment.time}
                             </p>
                           </div>
-                          <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded">
+                          <span className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded">
                             {appointment.status}
                           </span>
                         </div>
@@ -277,6 +303,82 @@ export default function Customers() {
               </div>
             </div>
           )}
+        </Modal>
+
+        {/* Add Customer Modal */}
+        <Modal
+          isOpen={isAddModalOpen}
+          onClose={() => {
+            setIsAddModalOpen(false);
+            setFormData({ name: '', phone: '', email: '' });
+            setError('');
+          }}
+          title="Add New Customer"
+          footer={
+            <>
+              <button
+                onClick={() => {
+                  setIsAddModalOpen(false);
+                  setFormData({ name: '', phone: '', email: '' });
+                  setError('');
+                }}
+                className="border border-[#303030] text-white px-3 py-1.5 text-sm rounded-lg hover:border-[#3a3a3a] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddCustomer}
+                disabled={isCreating}
+                className="bg-white text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+              >
+                {isCreating ? 'Creating...' : 'Add Customer'}
+              </button>
+            </>
+          }
+        >
+          <form onSubmit={handleAddCustomer} className="space-y-4">
+            {error && (
+              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm text-white opacity-60 mb-2">Name</label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full bg-[#262626] border border-[#303030] rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-[#3a3a3a] focus:outline-none"
+                placeholder="Customer name"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm text-white opacity-60 mb-2">Phone</label>
+              <input
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                className="w-full bg-[#262626] border border-[#303030] rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-[#3a3a3a] focus:outline-none"
+                placeholder="+1 (555) 123-4567"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm text-white opacity-60 mb-2">Email</label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full bg-[#262626] border border-[#303030] rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-[#3a3a3a] focus:outline-none"
+                placeholder="customer@email.com"
+                required
+              />
+            </div>
+          </form>
         </Modal>
       </div>
     </div>

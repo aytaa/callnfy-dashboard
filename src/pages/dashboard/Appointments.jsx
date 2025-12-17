@@ -102,7 +102,7 @@ export default function Appointments() {
       header: 'Status',
       accessor: 'status',
       render: (row) => (
-        <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded">
+        <span className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded">
           {row.status}
         </span>
       ),
@@ -167,7 +167,7 @@ export default function Appointments() {
             <h1 className="text-2xl font-bold text-white">Appointments</h1>
           </div>
           <div className="flex gap-3">
-            <div className="flex bg-[#1a1a1a] rounded-lg p-1">
+            <div className="flex bg-[#262626] rounded-lg p-1">
               <button
                 onClick={() => setView('calendar')}
                 className={`px-3 py-1.5 rounded-md transition-colors ${
@@ -209,13 +209,13 @@ export default function Appointments() {
               <div className="flex gap-2">
                 <button
                   onClick={handlePrevMonth}
-                  className="p-2 text-gray-400 hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors"
+                  className="p-2 text-gray-400 hover:text-white hover:bg-[#262626] rounded-lg transition-colors"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button
                   onClick={handleNextMonth}
-                  className="p-2 text-gray-400 hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors"
+                  className="p-2 text-gray-400 hover:text-white hover:bg-[#262626] rounded-lg transition-colors"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -232,7 +232,7 @@ export default function Appointments() {
                 <div
                   key={index}
                   className={`aspect-square p-2 border rounded-lg ${
-                    day ? 'border-[#2a2a2a] bg-[#0a0a0a] hover:bg-[#1a1a1a] cursor-pointer' : 'border-transparent'
+                    day ? 'border-[#303030] bg-[#212121] hover:bg-[#262626] cursor-pointer' : 'border-transparent'
                   } ${day === 14 ? 'border-white' : ''}`}
                 >
                   {day && (
@@ -266,7 +266,7 @@ export default function Appointments() {
             <>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="border border-[#2a2a2a] text-white px-3 py-1.5 text-sm rounded-lg hover:border-[#3a3a3a] transition-colors"
+                className="border border-[#303030] text-white px-3 py-1.5 text-sm rounded-lg hover:border-[#3a3a3a] transition-colors"
               >
                 Cancel
               </button>

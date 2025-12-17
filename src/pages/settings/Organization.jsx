@@ -17,14 +17,14 @@ export default function Organization() {
     <div>
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-8 h-8 bg-[#1a1a1a] rounded-lg flex items-center justify-center">
+        <div className="w-8 h-8 bg-[#262626] rounded-lg flex items-center justify-center">
           <Settings className="w-4 h-4 text-white" />
         </div>
         <h1 className="text-lg font-semibold text-white">{orgName}</h1>
       </div>
 
       {/* Card */}
-      <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+      <div className="bg-[#171717] border border-[#303030] rounded-xl p-4">
         <h2 className="text-base font-semibold text-white mb-1">Organization Settings</h2>
         <p className="text-white text-sm opacity-60 mb-4">Your organization's details.</p>
 
@@ -32,7 +32,7 @@ export default function Organization() {
           <div>
             <label className="block text-sm text-white opacity-60 mb-1">Organization Name</label>
             <input
-              className="w-full bg-black border border-[#2a2a2a] rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-[#3a3a3a] focus:outline-none"
+              className="w-full bg-[#262626] border border-[#303030] rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-[#3a3a3a] focus:outline-none"
               value={orgName}
               onChange={(e) => setOrgName(e.target.value)}
             />
@@ -41,7 +41,7 @@ export default function Organization() {
           <div>
             <label className="block text-sm text-white opacity-60 mb-1">Organization Email</label>
             <input
-              className="w-full bg-black border border-[#2a2a2a] rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-[#3a3a3a] focus:outline-none"
+              className="w-full bg-[#262626] border border-[#303030] rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-[#3a3a3a] focus:outline-none"
               value={orgEmail}
               onChange={(e) => setOrgEmail(e.target.value)}
             />
@@ -51,13 +51,13 @@ export default function Organization() {
             <label className="block text-sm text-white opacity-60 mb-1">Organization ID</label>
             <div className="flex items-center gap-2">
               <input
-                className="flex-1 bg-black border border-[#2a2a2a] rounded-lg px-3 py-2 text-sm text-white"
+                className="flex-1 bg-[#262626] border border-[#303030] rounded-lg px-3 py-2 text-sm text-white"
                 value={orgId}
                 readOnly
               />
               <button
                 onClick={handleCopy}
-                className="p-2 text-white opacity-60 hover:opacity-100 hover:bg-[#1a1a1a] rounded-lg transition-all"
+                className="p-2 text-white opacity-60 hover:opacity-100 hover:bg-[#262626] rounded-lg transition-all"
                 title="Copy Organization ID"
               >
                 {copied ? (
@@ -70,7 +70,7 @@ export default function Organization() {
           </div>
         </div>
 
-        <div className="flex justify-end mt-4 pt-3 border-t border-[#1a1a1a]">
+        <div className="flex justify-end mt-4 pt-3 border-t border-[#303030]">
           <button className="bg-white text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
             Save
           </button>

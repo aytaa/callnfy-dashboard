@@ -14,9 +14,9 @@ export default function Members() {
         </button>
       </div>
 
-      <div className="bg-[#111] border border-[#1a1a1a] rounded-xl overflow-hidden">
+      <div className="bg-[#171717] border border-[#303030] rounded-xl overflow-hidden">
         <table className="w-full">
-          <thead className="bg-black">
+          <thead className="bg-[#212121]">
             <tr>
               <th className="px-4 py-2 text-left text-xs text-gray-400 uppercase tracking-wider">Member</th>
               <th className="px-4 py-2 text-left text-xs text-gray-400 uppercase tracking-wider">Role</th>
@@ -25,10 +25,10 @@ export default function Members() {
           </thead>
           <tbody>
             {members.map((member, i) => (
-              <tr key={i} className="border-t border-[#1a1a1a]">
+              <tr key={i} className="border-t border-[#303030]">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#2a2a2a] rounded-full flex items-center justify-center text-white text-sm">
+                    <div className="w-8 h-8 bg-[#262626] rounded-full flex items-center justify-center text-white text-sm">
                       {member.avatar}
                     </div>
                     <div>

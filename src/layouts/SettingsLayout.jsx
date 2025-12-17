@@ -20,9 +20,9 @@ export default function SettingsLayout() {
   ];
 
   return (
-    <div className="flex h-screen bg-[#0a0a0a]">
+    <div className="flex h-screen bg-[#212121]">
       {/* Settings Sidebar */}
-      <div className="w-64 border-r border-[#1a1a1a] p-4 flex-shrink-0">
+      <div className="w-64 border-r border-[#303030] p-4 flex-shrink-0">
         <div className="flex items-center gap-2 mb-6">
           <Settings className="w-5 h-5 text-gray-400" />
           <span className="text-white font-semibold">Settings</span>
@@ -40,8 +40,8 @@ export default function SettingsLayout() {
                 className={({ isActive }) =>
                   `flex items-center gap-2 px-2 py-2 rounded-lg text-sm transition-colors ${
                     isActive
-                      ? 'bg-[#1a1a1a] text-white'
-                      : 'text-gray-400 hover:bg-[#1a1a1a] hover:text-white'
+                      ? 'bg-[#262626] text-white'
+                      : 'text-gray-400 hover:bg-[#262626] hover:text-white'
                   }`
                 }
               >

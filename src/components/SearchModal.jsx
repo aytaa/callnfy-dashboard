@@ -29,7 +29,7 @@ export default function SearchModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   const actions = [
-    { icon: ArrowRight, label: 'Switch Organization', shortcut: '\u2318 0', action: () => console.log('Switch org') }
+    { icon: ArrowRight, label: 'Switch Organization', shortcut: '⌘ 0', action: () => console.log('Switch org') }
   ];
 
   const pages = [
@@ -84,10 +84,10 @@ export default function SearchModal({ isOpen, onClose }) {
       <div className="fixed inset-0 bg-black/80 z-50" onClick={onClose} />
 
       {/* Modal */}
-      <div className="fixed top-[20%] left-1/2 -translate-x-1/2 w-full max-w-lg bg-[#111] border border-[#1a1a1a] rounded-xl z-50 overflow-hidden">
+      <div className="fixed top-[20%] left-1/2 -translate-x-1/2 w-full max-w-lg bg-[#171717] rounded-xl z-50 overflow-hidden">
 
         {/* Search Input */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-[#1a1a1a]">
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-[#303030]">
           <Search className="w-4 h-4 text-gray-500" />
           <input
             type="text"
@@ -98,7 +98,7 @@ export default function SearchModal({ isOpen, onClose }) {
               setSelectedIndex(0);
             }}
             onKeyDown={handleKeyDown}
-            className="flex-1 bg-transparent text-white placeholder:text-gray-500 focus:outline-none text-sm"
+            className="flex-1 bg-[#303030] px-3 py-1.5 rounded border-none text-white placeholder:text-gray-500 focus:outline-none text-sm"
             autoFocus
           />
         </div>
@@ -115,12 +115,12 @@ export default function SearchModal({ isOpen, onClose }) {
                   key={`action-${i}`}
                   onClick={action.action}
                   className={`flex items-center justify-between px-2 py-2 rounded-lg cursor-pointer ${
-                    selectedIndex === i ? 'bg-[#1a1a1a]' : 'hover:bg-[#1a1a1a]'
+                    selectedIndex === i ? 'bg-[#262626]' : 'hover:bg-[#262626]'
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <action.icon className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-300">{action.label}</span>
+                    <span className="text-sm text-white">{action.label}</span>
                   </div>
                   <span className="text-xs text-gray-500">{action.shortcut}</span>
                 </div>
@@ -139,13 +139,13 @@ export default function SearchModal({ isOpen, onClose }) {
                     key={`page-${i}`}
                     onClick={() => handleNavigate(page.path)}
                     className={`flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer ${
-                      selectedIndex === itemIndex ? 'bg-[#1a1a1a]' : 'hover:bg-[#1a1a1a]'
+                      selectedIndex === itemIndex ? 'bg-[#262626]' : 'hover:bg-[#262626]'
                     }`}
                   >
                     <page.icon className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-300">{page.label}</span>
+                    <span className="text-sm text-white">{page.label}</span>
                     {page.section && (
-                      <span className="text-xs text-gray-600">\u2014 {page.section}</span>
+                      <span className="text-xs text-gray-400">— {page.section}</span>
                     )}
                   </div>
                 );
@@ -162,15 +162,15 @@ export default function SearchModal({ isOpen, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center gap-4 px-4 py-2 border-t border-[#1a1a1a] text-xs text-gray-500">
+        <div className="flex items-center gap-4 px-4 py-2 border-t border-[#303030] text-xs text-gray-500">
           <span className="flex items-center gap-1">
-            <span>\u2191\u2193</span> to navigate
+            <span>↑↓</span> to navigate
           </span>
           <span className="flex items-center gap-1">
-            <span>\u21b5</span> to select
+            <span>↵</span> to select
           </span>
           <span className="flex items-center gap-1">
-            <span>\u2318 0</span> Switch Organizations
+            <span>⌘ 0</span> Switch Organizations
           </span>
           <span className="ml-auto">{resultCount} results</span>
         </div>

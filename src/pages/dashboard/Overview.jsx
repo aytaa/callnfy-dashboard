@@ -53,7 +53,7 @@ export default function Overview() {
       header: 'Status',
       accessor: 'status',
       render: (row) => (
-        <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded capitalize">
+        <span className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded capitalize">
           {row.status}
         </span>
       ),
@@ -83,7 +83,7 @@ export default function Overview() {
     return (
       <div className="p-6">
         <div className="max-w-2xl mx-auto text-center py-12">
-          <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-8">
+          <div className="bg-[#171717] border border-[#303030] rounded-xl p-8">
             <Phone className="w-16 h-16 text-gray-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-white mb-2">Welcome to Callnfy!</h2>
             <p className="text-gray-400 mb-6">
@@ -116,7 +116,7 @@ export default function Overview() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-white">Metrics</h2>
             <div className="flex gap-2">
-              <button className="px-3 py-1.5 text-sm border border-[#2a2a2a] rounded-lg text-gray-400 hover:border-[#3a3a3a] hover:text-gray-300 transition-colors">
+              <button className="px-3 py-1.5 text-sm border border-[#303030] rounded-lg text-gray-400 hover:border-[#3a3a3a] hover:text-gray-300 transition-colors">
                 Last Month
               </button>
             </div>
@@ -125,28 +125,28 @@ export default function Overview() {
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Card 1: Today's Calls */}
-            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+            <div className="bg-[#171717] border border-[#303030] rounded-xl p-4">
               <p className="text-sm text-gray-500 mb-2">Today's Calls</p>
               <p className="text-2xl font-bold text-white mb-1">{todaysCalls}</p>
               <p className="text-sm text-gray-600">Total calls received today</p>
             </div>
 
             {/* Card 2: Minutes Used */}
-            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+            <div className="bg-[#171717] border border-[#303030] rounded-xl p-4">
               <p className="text-sm text-gray-500 mb-2">Minutes Used</p>
               <p className="text-2xl font-bold text-white mb-1">{minutesFormatted}</p>
               <p className="text-sm text-gray-600">Total call duration</p>
             </div>
 
             {/* Card 3: Today's Appointments */}
-            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+            <div className="bg-[#171717] border border-[#303030] rounded-xl p-4">
               <p className="text-sm text-gray-500 mb-2">Today's Appointments</p>
               <p className="text-2xl font-bold text-white mb-1">{todaysAppointments}</p>
               <p className="text-sm text-gray-600">Scheduled for today</p>
             </div>
 
             {/* Card 4: Total Calls */}
-            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+            <div className="bg-[#171717] border border-[#303030] rounded-xl p-4">
               <p className="text-sm text-gray-500 mb-2">Total Calls</p>
               <p className="text-2xl font-bold text-white mb-1">{calls.length}</p>
               <p className="text-sm text-gray-600">All time</p>
@@ -166,15 +166,15 @@ export default function Overview() {
             </Link>
           </div>
           {callsLoading ? (
-            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-8 text-center">
+            <div className="bg-[#171717] border border-[#303030] rounded-xl p-8 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
             </div>
           ) : calls.length > 0 ? (
             <DataTable columns={callsColumns} data={calls} />
           ) : (
-            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-8">
+            <div className="bg-[#171717] border border-[#303030] rounded-xl p-8">
               <div className="flex flex-col items-center justify-center">
-                <div className="w-16 h-16 rounded-full bg-[#1a1a1a] flex items-center justify-center mb-4">
+                <div className="w-16 h-16 rounded-full bg-[#262626] flex items-center justify-center mb-4">
                   <Phone className="w-8 h-8 text-gray-500" strokeWidth={1.5} />
                 </div>
                 <p className="text-white font-semibold mb-1">No calls yet</p>
@@ -196,7 +196,7 @@ export default function Overview() {
             </Link>
           </div>
           {appointmentsLoading ? (
-            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-8 text-center">
+            <div className="bg-[#171717] border border-[#303030] rounded-xl p-8 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
             </div>
           ) : appointments.length > 0 ? (
@@ -209,7 +209,7 @@ export default function Overview() {
                         <h3 className="text-lg font-semibold text-white">
                           {appointment.customerName || 'Unknown'}
                         </h3>
-                        <span className="inline-block px-2 py-0.5 bg-[#1a1a1a] text-white text-xs font-medium rounded capitalize">
+                        <span className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded capitalize">
                           {appointment.status}
                         </span>
                       </div>
@@ -230,9 +230,9 @@ export default function Overview() {
               ))}
             </div>
           ) : (
-            <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-8">
+            <div className="bg-[#171717] border border-[#303030] rounded-xl p-8">
               <div className="flex flex-col items-center justify-center">
-                <div className="w-16 h-16 rounded-full bg-[#1a1a1a] flex items-center justify-center mb-4">
+                <div className="w-16 h-16 rounded-full bg-[#262626] flex items-center justify-center mb-4">
                   <TrendingUp className="w-8 h-8 text-gray-500" strokeWidth={1.5} />
                 </div>
                 <p className="text-white font-semibold mb-1">No appointments scheduled</p>

@@ -83,7 +83,7 @@ export default function Business() {
         </div>
 
         {/* Basic Information */}
-        <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+        <div className="bg-[#171717] border border-[#303030] rounded-xl p-4">
           <h2 className="text-lg font-semibold text-white mb-3">Basic Information</h2>
           <div className="space-y-4">
             <Input
@@ -109,7 +109,7 @@ export default function Business() {
         </div>
 
         {/* Working Hours */}
-        <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+        <div className="bg-[#171717] border border-[#303030] rounded-xl p-4">
           <div className="flex items-center gap-2 mb-3">
             <Clock className="w-4 h-4 text-gray-400" strokeWidth={1.5} />
             <h2 className="text-lg font-semibold text-white">Working Hours</h2>
@@ -118,7 +118,7 @@ export default function Business() {
             {daysOfWeek.map(({ key, label }) => (
               <div
                 key={key}
-                className="flex items-center gap-4 p-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg"
+                className="flex items-center gap-4 p-3 bg-[#212121] border border-[#303030] rounded-lg"
               >
                 <div className="flex items-center min-w-[120px]">
                   <input
@@ -126,7 +126,7 @@ export default function Business() {
                     id={`day-${key}`}
                     checked={workingHours[key].enabled}
                     onChange={(e) => handleHoursChange(key, 'enabled', e.target.checked)}
-                    className="w-4 h-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded checked:bg-white checked:border-white focus:ring-0 focus:ring-offset-0"
+                    className="w-4 h-4 bg-[#212121] border border-[#303030] rounded checked:bg-white checked:border-white focus:ring-0 focus:ring-offset-0"
                   />
                   <label htmlFor={`day-${key}`} className="ml-2 text-white font-medium">
                     {label}
@@ -138,14 +138,14 @@ export default function Business() {
                       type="time"
                       value={workingHours[key].start}
                       onChange={(e) => handleHoursChange(key, 'start', e.target.value)}
-                      className="bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#3a3a3a]"
+                      className="bg-[#212121] border border-[#303030] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#3a3a3a]"
                     />
                     <span className="text-gray-400">to</span>
                     <input
                       type="time"
                       value={workingHours[key].end}
                       onChange={(e) => handleHoursChange(key, 'end', e.target.value)}
-                      className="bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#3a3a3a]"
+                      className="bg-[#212121] border border-[#303030] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#3a3a3a]"
                     />
                   </div>
                 ) : (
@@ -157,7 +157,7 @@ export default function Business() {
         </div>
 
         {/* Timezone */}
-        <div className="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
+        <div className="bg-[#171717] border border-[#303030] rounded-xl p-4">
           <h2 className="text-lg font-semibold text-white mb-3">Timezone</h2>
           <Select
             label="Select your timezone"

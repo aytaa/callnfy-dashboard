@@ -34,7 +34,7 @@ function Login() {
         refreshToken: result.data.refreshToken,
       }));
 
-      navigate('/dashboard');
+      navigate('/overview');
     } catch (err) {
       setError(err?.data?.error?.message || err?.data?.message || 'Failed to login. Please try again.');
     }
