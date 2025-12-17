@@ -8,7 +8,6 @@ import {
     Users,
     Bot,
     Hash,
-    Settings,
     ChevronDown,
     ChevronLeft,
     ChevronRight,
@@ -16,6 +15,8 @@ import {
     X,
     LogOut,
     User,
+    Settings,
+    Sparkles,
 } from 'lucide-react';
 import clsx from 'clsx';
 import SearchModal from './SearchModal';
@@ -92,12 +93,6 @@ function Sidebar({isOpen, onClose}) {
                 {icon: Hash, label: 'Phone Numbers', path: '/phone-numbers'},
             ],
         },
-        {
-            title: 'SETTINGS',
-            items: [
-                {icon: Settings, label: 'Settings', path: '/settings/organization'},
-            ],
-        },
     ];
 
     const handleLogout = () => {
@@ -109,9 +104,12 @@ function Sidebar({isOpen, onClose}) {
     const handleDropdownItemClick = (action) => {
         setEmailDropdownOpen(false);
         if (action === 'settings') {
-            navigate('/settings/organization');
+            navigate('/settings');
         } else if (action === 'account') {
             navigate('/settings/profile');
+        } else if (action === 'whats-new') {
+            // Empty for now - can add modal later
+            console.log('What\'s New clicked');
         } else if (action === 'logout') {
             handleLogout();
         }
@@ -140,22 +138,40 @@ function Sidebar({isOpen, onClose}) {
             >
                 {/* Top Section */}
                 <div className={clsx('p-4 space-y-3', isCollapsed && 'px-2')}>
-                    {/* Logo + Close/Collapse Button */}
+                    {/* Logo + Collapse Button */}
                     <div className="flex items-center justify-between mb-2">
                         {isCollapsed ? (
                             <div className="w-full flex justify-center">
-                                <span className="text-lg font-bold text-white">C</span>
+                                <span className="text-lg font-bold text-white" style={{fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700}}>C</span>
                             </div>
                         ) : (
                             <>
-                                <span className="text-lg font-bold text-white">Callnfy</span>
-                                <button
-                                    onClick={onClose}
-                                    className="p-1.5 rounded-lg hover:bg-[#262626] transition-colors lg:hidden"
-                                >
-                                    <X className="w-4 h-4 text-white"/>
-                                </button>
+                                <span className="text-lg font-bold text-white" style={{fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700}}>Callnfy</span>
+                                <div className="flex items-center gap-1">
+                                    <button
+                                        onClick={toggleCollapse}
+                                        className="hidden lg:block p-1.5 rounded-lg hover:bg-[#262626] transition-colors"
+                                        title="Collapse sidebar"
+                                    >
+                                        <ChevronLeft className="w-4 h-4 text-white" />
+                                    </button>
+                                    <button
+                                        onClick={onClose}
+                                        className="p-1.5 rounded-lg hover:bg-[#262626] transition-colors lg:hidden"
+                                    >
+                                        <X className="w-4 h-4 text-white"/>
+                                    </button>
+                                </div>
                             </>
+                        )}
+                        {isCollapsed && (
+                            <button
+                                onClick={toggleCollapse}
+                                className="hidden lg:block absolute right-2 top-4 p-1.5 rounded-lg hover:bg-[#262626] transition-colors"
+                                title="Expand sidebar"
+                            >
+                                <ChevronRight className="w-4 h-4 text-white" />
+                            </button>
                         )}
                     </div>
 
@@ -178,8 +194,8 @@ function Sidebar({isOpen, onClose}) {
                                 <>
                                     {/* Email */}
                                     <span className="text-sm text-white truncate flex-1 text-left">
-                    {userEmail}'s Org
-                  </span>
+                                        {userEmail}'s Org
+                                    </span>
                                     {/* Chevron */}
                                     <ChevronDown className="w-3.5 h-3.5 text-white flex-shrink-0"/>
                                 </>
@@ -190,7 +206,7 @@ function Sidebar({isOpen, onClose}) {
                         {emailDropdownOpen && (
                             <div
                                 className={clsx(
-                                    'absolute top-full mt-2 bg-[#171717] rounded-lg shadow-lg py-2 z-50',
+                                    'absolute top-full mt-2 bg-[#171717] border border-[#303030] rounded-lg shadow-lg py-2 z-50',
                                     isCollapsed ? 'left-16' : 'left-0 right-0'
                                 )}
                                 style={isCollapsed ? {minWidth: '200px'} : {}}
@@ -208,6 +224,13 @@ function Sidebar({isOpen, onClose}) {
                                 >
                                     <Settings className="w-4 h-4"/>
                                     <span>Settings</span>
+                                </button>
+                                <button
+                                    onClick={() => handleDropdownItemClick('whats-new')}
+                                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-[#262626] transition-colors"
+                                >
+                                    <Sparkles className="w-4 h-4"/>
+                                    <span>What's New</span>
                                 </button>
                                 <div className="my-1 border-t border-[#303030]"/>
                                 <button
@@ -259,7 +282,6 @@ function Sidebar({isOpen, onClose}) {
                             <ul className="space-y-0.5">
                                 {section.items.map((item) => {
                                     const Icon = item.icon;
-                                    const isSettingsActive = item.path === '/settings/organization' && location.pathname.startsWith('/settings');
                                     return (
                                         <li key={item.path}>
                                             <NavLink
@@ -269,7 +291,7 @@ function Sidebar({isOpen, onClose}) {
                                                     clsx(
                                                         'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors',
                                                         isCollapsed && 'justify-center px-0',
-                                                        (isActive || isSettingsActive)
+                                                        isActive
                                                             ? 'bg-[#262626] text-white'
                                                             : 'text-white hover:bg-[#262626]'
                                                     )
@@ -293,9 +315,9 @@ function Sidebar({isOpen, onClose}) {
                     {!isCollapsed && (
                         <div className="px-3 py-2">
                             <div className="flex items-center justify-between mb-2">
-                <span className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded">
-                  STARTER
-                </span>
+                                <span className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded">
+                                    STARTER
+                                </span>
                                 <span className="text-xs text-white">125 / 150 min</span>
                             </div>
                         </div>
@@ -308,22 +330,6 @@ function Sidebar({isOpen, onClose}) {
                             Upgrade
                         </button>
                     )}
-
-                    {/* Collapse Toggle Button (Desktop only) */}
-                    <button
-                        onClick={toggleCollapse}
-                        className="hidden lg:flex w-full items-center justify-center px-3 py-2 text-white hover:bg-[#262626] rounded-lg transition-colors"
-                        title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                    >
-                        {isCollapsed ? (
-                            <ChevronRight className="w-4 h-4"/>
-                        ) : (
-                            <div className="flex items-center gap-2 w-full">
-                                <ChevronLeft className="w-4 h-4"/>
-                                <span className="text-sm">Collapse</span>
-                            </div>
-                        )}
-                    </button>
                 </div>
             </aside>
 
