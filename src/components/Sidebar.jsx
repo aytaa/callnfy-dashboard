@@ -16,11 +16,11 @@ import {
     LogOut,
     User,
     Settings,
-    Sparkles,
 } from 'lucide-react';
 import clsx from 'clsx';
 import SearchModal from './SearchModal';
 import {logout} from '../slices/authSlice';
+import {useCreateCheckoutMutation} from '../slices/apiSlice/subscriptionApiSlice';
 
 function Sidebar({isOpen, onClose}) {
     const [isCollapsed, setIsCollapsed] = useState(() => {
@@ -33,6 +33,7 @@ function Sidebar({isOpen, onClose}) {
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [createCheckout, { isLoading: isCreatingCheckout }] = useCreateCheckoutMutation();
 
     // Get user email and name from localStorage with safe parsing
     const getUserFromStorage = () => {
@@ -107,9 +108,6 @@ function Sidebar({isOpen, onClose}) {
             navigate('/settings');
         } else if (action === 'account') {
             navigate('/settings/profile');
-        } else if (action === 'whats-new') {
-            // Empty for now - can add modal later
-            console.log('What\'s New clicked');
         } else if (action === 'logout') {
             handleLogout();
         }
@@ -117,6 +115,18 @@ function Sidebar({isOpen, onClose}) {
 
     const toggleCollapse = () => {
         setIsCollapsed(!isCollapsed);
+    };
+
+    const handleUpgrade = async () => {
+        try {
+            const result = await createCheckout().unwrap();
+            if (result?.data?.url) {
+                window.location.href = result.data.url;
+            }
+        } catch (err) {
+            console.error('Checkout error:', err);
+            alert('Failed to start checkout process. Please try again.');
+        }
     };
 
     return (
@@ -225,13 +235,6 @@ function Sidebar({isOpen, onClose}) {
                                     <Settings className="w-4 h-4"/>
                                     <span>Settings</span>
                                 </button>
-                                <button
-                                    onClick={() => handleDropdownItemClick('whats-new')}
-                                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-[#262626] transition-colors"
-                                >
-                                    <Sparkles className="w-4 h-4"/>
-                                    <span>What's New</span>
-                                </button>
                                 <div className="my-1 border-t border-[#303030]"/>
                                 <button
                                     onClick={() => handleDropdownItemClick('logout')}
@@ -326,8 +329,10 @@ function Sidebar({isOpen, onClose}) {
                     {/* Upgrade Button */}
                     {!isCollapsed && (
                         <button
-                            className="w-full px-3 py-2 text-sm font-medium text-white border border-[#303030] hover:bg-[#262626] rounded-lg transition-colors">
-                            Upgrade
+                            onClick={handleUpgrade}
+                            disabled={isCreatingCheckout}
+                            className="w-full px-3 py-2 text-sm font-medium text-white border border-[#303030] hover:bg-[#262626] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            {isCreatingCheckout ? 'Loading...' : 'Upgrade'}
                         </button>
                     )}
                 </div>

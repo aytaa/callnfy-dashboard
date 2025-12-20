@@ -3,9 +3,10 @@ import { apiSlice } from '../apiSlice';
 export const bookingsApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getBookings: builder.query({
-      query: ({ page = 1, limit = 10, status, startDate, endDate } = {}) => ({
+      query: ({ businessId, page = 1, limit = 10, status, startDate, endDate } = {}) => ({
         url: '/bookings',
         params: {
+          businessId,
           page: Number(page),
           limit: Number(limit),
           ...(status && { status }),

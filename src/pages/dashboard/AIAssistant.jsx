@@ -20,9 +20,6 @@ export default function AIAssistant() {
   const [createAssistant, { isLoading: isCreating }] = useCreateAssistantMutation();
   const [updateAssistant, { isLoading: isUpdating }] = useUpdateAssistantMutation();
 
-  // Debug log
-  console.log('Assistants Query:', { data: assistantsData, isLoading, isError, error: queryError });
-
   // Handle API response structure - check if data is wrapped in { success, data }
   const assistants = assistantsData?.data || assistantsData;
   const assistant = assistants && Array.isArray(assistants) && assistants.length > 0 ? assistants[0] : null;
@@ -72,7 +69,7 @@ export default function AIAssistant() {
 
   if (isLoading) {
     return (
-      <div className="p-6 flex items-center justify-center min-h-screen">
+      <div className="px-8 py-6 flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p className="text-gray-400">Loading assistant...</p>
@@ -83,8 +80,8 @@ export default function AIAssistant() {
 
   if (isError) {
     return (
-      <div className="p-6 pt-8">
-        <div className="max-w-5xl mx-auto">
+      <div className="px-8 py-6">
+        <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl font-bold text-white mb-4">AI Assistant</h1>
           <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
             <p className="text-sm text-red-600 dark:text-red-400">
@@ -97,9 +94,8 @@ export default function AIAssistant() {
   }
 
   return (
-    <div className="p-6 pt-8">
-      <div className="max-w-5xl mx-auto space-y-4">
-        <h1 className="text-2xl font-bold text-white">AI Assistant</h1>
+    <div className="px-8 py-6">
+      <div className="max-w-7xl mx-auto space-y-4">
 
         {error && (
           <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">

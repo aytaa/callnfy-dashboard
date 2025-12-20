@@ -8,11 +8,14 @@ import Input from '../../components/Input';
 import Select from '../../components/Select';
 import Textarea from '../../components/Textarea';
 import Card from '../../components/Card';
+import { useGetBookingsQuery, useCreateBookingMutation } from '../../slices/apiSlice/bookingsApiSlice';
+import { useGetBusinessesQuery } from '../../slices/apiSlice/businessApiSlice';
 
 export default function Appointments() {
   const [view, setView] = useState('calendar'); // 'calendar' or 'list'
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 11, 14)); // Dec 14, 2025
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [page, setPage] = useState(1);
   const [formData, setFormData] = useState({
     customer: '',
     service: '',
@@ -20,70 +23,25 @@ export default function Appointments() {
     time: '',
     notes: '',
   });
+  const [error, setError] = useState('');
 
-  // Mock appointments data
-  const appointments = [
+  // Fetch business first to get businessId
+  const { data: businessData } = useGetBusinessesQuery();
+  const businessId = businessData?.[0]?.id;
+
+  // Fetch appointments from API with businessId
+  const { data: bookingsData, isLoading, error: queryError } = useGetBookingsQuery(
     {
-      id: 1,
-      customer: 'Sarah Johnson',
-      phone: '(555) 123-4567',
-      service: 'Consultation',
-      date: 'Dec 15, 2025',
-      time: '2:00 PM',
-      status: 'confirmed',
-      notes: 'First-time customer',
+      businessId,
+      page: Number(page),
+      limit: 100
     },
-    {
-      id: 2,
-      customer: 'David Martinez',
-      phone: '(555) 234-5678',
-      service: 'Follow-up',
-      date: 'Dec 16, 2025',
-      time: '10:30 AM',
-      status: 'confirmed',
-      notes: 'Regular customer',
-    },
-    {
-      id: 3,
-      customer: 'Jennifer Lee',
-      phone: '(555) 345-6789',
-      service: 'Initial Assessment',
-      date: 'Dec 17, 2025',
-      time: '3:30 PM',
-      status: 'pending',
-      notes: 'New inquiry',
-    },
-    {
-      id: 4,
-      customer: 'Michael Brown',
-      phone: '(555) 456-7890',
-      service: 'Consultation',
-      date: 'Dec 18, 2025',
-      time: '11:00 AM',
-      status: 'confirmed',
-      notes: '',
-    },
-    {
-      id: 5,
-      customer: 'Emma Wilson',
-      phone: '(555) 567-8901',
-      service: 'Check-up',
-      date: 'Dec 19, 2025',
-      time: '1:00 PM',
-      status: 'pending',
-      notes: 'Rescheduled from last week',
-    },
-    {
-      id: 6,
-      customer: 'James Taylor',
-      phone: '(555) 678-9012',
-      service: 'Follow-up',
-      date: 'Dec 20, 2025',
-      time: '9:00 AM',
-      status: 'cancelled',
-      notes: 'Customer cancelled',
-    },
-  ];
+    { skip: !businessId }
+  );
+  const [createBooking, { isLoading: isCreating }] = useCreateBookingMutation();
+
+  // Extract appointments from API response
+  const appointments = bookingsData?.data || [];
 
   const serviceOptions = [
     { value: 'consultation', label: 'Consultation' },
@@ -93,17 +51,25 @@ export default function Appointments() {
   ];
 
   const columns = [
-    { header: 'Customer', accessor: 'customer' },
-    { header: 'Phone', accessor: 'phone' },
-    { header: 'Service', accessor: 'service' },
-    { header: 'Date', accessor: 'date' },
-    { header: 'Time', accessor: 'time' },
+    { header: 'Customer', accessor: 'customerName', render: (row) => row.customerName || 'N/A' },
+    { header: 'Phone', accessor: 'customerPhone', render: (row) => row.customerPhone || 'N/A' },
+    { header: 'Service', accessor: 'service', render: (row) => row.service || 'N/A' },
+    {
+      header: 'Date',
+      accessor: 'date',
+      render: (row) => row.date ? new Date(row.date).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      }) : 'N/A'
+    },
+    { header: 'Time', accessor: 'time', render: (row) => row.time || 'N/A' },
     {
       header: 'Status',
       accessor: 'status',
       render: (row) => (
-        <span className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded">
-          {row.status}
+        <span className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded capitalize">
+          {row.status || 'pending'}
         </span>
       ),
     },
@@ -135,8 +101,13 @@ export default function Appointments() {
 
   const hasAppointment = (day) => {
     if (!day) return false;
-    const dateStr = `Dec ${day}, 2025`;
-    return appointments.some(apt => apt.date === dateStr && apt.status !== 'cancelled');
+    const checkDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    const checkDateStr = checkDate.toISOString().split('T')[0];
+    return appointments.some(apt => {
+      if (!apt.date || apt.status === 'cancelled') return false;
+      const aptDate = new Date(apt.date).toISOString().split('T')[0];
+      return aptDate === checkDateStr;
+    });
   };
 
   const handlePrevMonth = () => {
@@ -152,19 +123,64 @@ export default function Appointments() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = () => {
-    console.log('New appointment:', formData);
-    setIsModalOpen(false);
-    setFormData({ customer: '', service: '', date: '', time: '', notes: '' });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    try {
+      await createBooking({
+        customerName: formData.customer,
+        service: formData.service,
+        date: formData.date,
+        time: formData.time,
+        notes: formData.notes,
+      }).unwrap();
+      setIsModalOpen(false);
+      setFormData({ customer: '', service: '', date: '', time: '', notes: '' });
+    } catch (err) {
+      setError(err?.data?.error?.message || err?.data?.message || 'Failed to create appointment');
+    }
   };
 
+  if (isLoading) {
+    return (
+      <div className="px-8 py-6 flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading appointments...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (queryError) {
+    return (
+      <div className="px-8 py-6">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-2xl font-bold text-white mb-4">Appointments</h1>
+          <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <p className="text-sm text-red-600 dark:text-red-400">
+              {queryError?.data?.error?.message || queryError?.data?.message || 'Failed to load appointments'}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6 pt-8">
-      <div className="max-w-5xl mx-auto space-y-4">
+    <div className="px-8 py-6">
+      <div className="max-w-7xl mx-auto space-y-4">
+        {/* Error display */}
+        {error && (
+          <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white">Appointments</h1>
           </div>
           <div className="flex gap-3">
             <div className="flex bg-[#262626] rounded-lg p-1">
@@ -260,26 +276,41 @@ export default function Appointments() {
         {/* Add Appointment Modal */}
         <Modal
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            setIsModalOpen(false);
+            setError('');
+            setFormData({ customer: '', service: '', date: '', time: '', notes: '' });
+          }}
           title="Add New Appointment"
           footer={
             <>
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setError('');
+                  setFormData({ customer: '', service: '', date: '', time: '', notes: '' });
+                }}
                 className="border border-[#303030] text-white px-3 py-1.5 text-sm rounded-lg hover:border-[#3a3a3a] transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSubmit}
-                className="bg-white text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                disabled={isCreating}
+                className="bg-white text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Create Appointment
+                {isCreating ? 'Creating...' : 'Create Appointment'}
               </button>
             </>
           }
         >
-          <div className="space-y-3">
+          <form onSubmit={handleSubmit}>
+            {error && (
+              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg mb-3">
+                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+              </div>
+            )}
+            <div className="space-y-3">
             <Input
               label="Customer Name"
               name="customer"
@@ -318,7 +349,8 @@ export default function Appointments() {
               placeholder="Add any additional notes"
               rows={2}
             />
-          </div>
+            </div>
+          </form>
         </Modal>
       </div>
     </div>

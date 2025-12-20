@@ -46,30 +46,30 @@ function Register() {
     return (
       <div className="text-center">
         <div className="mb-8">
-          <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-16 h-16 bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-2xl font-bold text-white mb-2">
             Check your email
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-400">
             We've sent a verification link to
           </p>
-          <p className="text-gray-900 dark:text-white font-semibold mt-1">
+          <p className="text-white font-semibold mt-1">
             {formData.email}
           </p>
         </div>
 
         <div className="space-y-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-400">
             Click the link in the email to verify your account and complete registration.
           </p>
 
           <Link
             to="/login"
-            className="inline-block w-full bg-black dark:bg-white text-white dark:text-black py-2.5 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors text-center"
+            className="inline-block w-full bg-white text-black py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition-colors text-center"
           >
             Back to sign in
           </Link>
@@ -81,23 +81,23 @@ function Register() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-2xl font-bold text-white mb-2">
           Create your account
         </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-gray-400">
           Get started with Callnfy today
         </p>
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit}>
         {error && (
-          <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          <div className="p-3 bg-red-900/20 border border-red-800 rounded-lg">
+            <p className="text-sm text-red-400">{error}</p>
           </div>
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+          <label className="block text-sm font-medium text-white mb-2">
             Full name
           </label>
           <input
@@ -105,14 +105,14 @@ function Register() {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-2.5 border border-[#303030] rounded-lg bg-[#262626] text-white placeholder-gray-500 focus:border-[#3a3a3a] focus:outline-none transition-all"
             placeholder="John Doe"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+          <label className="block text-sm font-medium text-white mb-2">
             Email
           </label>
           <input
@@ -120,14 +120,14 @@ function Register() {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-2.5 border border-[#303030] rounded-lg bg-[#262626] text-white placeholder-gray-500 focus:border-[#3a3a3a] focus:outline-none transition-all"
             placeholder="you@example.com"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+          <label className="block text-sm font-medium text-white mb-2">
             Password
           </label>
           <input
@@ -135,12 +135,12 @@ function Register() {
             name="password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-2.5 border border-[#303030] rounded-lg bg-[#262626] text-white placeholder-gray-500 focus:border-[#3a3a3a] focus:outline-none transition-all"
             placeholder="••••••••"
             required
             minLength={8}
           />
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-xs text-gray-400 mt-1">
             Must be at least 8 characters
           </p>
         </div>
@@ -148,18 +148,18 @@ function Register() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-black dark:bg-white text-white dark:text-black py-2.5 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-white text-black py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Creating account...' : 'Create account'}
         </button>
       </form>
 
       <div className="mt-6 text-center">
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-gray-400">
           Already have an account?{' '}
           <Link
             to="/login"
-            className="text-gray-900 dark:text-white font-semibold hover:underline"
+            className="text-white font-semibold hover:underline"
           >
             Sign in
           </Link>

@@ -54,13 +54,13 @@ function VerifyEmail() {
     return (
       <div className="text-center">
         <div className="mb-8">
-          <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Loader2 className="w-8 h-8 text-gray-600 dark:text-gray-400 animate-spin" />
+          <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-2xl font-bold text-white mb-2">
             Verifying your email...
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-400">
             Please wait while we verify your email address
           </p>
         </div>
@@ -72,22 +72,22 @@ function VerifyEmail() {
     return (
       <div className="text-center">
         <div className="mb-8">
-          <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-16 h-16 bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-2xl font-bold text-white mb-2">
             Email verified successfully!
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-400">
             Your email has been verified. You can now sign in to your account.
           </p>
         </div>
 
         <Link
           to="/login"
-          className="inline-block w-full bg-black dark:bg-white text-white dark:text-black py-2.5 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors text-center"
+          className="inline-block w-full bg-white text-black py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition-colors text-center"
         >
           Continue to sign in
         </Link>
@@ -99,22 +99,22 @@ function VerifyEmail() {
     return (
       <div>
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-16 h-16 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-2xl font-bold text-white mb-2">
             Verification failed
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          <p className="text-sm text-gray-400 mb-4">
             {error}
           </p>
         </div>
 
         {resendSuccess ? (
-          <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg mb-4">
-            <p className="text-sm text-green-600 dark:text-green-400 text-center">
+          <div className="p-3 bg-green-900/20 border border-green-800 rounded-lg mb-4">
+            <p className="text-sm text-green-400 text-center">
               Verification email sent! Please check your inbox.
             </p>
           </div>
@@ -124,13 +124,13 @@ function VerifyEmail() {
           <div className="space-y-3">
             <button
               onClick={() => setShowResendForm(true)}
-              className="w-full bg-black dark:bg-white text-white dark:text-black py-2.5 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
+              className="w-full bg-white text-black py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
             >
               Resend verification email
             </button>
             <Link
               to="/login"
-              className="block text-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="block text-center text-sm text-gray-400 hover:text-white transition-colors"
             >
               Back to sign in
             </Link>
@@ -139,14 +139,14 @@ function VerifyEmail() {
           <div>
             <form className="space-y-4" onSubmit={handleResendSubmit}>
               <div>
-                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                <label className="block text-sm font-medium text-white mb-2">
                   Email
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent outline-none transition-all"
+                  className="w-full px-4 py-2.5 border border-[#303030] rounded-lg bg-[#262626] text-white placeholder-gray-500 focus:border-[#3a3a3a] focus:outline-none transition-all"
                   placeholder="you@example.com"
                   required
                 />
@@ -155,7 +155,7 @@ function VerifyEmail() {
               <button
                 type="submit"
                 disabled={isResending}
-                className="w-full bg-black dark:bg-white text-white dark:text-black py-2.5 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-white text-black py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isResending ? 'Sending...' : 'Send verification email'}
               </button>
@@ -164,7 +164,7 @@ function VerifyEmail() {
             <div className="mt-4 text-center">
               <button
                 onClick={() => setShowResendForm(false)}
-                className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                className="text-sm text-gray-400 hover:text-white transition-colors"
               >
                 Cancel
               </button>

@@ -3,9 +3,10 @@ import { apiSlice } from '../apiSlice';
 export const customersApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getCustomers: builder.query({
-      query: ({ page = 1, limit = 10, search } = {}) => ({
+      query: ({ businessId, page = 1, limit = 10, search } = {}) => ({
         url: '/customers',
         params: {
+          businessId,
           page: Number(page),
           limit: Number(limit),
           ...(search && { search }),

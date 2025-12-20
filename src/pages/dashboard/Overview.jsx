@@ -12,12 +12,20 @@ import Card from '../../components/Card';
 export default function Overview() {
   const user = useSelector(selectCurrentUser);
   const { data: businesses, isLoading: businessesLoading } = useGetBusinessesQuery();
-  const { data: callsData, isLoading: callsLoading } = useGetCallsQuery({ page: 1, limit: 5 });
-  const { data: appointmentsData, isLoading: appointmentsLoading } = useGetAppointmentsQuery(1);
+  const business = businesses?.[0];
+  const businessId = business?.id;
+
+  const { data: callsData, isLoading: callsLoading } = useGetCallsQuery(
+    { businessId, page: 1, limit: 5 },
+    { skip: !businessId }
+  );
+  const { data: appointmentsData, isLoading: appointmentsLoading } = useGetAppointmentsQuery(
+    { businessId, page: 1, limit: 10 },
+    { skip: !businessId }
+  );
 
   const userName = user?.name || 'User';
   const userEmail = user?.email || '';
-  const business = businesses?.[0];
   const calls = callsData?.calls || [];
   const appointments = appointmentsData?.appointments || [];
 
@@ -70,7 +78,7 @@ export default function Overview() {
 
   if (businessesLoading) {
     return (
-      <div className="p-6 flex items-center justify-center min-h-screen">
+      <div className="px-8 py-6 flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p className="text-gray-400">Loading...</p>
@@ -81,7 +89,7 @@ export default function Overview() {
 
   if (!business) {
     return (
-      <div className="p-6">
+      <div className="px-8 py-6">
         <div className="max-w-2xl mx-auto text-center py-12">
           <div className="bg-[#171717] border border-[#303030] rounded-xl p-8">
             <Phone className="w-16 h-16 text-gray-500 mx-auto mb-4" />
@@ -103,12 +111,11 @@ export default function Overview() {
   }
 
   return (
-    <div className="p-6">
-      <div className="max-w-5xl mx-auto space-y-6">
+    <div className="px-8 py-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Welcome Section */}
         <div>
-          <p className="text-gray-500 text-sm mb-1">{business.name}</p>
-          <h1 className="text-3xl font-bold text-white">Welcome {userName}</h1>
+          <p className="text-gray-400 text-sm">Welcome back, {userName}! Here's your {business.name} dashboard.</p>
         </div>
 
         {/* Metrics Section */}
@@ -159,7 +166,7 @@ export default function Overview() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-white">Recent Calls</h2>
             <Link
-              to="/dashboard/calls"
+              to="/calls"
               className="text-sm text-gray-400 hover:text-white transition-colors"
             >
               View All
@@ -189,7 +196,7 @@ export default function Overview() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-white">Upcoming Appointments</h2>
             <Link
-              to="/dashboard/appointments"
+              to="/appointments"
               className="text-sm text-gray-400 hover:text-white transition-colors"
             >
               View All

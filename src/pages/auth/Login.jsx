@@ -43,10 +43,10 @@ function Login() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-2xl font-bold text-white mb-2">
           Sign in to your account
         </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-gray-400">
           Welcome back! Please enter your details.
         </p>
       </div>
@@ -65,28 +65,28 @@ function Login() {
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+          <label className="block text-sm font-medium text-white mb-2">
             Email
           </label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-2.5 border border-[#303030] rounded-lg bg-[#262626] text-white placeholder-gray-500 focus:border-[#3a3a3a] focus:outline-none transition-all"
             placeholder="you@example.com"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+          <label className="block text-sm font-medium text-white mb-2">
             Password
           </label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-2.5 border border-[#303030] rounded-lg bg-[#262626] text-white placeholder-gray-500 focus:border-[#3a3a3a] focus:outline-none transition-all"
             placeholder="••••••••"
             required
           />
@@ -95,7 +95,7 @@ function Login() {
         <div className="flex items-center justify-end">
           <Link
             to="/forgot-password"
-            className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            className="text-sm text-gray-400 hover:text-white transition-colors"
           >
             Forgot password?
           </Link>
@@ -104,18 +104,18 @@ function Login() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-black dark:bg-white text-white dark:text-black py-2.5 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-white text-black py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Signing in...' : 'Sign in'}
         </button>
       </form>
 
       <div className="mt-6 text-center">
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-gray-400">
           Don't have an account?{' '}
           <Link
             to="/register"
-            className="text-gray-900 dark:text-white font-semibold hover:underline"
+            className="text-white font-semibold hover:underline"
           >
             Create account
           </Link>

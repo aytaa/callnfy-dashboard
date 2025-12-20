@@ -3,9 +3,10 @@ import { apiSlice } from '../apiSlice';
 export const appointmentsApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getAppointments: builder.query({
-      query: ({ page = 1, limit = 10, status, startDate, endDate } = {}) => ({
+      query: ({ businessId, page = 1, limit = 10, status, startDate, endDate } = {}) => ({
         url: '/appointments',
         params: {
+          businessId,
           page: Number(page),
           limit: Number(limit),
           ...(status && { status }),

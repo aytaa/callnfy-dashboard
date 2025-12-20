@@ -5,9 +5,9 @@ export const businessApiSlice = apiSlice.injectEndpoints({
     getBusinesses: builder.query({
       query: () => '/businesses',
       providesTags: (result) =>
-        result
+        result?.data
           ? [
-              ...result.map(({ id }) => ({ type: 'Business', id })),
+              ...result.data.map(({ id }) => ({ type: 'Business', id })),
               { type: 'Business', id: 'LIST' },
             ]
           : [{ type: 'Business', id: 'LIST' }],

@@ -17,6 +17,7 @@ import Appointments from './pages/dashboard/Appointments';
 import Customers from './pages/dashboard/Customers';
 import AIAssistant from './pages/dashboard/AIAssistant';
 import PhoneNumbers from './pages/dashboard/PhoneNumbers';
+import SelectPlan from './pages/dashboard/SelectPlan';
 
 // Settings pages
 import Organization from './pages/settings/Organization';
@@ -162,6 +163,16 @@ function App() {
                 <VerifyEmail />
               </AuthLayout>
             </AuthRoute>
+          }
+        />
+
+        {/* Select Plan Route (Protected, but no subscription check) */}
+        <Route
+          path="/select-plan"
+          element={
+            <ProtectedRoute>
+              <SelectPlan />
+            </ProtectedRoute>
           }
         />
 

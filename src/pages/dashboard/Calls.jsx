@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Phone, MoreVertical } from 'lucide-react';
 import { useGetCallsQuery, useGetCallStatsQuery } from '../../slices/apiSlice/callsApiSlice';
+import { useGetBusinessesQuery } from '../../slices/apiSlice/businessApiSlice';
 import DataTable from '../../components/DataTable';
 import Select from '../../components/Select';
 import Modal from '../../components/Modal';
@@ -13,12 +14,23 @@ export default function Calls() {
   const [selectedCall, setSelectedCall] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data: callsData, isLoading: callsLoading } = useGetCallsQuery({
-    page,
-    dateRange: dateFilter,
-    status: statusFilter !== 'all' ? statusFilter : undefined
-  });
-  const { data: stats, isLoading: statsLoading } = useGetCallStatsQuery({ dateRange: dateFilter });
+  // Fetch business first to get businessId
+  const { data: businessData } = useGetBusinessesQuery();
+  const businessId = businessData?.[0]?.id;
+
+  const { data: callsData, isLoading: callsLoading } = useGetCallsQuery(
+    {
+      businessId,
+      page,
+      dateRange: dateFilter,
+      status: statusFilter !== 'all' ? statusFilter : undefined
+    },
+    { skip: !businessId }
+  );
+  const { data: stats, isLoading: statsLoading } = useGetCallStatsQuery(
+    { businessId, dateRange: dateFilter },
+    { skip: !businessId }
+  );
 
   const calls = callsData?.calls || [];
   const pagination = callsData?.pagination || {};
@@ -98,7 +110,7 @@ export default function Calls() {
 
   if (callsLoading && page === 1) {
     return (
-      <div className="p-6 flex items-center justify-center min-h-screen">
+      <div className="px-8 py-6 flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p className="text-gray-400">Loading calls...</p>
@@ -108,12 +120,11 @@ export default function Calls() {
   }
 
   return (
-    <div className="p-6 pt-8">
-      <div className="max-w-5xl mx-auto space-y-4">
+    <div className="px-8 py-6">
+      <div className="max-w-7xl mx-auto space-y-4">
         {/* Header with Filters */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white">Calls</h1>
           </div>
           <div className="flex gap-2">
             <Select

@@ -12,6 +12,7 @@ import {
   useUpdateCustomerMutation,
   useDeleteCustomerMutation,
 } from '../../slices/apiSlice/customersApiSlice';
+import { useGetBusinessesQuery } from '../../slices/apiSlice/businessApiSlice';
 
 export default function Customers() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -22,11 +23,19 @@ export default function Customers() {
   const [formData, setFormData] = useState({ name: '', phone: '', email: '' });
   const [error, setError] = useState('');
 
-  const { data: customersData, isLoading } = useGetCustomersQuery({
-    page: Number(page),
-    limit: 10,
-    search: searchQuery,
-  });
+  // Fetch business first to get businessId
+  const { data: businessData } = useGetBusinessesQuery();
+  const businessId = businessData?.[0]?.id;
+
+  const { data: customersData, isLoading } = useGetCustomersQuery(
+    {
+      businessId,
+      page: Number(page),
+      limit: 10,
+      search: searchQuery,
+    },
+    { skip: !businessId }
+  );
 
   const [createCustomer, { isLoading: isCreating }] = useCreateCustomerMutation();
   const [updateCustomer, { isLoading: isUpdating }] = useUpdateCustomerMutation();
@@ -92,7 +101,7 @@ export default function Customers() {
 
   if (isLoading && page === 1) {
     return (
-      <div className="p-6 flex items-center justify-center min-h-screen">
+      <div className="px-8 py-6 flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p className="text-gray-400">Loading customers...</p>
@@ -102,11 +111,10 @@ export default function Customers() {
   }
 
   return (
-    <div className="p-6 pt-8">
-      <div className="max-w-5xl mx-auto space-y-4">
+    <div className="px-8 py-6">
+      <div className="max-w-7xl mx-auto space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-white">Customers</h1>
           <button
             onClick={() => setIsAddModalOpen(true)}
             className="bg-white text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"

@@ -55,7 +55,7 @@ export default function PhoneNumbers() {
 
   if (isLoading) {
     return (
-      <div className="p-6 flex items-center justify-center min-h-screen">
+      <div className="px-8 py-6 flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p className="text-gray-400">Loading phone numbers...</p>
@@ -65,12 +65,11 @@ export default function PhoneNumbers() {
   }
 
   return (
-    <div className="p-6 pt-8">
-      <div className="max-w-5xl mx-auto space-y-4">
+    <div className="px-8 py-6">
+      <div className="max-w-7xl mx-auto space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">Phone Numbers</h1>
             <p className="text-white opacity-60 text-sm mt-1">
               Manage your AI receptionist phone numbers
             </p>
