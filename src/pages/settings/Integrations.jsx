@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar, Zap, Check, X, Copy, Link, RefreshCw, ExternalLink } from 'lucide-react';
+import { Calendar, Zap, Check, X, Copy, Link, RefreshCw, ExternalLink, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useGetBusinessesQuery } from '../../slices/apiSlice/businessApiSlice';
 import {
@@ -27,6 +27,7 @@ export default function Integrations() {
   const [revokeZapierKey, { isLoading: isRevokingZapier }] = useRevokeZapierKeyMutation();
 
   const [syncMode, setSyncMode] = useState('one-way'); // 'one-way' or 'two-way'
+  const [showApiKey, setShowApiKey] = useState(false);
 
   // Extract integration data
   const googleCalendar = integrationStatus?.googleCalendar || {};
@@ -37,8 +38,8 @@ export default function Integrations() {
   const googleSyncMode = googleCalendar?.syncMode || 'one-way';
 
   const isZapierConnected = zapier?.connected || false;
-  const zapierApiKey = zapier?.apiKey || '';
-  const zapierWebhookUrl = zapier?.webhookUrl || '';
+  const zapierApiKey = zapier?.settings?.apiKey || ''; // Full API key from settings
+  const zapierWebhookUrl = zapier?.webhookUrl || ''; // Webhook URL from root level
 
   // Handle Google Calendar connection
   const handleConnectGoogle = async () => {
@@ -275,63 +276,48 @@ export default function Integrations() {
             </div>
           </div>
 
-          <div className="pt-3 border-t border-[#303030] space-y-3">
-            {/* API Key */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs text-gray-400">API Key</label>
-                {isZapierConnected && (
-                  <button
-                    onClick={handleRevokeZapierKey}
-                    disabled={isRevokingZapier}
-                    className="bg-white text-black text-xs py-1 px-2 rounded hover:bg-gray-200 transition-colors disabled:opacity-50"
-                  >
-                    {isRevokingZapier ? 'Revoking...' : 'Revoke Key'}
-                  </button>
-                )}
-              </div>
-              {isZapierConnected ? (
+          {isZapierConnected ? (
+            <div className="space-y-3 pt-3 border-t border-[#303030]">
+              {/* API Key */}
+              <div>
+                <label className="text-xs text-gray-400 mb-1 block">API Key</label>
                 <div className="flex items-center gap-2">
                   <input
-                    type="text"
-                    value={zapierApiKey}
+                    type={showApiKey ? "text" : "password"}
                     readOnly
-                    className="flex-1 bg-[#262626] border border-[#303030] rounded-lg px-2.5 py-1.5 text-xs text-white font-mono"
+                    value={zapierApiKey || ''}
+                    className="flex-1 bg-[#1a1a1a] border border-[#333] rounded px-2 py-1.5 text-xs text-white font-mono"
                   />
                   <button
-                    onClick={() => copyToClipboard(zapierApiKey, 'API key')}
-                    className="bg-white text-black p-1.5 rounded hover:bg-gray-200 border border-[#333] transition-colors"
+                    onClick={() => setShowApiKey(!showApiKey)}
+                    className="bg-white text-black p-1.5 rounded hover:bg-gray-200 transition-colors flex-shrink-0"
+                    title={showApiKey ? "Hide API key" : "Show API key"}
+                  >
+                    {showApiKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  </button>
+                  <button
+                    onClick={() => copyToClipboard(zapierApiKey, 'API Key')}
+                    className="bg-white text-black p-1.5 rounded hover:bg-gray-200 transition-colors flex-shrink-0"
                     title="Copy API key"
                   >
                     <Copy className="w-3.5 h-3.5" />
                   </button>
                 </div>
-              ) : (
-                <button
-                  onClick={handleGenerateZapierKey}
-                  disabled={isGeneratingZapier}
-                  className="inline-flex items-center gap-1.5 bg-white text-black text-sm py-1.5 px-3 rounded hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <RefreshCw className="w-3.5 h-3.5" />
-                  {isGeneratingZapier ? 'Generating...' : 'Generate API Key'}
-                </button>
-              )}
-            </div>
+              </div>
 
-            {/* Webhook URL */}
-            {isZapierConnected && (
+              {/* Webhook URL */}
               <div>
-                <label className="block text-xs text-gray-400 mb-1.5">Webhook URL</label>
+                <label className="text-xs text-gray-400 mb-1 block">Webhook URL</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
-                    value={zapierWebhookUrl}
                     readOnly
-                    className="flex-1 bg-[#262626] border border-[#303030] rounded-lg px-2.5 py-1.5 text-xs text-white font-mono"
+                    value={zapierWebhookUrl || ''}
+                    className="flex-1 bg-[#1a1a1a] border border-[#333] rounded px-2 py-1.5 text-xs text-white font-mono truncate"
                   />
                   <button
                     onClick={() => copyToClipboard(zapierWebhookUrl, 'Webhook URL')}
-                    className="bg-white text-black p-1.5 rounded hover:bg-gray-200 border border-[#333] transition-colors"
+                    className="bg-white text-black p-1.5 rounded hover:bg-gray-200 transition-colors flex-shrink-0"
                     title="Copy webhook URL"
                   >
                     <Copy className="w-3.5 h-3.5" />
@@ -341,13 +327,20 @@ export default function Integrations() {
                   Use this URL in Zapier to receive events (new appointments, cancellations, etc.)
                 </p>
               </div>
-            )}
 
-            {/* Zapier Documentation Link */}
-            {isZapierConnected && (
+              {/* Revoke Button */}
+              <button
+                onClick={handleRevokeZapierKey}
+                disabled={isRevokingZapier}
+                className="text-xs text-gray-400 hover:text-white transition-colors"
+              >
+                {isRevokingZapier ? 'Revoking...' : 'Revoke API Key'}
+              </button>
+
+              {/* Zapier Documentation Link */}
               <div className="pt-1.5">
                 <a
-                  href="https://zapier.com/apps/callnfy/integrations"
+                  href="https://docs.zapier.com/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition-colors"
@@ -356,8 +349,19 @@ export default function Integrations() {
                   View Zapier documentation
                 </a>
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="pt-3 border-t border-[#303030]">
+              <button
+                onClick={handleGenerateZapierKey}
+                disabled={isGeneratingZapier}
+                className="inline-flex items-center gap-1.5 bg-white text-black text-sm py-1.5 px-3 rounded hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                {isGeneratingZapier ? 'Generating...' : 'Generate API Key'}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
