@@ -1,5 +1,5 @@
 import {useState, useEffect, useRef} from 'react';
-import {NavLink, useLocation, useNavigate} from 'react-router-dom';
+import {NavLink, useNavigate} from 'react-router-dom';
 import {useDispatch} from 'react-redux';
 import {
     Home,
@@ -20,9 +20,11 @@ import {
 import clsx from 'clsx';
 import SearchModal from './SearchModal';
 import {logout} from '../slices/authSlice';
-import {useCreateCheckoutMutation} from '../slices/apiSlice/subscriptionApiSlice';
+import {useGetMeQuery} from '../slices/apiSlice/authApiSlice';
+
 
 function Sidebar({isOpen, onClose}) {
+
     const [isCollapsed, setIsCollapsed] = useState(() => {
         const saved = localStorage.getItem('sidebarCollapsed');
         return saved === 'true';
@@ -30,10 +32,9 @@ function Sidebar({isOpen, onClose}) {
     const [emailDropdownOpen, setEmailDropdownOpen] = useState(false);
     const [searchModalOpen, setSearchModalOpen] = useState(false);
     const dropdownRef = useRef(null);
-    const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [createCheckout, { isLoading: isCreatingCheckout }] = useCreateCheckoutMutation();
+    const {data: userData} = useGetMeQuery();
 
     // Get user email and name from localStorage with safe parsing
     const getUserFromStorage = () => {
@@ -117,16 +118,9 @@ function Sidebar({isOpen, onClose}) {
         setIsCollapsed(!isCollapsed);
     };
 
-    const handleUpgrade = async () => {
-        try {
-            const result = await createCheckout().unwrap();
-            if (result?.data?.url) {
-                window.location.href = result.data.url;
-            }
-        } catch (err) {
-            console.error('Checkout error:', err);
-            alert('Failed to start checkout process. Please try again.');
-        }
+    const handleUpgrade = () => {
+        // Navigate to select plan page instead of directly creating checkout
+        navigate('/select-plan');
     };
 
     return (
@@ -152,18 +146,20 @@ function Sidebar({isOpen, onClose}) {
                     <div className="flex items-center justify-between mb-2">
                         {isCollapsed ? (
                             <div className="w-full flex justify-center">
-                                <span className="text-lg font-bold text-white" style={{fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700}}>C</span>
+                                <span className="text-lg font-bold text-white"
+                                      style={{fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700}}>C</span>
                             </div>
                         ) : (
                             <>
-                                <span className="text-lg font-bold text-white" style={{fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700}}>Callnfy</span>
+                                <span className="text-lg font-bold text-white"
+                                      style={{fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700}}>Callnfy</span>
                                 <div className="flex items-center gap-1">
                                     <button
                                         onClick={toggleCollapse}
                                         className="hidden lg:block p-1.5 rounded-lg hover:bg-[#262626] transition-colors"
                                         title="Collapse sidebar"
                                     >
-                                        <ChevronLeft className="w-4 h-4 text-white" />
+                                        <ChevronLeft className="w-4 h-4 text-white"/>
                                     </button>
                                     <button
                                         onClick={onClose}
@@ -180,7 +176,7 @@ function Sidebar({isOpen, onClose}) {
                                 className="hidden lg:block absolute right-2 top-4 p-1.5 rounded-lg hover:bg-[#262626] transition-colors"
                                 title="Expand sidebar"
                             >
-                                <ChevronRight className="w-4 h-4 text-white" />
+                                <ChevronRight className="w-4 h-4 text-white"/>
                             </button>
                         )}
                     </div>
@@ -314,27 +310,74 @@ function Sidebar({isOpen, onClose}) {
 
                 {/* Bottom Section */}
                 <div className={clsx('p-3 space-y-2', isCollapsed && 'px-2')}>
-                    {/* Plan Badge and Usage */}
-                    {!isCollapsed && (
-                        <div className="px-3 py-2">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded">
-                                    STARTER
-                                </span>
-                                <span className="text-xs text-white">125 / 150 min</span>
+                    {/* Plan Badge and Trial Status */}
+                    {!isCollapsed && (() => {
+                        const user = userData?.data;
+                        const subscriptionStatus = user?.subscriptionStatus;
+                        const trialEndsAt = user?.trialEndsAt;
+
+                        // Calculate days remaining if on trial
+                        let daysRemaining = null;
+                        if (subscriptionStatus === 'trialing' && trialEndsAt) {
+                            const now = new Date();
+                            const endDate = new Date(trialEndsAt);
+                            const diffTime = endDate - now;
+                            daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        }
+
+                        return (
+                            <div className="px-3 py-2">
+                                <div className="flex items-center justify-between mb-2">
+                                    {subscriptionStatus === 'trialing' && daysRemaining !== null ? (
+                                        <>
+                                            <span
+                                                className="inline-block px-2 py-0.5 bg-blue-900/30 text-blue-400 text-xs font-medium rounded border border-blue-800">
+                                                TRIAL
+                                            </span>
+                                            <span className="text-xs text-white">
+                                                {daysRemaining > 0 ? `${daysRemaining} days left` : 'Expires today'}
+                                            </span>
+                                        </>
+                                    ) : subscriptionStatus === 'active' ? (
+                                        <>
+                                            <span
+                                                className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded">
+                                                STARTER
+                                            </span>
+                                            <span className="text-xs text-white">125 / 150 min</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span
+                                                className="inline-block px-2 py-0.5 bg-gray-800 text-gray-400 text-xs font-medium rounded">
+                                                FREE
+                                            </span>
+                                            <span className="text-xs text-gray-400">Start trial</span>
+                                        </>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        );
+                    })()}
 
                     {/* Upgrade Button */}
-                    {!isCollapsed && (
-                        <button
-                            onClick={handleUpgrade}
-                            disabled={isCreatingCheckout}
-                            className="w-full px-3 py-2 text-sm font-medium text-white border border-[#303030] hover:bg-[#262626] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                            {isCreatingCheckout ? 'Loading...' : 'Upgrade'}
-                        </button>
-                    )}
+                    {!isCollapsed && (() => {
+                        const user = userData?.data;
+                        const subscriptionStatus = user?.subscriptionStatus;
+
+                        // Only show upgrade button if on trial or no subscription
+                        const showUpgrade = subscriptionStatus !== 'active';
+
+                        if (!showUpgrade) return null;
+
+                        return (
+                            <button
+                                onClick={handleUpgrade}
+                                className="w-full px-3 py-2 text-sm font-medium text-white border border-[#303030] hover:bg-[#262626] rounded-lg transition-colors">
+                                Upgrade
+                            </button>
+                        );
+                    })()}
                 </div>
             </aside>
 

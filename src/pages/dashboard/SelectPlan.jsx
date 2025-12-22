@@ -1,10 +1,21 @@
 import { useState } from 'react';
-import { Check } from 'lucide-react';
+import { Check, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useGetMeQuery } from '../../slices/apiSlice/authApiSlice';
 import { useCreateCheckoutMutation } from '../../slices/apiSlice/subscriptionApiSlice';
 import { toast } from 'react-hot-toast';
 
 export default function SelectPlan() {
+  const { data: userData } = useGetMeQuery();
   const [createCheckout, { isLoading }] = useCreateCheckoutMutation();
+
+  const user = userData?.data;
+  const subscriptionStatus = user?.subscriptionStatus;
+  const trialEndsAt = user?.trialEndsAt;
+
+  // Check if trial has expired
+  const isTrialExpired = subscriptionStatus === 'trialing' && trialEndsAt && new Date(trialEndsAt) < new Date();
+  const isTrialActive = subscriptionStatus === 'trialing' && trialEndsAt && new Date(trialEndsAt) > new Date();
 
   const features = [
     '1 AI Assistant',
@@ -13,7 +24,7 @@ export default function SelectPlan() {
     'Email notifications',
   ];
 
-  const handleStartTrial = async () => {
+  const handleSubscribe = async () => {
     try {
       const result = await createCheckout({
         planId: 'starter',
@@ -36,9 +47,26 @@ export default function SelectPlan() {
   return (
     <div className="min-h-screen bg-[#212121] flex items-center justify-center p-4">
       <div className="max-w-md w-full">
+        {/* Back to Dashboard link if trial is still active */}
+        {isTrialActive && (
+          <Link
+            to="/overview"
+            className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Dashboard
+          </Link>
+        )}
+
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Choose Your Plan</h1>
-          <p className="text-gray-400">Start your 7-day free trial today</p>
+          <h1 className="text-3xl font-bold text-white mb-2">
+            {isTrialExpired ? 'Your Trial Has Ended' : 'Upgrade Your Plan'}
+          </h1>
+          <p className="text-gray-400">
+            {isTrialExpired
+              ? 'Subscribe now to continue using Callnfy'
+              : 'Upgrade to unlock full features'}
+          </p>
         </div>
 
         <div className="bg-[#171717] rounded-lg border border-[#303030] p-8">
@@ -48,7 +76,9 @@ export default function SelectPlan() {
               <span className="text-4xl font-bold text-white">£29</span>
               <span className="text-gray-400">/month</span>
             </div>
-            <p className="text-sm text-green-500 mt-2">7-day free trial included</p>
+            {!isTrialExpired && (
+              <p className="text-sm text-gray-500 mt-2">Billed monthly</p>
+            )}
           </div>
 
           <div className="space-y-4 mb-8">
@@ -63,15 +93,17 @@ export default function SelectPlan() {
           </div>
 
           <button
-            onClick={handleStartTrial}
+            onClick={handleSubscribe}
             disabled={isLoading}
             className="w-full bg-green-600 hover:bg-green-700 disabled:bg-green-600/50 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors"
           >
-            {isLoading ? 'Loading...' : 'Start 7-day free trial'}
+            {isLoading ? 'Loading...' : isTrialExpired ? 'Subscribe Now' : 'Upgrade Now'}
           </button>
 
           <p className="text-xs text-gray-500 text-center mt-4">
-            Cancel anytime during your trial. No charges until trial ends.
+            {isTrialExpired
+              ? 'Secure payment powered by Stripe'
+              : 'Cancel anytime. No long-term commitment.'}
           </p>
         </div>
       </div>

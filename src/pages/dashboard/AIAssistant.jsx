@@ -20,9 +20,9 @@ export default function AIAssistant() {
   const [createAssistant, { isLoading: isCreating }] = useCreateAssistantMutation();
   const [updateAssistant, { isLoading: isUpdating }] = useUpdateAssistantMutation();
 
-  // Handle API response structure - check if data is wrapped in { success, data }
-  const assistants = assistantsData?.data || assistantsData;
-  const assistant = assistants && Array.isArray(assistants) && assistants.length > 0 ? assistants[0] : null;
+  // transformResponse in API slice returns the assistants array directly
+  const assistants = assistantsData || [];
+  const assistant = assistants.length > 0 ? assistants[0] : null;
   const businessId = businesses && businesses.length > 0 ? businesses[0].id : null;
 
   useEffect(() => {

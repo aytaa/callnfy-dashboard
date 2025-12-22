@@ -4,6 +4,7 @@ export const assistantApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getAssistant: builder.query({
       query: () => '/assistants',
+      transformResponse: (response) => response?.data?.assistants || [],
       providesTags: (result) =>
         result
           ? [

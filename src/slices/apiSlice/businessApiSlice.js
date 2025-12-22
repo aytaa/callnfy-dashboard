@@ -4,10 +4,14 @@ export const businessApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getBusinesses: builder.query({
       query: () => '/businesses',
+      transformResponse: (response) => {
+        // Handle nested response: {"success":true,"data":{"businesses":[]}}
+        return response?.data?.businesses || response?.businesses || response?.data || [];
+      },
       providesTags: (result) =>
-        result?.data
+        result
           ? [
-              ...result.data.map(({ id }) => ({ type: 'Business', id })),
+              ...result.map(({ id }) => ({ type: 'Business', id })),
               { type: 'Business', id: 'LIST' },
             ]
           : [{ type: 'Business', id: 'LIST' }],

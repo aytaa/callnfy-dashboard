@@ -34,6 +34,8 @@ export const authApiSlice = apiSlice.injectEndpoints({
     }),
     getMe: builder.query({
       query: () => '/auth/me',
+      keepUnusedDataFor: 0,  // Don't cache
+      refetchOnMountOrArgChange: true,  // Refetch every time component mounts
       providesTags: ['User'],
     }),
     verifyEmail: builder.mutation({

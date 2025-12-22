@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useGetMeQuery } from '../slices/apiSlice/authApiSlice';
+import { useGetMeQuery, useLogoutMutation } from '../slices/apiSlice/authApiSlice';
 import Sidebar from './Sidebar';
 
 export default function Layout({ children, skipSubscriptionCheck = false }) {
@@ -12,7 +12,10 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
   });
   const location = useLocation();
   const navigate = useNavigate();
-  const { data: userData, isLoading: isLoadingUser } = useGetMeQuery();
+  const { data: userData, isLoading: isLoadingUser, error: meError, refetch } = useGetMeQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+  const [logout] = useLogoutMutation();
 
   // Get page title from route
   const getPageTitle = () => {
@@ -46,26 +49,66 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
     };
   }, []);
 
+  // Refetch user data on route change
+  useEffect(() => {
+    refetch();
+  }, [location.pathname, refetch]);
+
+  // Handle authentication errors
+  useEffect(() => {
+    if (meError) {
+      // Check if it's a 401 Unauthorized error
+      if (meError.status === 401 || meError.status === 'FETCH_ERROR') {
+        // Logout and redirect to login
+        logout();
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        navigate('/login', { replace: true });
+      }
+    }
+  }, [meError, logout, navigate]);
+
   // Check subscription status and redirect if needed
   useEffect(() => {
     if (skipSubscriptionCheck || isLoadingUser) return;
 
     const user = userData?.data;
     const subscriptionStatus = user?.subscriptionStatus;
+    const trialEndsAt = user?.trialEndsAt;
 
-    // If no subscription, redirect to select plan
-    if (!subscriptionStatus || subscriptionStatus === null || subscriptionStatus === undefined) {
+    // Allow access for active subscriptions
+    if (subscriptionStatus === 'active') {
+      return;
+    }
+
+    // Check if trial is still valid
+    if (subscriptionStatus === 'trialing') {
+      if (trialEndsAt) {
+        const trialEndDate = new Date(trialEndsAt);
+        const now = new Date();
+
+        if (trialEndDate > now) {
+          // Trial is still active, allow access
+          return;
+        } else {
+          // Trial expired, redirect to select plan
+          navigate('/select-plan', { replace: true });
+          return;
+        }
+      }
+      // If trialing but no trialEndsAt, allow access (backend will set it)
+      return;
+    }
+
+    // If subscription is canceled or past due, redirect to select plan
+    if (subscriptionStatus === 'canceled' || subscriptionStatus === 'past_due') {
       navigate('/select-plan', { replace: true });
       return;
     }
 
-    // If subscription is canceled or past due, redirect to settings with warning
-    if (subscriptionStatus === 'canceled' || subscriptionStatus === 'past_due') {
-      navigate('/settings?subscription=warning', { replace: true });
-      return;
-    }
-
-    // Allow access for trialing or active subscriptions
+    // If no subscription status (null/undefined), allow access
+    // Backend will auto-start trial on first login
+    // This allows new users to access the dashboard immediately
   }, [userData, isLoadingUser, skipSubscriptionCheck, navigate]);
 
   // Show loading while checking subscription
