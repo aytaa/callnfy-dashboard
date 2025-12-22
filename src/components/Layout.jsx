@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useGetMeQuery, useLogoutMutation } from '../slices/apiSlice/authApiSlice';
+import { useGetBusinessesQuery } from '../slices/apiSlice/businessApiSlice';
 import Sidebar from './Sidebar';
+import CreateBusinessModal from './CreateBusinessModal';
 
 export default function Layout({ children, skipSubscriptionCheck = false }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -15,6 +17,7 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
   const { data: userData, isLoading: isLoadingUser, error: meError, refetch } = useGetMeQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
+  const { data: businesses, isLoading: businessesLoading } = useGetBusinessesQuery();
   const [logout] = useLogoutMutation();
 
   // Get page title from route
@@ -111,8 +114,8 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
     // This allows new users to access the dashboard immediately
   }, [userData, isLoadingUser, skipSubscriptionCheck, navigate]);
 
-  // Show loading while checking subscription
-  if (!skipSubscriptionCheck && isLoadingUser) {
+  // Show loading while checking subscription and businesses
+  if (!skipSubscriptionCheck && (isLoadingUser || businessesLoading)) {
     return (
       <div className="flex h-screen bg-[#212121] items-center justify-center">
         <div className="text-white">Loading...</div>
@@ -120,8 +123,15 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
     );
   }
 
+  // Check if user has no business (after loading is complete)
+  const hasBusiness = businesses && businesses.length > 0;
+  const showCreateBusinessModal = !businessesLoading && !hasBusiness;
+
   return (
     <div className="flex h-screen bg-[#212121]">
+      {/* Show Create Business Modal if no business exists */}
+      {showCreateBusinessModal && <CreateBusinessModal />}
+
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className={`flex-1 flex flex-col transition-all duration-300 ${isCollapsed ? 'lg:pl-16' : 'lg:pl-60'}`}>
         {/* Mobile Header */}

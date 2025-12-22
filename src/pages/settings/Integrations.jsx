@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Calendar, Zap, Check, X, Copy, Link, RefreshCw, ExternalLink } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useGetBusinessesQuery } from '../../slices/apiSlice/businessApiSlice';
 import {
   useGetIntegrationStatusQuery,
   useConnectGoogleCalendarMutation,
@@ -11,7 +12,14 @@ import {
 } from '../../slices/apiSlice/integrationsApiSlice';
 
 export default function Integrations() {
-  const { data: integrationStatus, isLoading } = useGetIntegrationStatusQuery();
+  // Get businessId from current business
+  const { data: businesses, isLoading: businessesLoading } = useGetBusinessesQuery();
+  const business = businesses?.[0];
+  const businessId = business?.id;
+
+  const { data: integrationStatus, isLoading } = useGetIntegrationStatusQuery(businessId, {
+    skip: !businessId,
+  });
   const [connectGoogle, { isLoading: isConnectingGoogle }] = useConnectGoogleCalendarMutation();
   const [disconnectGoogle, { isLoading: isDisconnectingGoogle }] = useDisconnectGoogleCalendarMutation();
   const [updateGoogleSettings, { isLoading: isUpdatingGoogle }] = useUpdateGoogleCalendarSettingsMutation();
@@ -34,8 +42,13 @@ export default function Integrations() {
 
   // Handle Google Calendar connection
   const handleConnectGoogle = async () => {
+    if (!businessId) {
+      toast.error('Business not found');
+      return;
+    }
+
     try {
-      const result = await connectGoogle().unwrap();
+      const result = await connectGoogle(businessId).unwrap();
       if (result?.data?.authUrl) {
         // Redirect to Google OAuth
         window.location.href = result.data.authUrl;
@@ -48,9 +61,13 @@ export default function Integrations() {
 
   const handleDisconnectGoogle = async () => {
     if (!window.confirm('Are you sure you want to disconnect Google Calendar?')) return;
+    if (!businessId) {
+      toast.error('Business not found');
+      return;
+    }
 
     try {
-      await disconnectGoogle().unwrap();
+      await disconnectGoogle(businessId).unwrap();
       toast.success('Google Calendar disconnected');
     } catch (err) {
       console.error('Google disconnect error:', err);
@@ -59,8 +76,13 @@ export default function Integrations() {
   };
 
   const handleUpdateSyncMode = async (mode) => {
+    if (!businessId) {
+      toast.error('Business not found');
+      return;
+    }
+
     try {
-      await updateGoogleSettings({ syncMode: mode }).unwrap();
+      await updateGoogleSettings({ businessId, settings: { syncMode: mode } }).unwrap();
       setSyncMode(mode);
       toast.success('Sync mode updated');
     } catch (err) {
@@ -71,8 +93,13 @@ export default function Integrations() {
 
   // Handle Zapier API key
   const handleGenerateZapierKey = async () => {
+    if (!businessId) {
+      toast.error('Business not found');
+      return;
+    }
+
     try {
-      await generateZapierKey().unwrap();
+      await generateZapierKey(businessId).unwrap();
       toast.success('Zapier API key generated');
     } catch (err) {
       console.error('Zapier key generation error:', err);
@@ -82,9 +109,13 @@ export default function Integrations() {
 
   const handleRevokeZapierKey = async () => {
     if (!window.confirm('Are you sure? This will break existing Zapier integrations.')) return;
+    if (!businessId) {
+      toast.error('Business not found');
+      return;
+    }
 
     try {
-      await revokeZapierKey().unwrap();
+      await revokeZapierKey(businessId).unwrap();
       toast.success('Zapier API key revoked');
     } catch (err) {
       console.error('Zapier key revoke error:', err);
@@ -97,10 +128,18 @@ export default function Integrations() {
     toast.success(`${label} copied to clipboard`);
   };
 
-  if (isLoading) {
+  if (businessesLoading || isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-gray-400">Loading integrations...</div>
+      </div>
+    );
+  }
+
+  if (!businessId) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-gray-400">Loading business information...</div>
       </div>
     );
   }
