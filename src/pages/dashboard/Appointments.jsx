@@ -127,8 +127,28 @@ export default function Appointments() {
     e.preventDefault();
     setError('');
 
+    // Get booking type based on business industry
+    const getBookingType = (industry) => {
+      const typeMap = {
+        'healthcare': 'appointment',
+        'hospitality': 'reservation',
+        'consulting': 'appointment',
+        'legal': 'appointment',
+        'real-estate': 'appointment',
+        'finance': 'appointment',
+        'education': 'appointment',
+        'retail': 'appointment',
+      };
+      return typeMap[industry] || 'appointment'; // Default to 'appointment'
+    };
+
+    const businessIndustry = businessData?.[0]?.industry;
+    const bookingType = getBookingType(businessIndustry);
+
     try {
       await createBooking({
+        businessId,
+        type: bookingType,
         customerName: formData.customer,
         service: formData.service,
         date: formData.date,
