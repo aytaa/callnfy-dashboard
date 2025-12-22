@@ -13,6 +13,7 @@ export const apiSlice = createApi({
         'Subscription',
         'Assistant',
         'PhoneNumber',
+        'Integration',
     ],
     endpoints: (builder) => ({}),
 });

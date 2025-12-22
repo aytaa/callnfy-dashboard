@@ -24,6 +24,7 @@ import Organization from './pages/settings/Organization';
 import Billing from './pages/settings/Billing';
 import Members from './pages/settings/Members';
 import Profile from './pages/settings/Profile';
+import Integrations from './pages/settings/Integrations';
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
@@ -261,6 +262,7 @@ function App() {
           <Route path="organization" element={<Organization />} />
           <Route path="billing" element={<Billing />} />
           <Route path="members" element={<Members />} />
+          <Route path="integrations" element={<Integrations />} />
           <Route path="profile" element={<Profile />} />
         </Route>
 
