@@ -17,6 +17,7 @@ import Appointments from './pages/dashboard/Appointments';
 import Customers from './pages/dashboard/Customers';
 import AIAssistant from './pages/dashboard/AIAssistant';
 import PhoneNumbers from './pages/dashboard/PhoneNumbers';
+import PhoneNumberSettings from './pages/dashboard/PhoneNumberSettings';
 import SelectPlan from './pages/dashboard/SelectPlan';
 
 // Settings pages
@@ -234,6 +235,16 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <PhoneNumbers />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/phone-numbers/:id"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <PhoneNumberSettings />
               </Layout>
             </ProtectedRoute>
           }

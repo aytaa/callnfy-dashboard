@@ -34,25 +34,28 @@ function Sidebar({isOpen, onClose}) {
     const dropdownRef = useRef(null);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const {data: userData} = useGetMeQuery();
+    const {data: userData, isLoading: isLoadingUser, error: userError} = useGetMeQuery();
 
-    // Get user email and name from localStorage with safe parsing
+    // Get user email and name from API data, with localStorage fallback
     const getUserFromStorage = () => {
         try {
             const userStr = localStorage.getItem('user');
             if (userStr && userStr !== 'undefined' && userStr !== 'null') {
                 return JSON.parse(userStr);
             }
-            return {email: 'aytac@callnfy.com', name: 'Aytac'};
+            return {email: '', name: ''};
         } catch (error) {
             console.error('Error parsing user from localStorage:', error);
-            return {email: 'aytac@callnfy.com', name: 'Aytac'};
+            return {email: '', name: ''};
         }
     };
 
-    const user = getUserFromStorage();
-    const userEmail = user.email || 'aytac@callnfy.com';
-    const userName = user.name || 'User';
+    const localUser = getUserFromStorage();
+    const apiUser = userData?.data;
+
+    // Prefer API data over localStorage
+    const userEmail = apiUser?.email || localUser.email || 'User';
+    const userName = apiUser?.name || localUser.name || 'User';
     const userInitial = userName.charAt(0).toUpperCase();
 
     // Save collapse state to localStorage
@@ -189,18 +192,22 @@ function Sidebar({isOpen, onClose}) {
                                 'w-full flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-[#262626] transition-colors',
                                 isCollapsed && 'justify-center px-0'
                             )}
-                            title={isCollapsed ? `${userEmail}'s Org` : ''}
+                            title={isCollapsed ? userEmail : ''}
                         >
                             {/* Avatar Circle */}
                             <div
                                 className="w-6 h-6 rounded-full bg-[#262626] flex items-center justify-center flex-shrink-0">
-                                <span className="text-white text-xs font-semibold">{userInitial}</span>
+                                {isLoadingUser ? (
+                                    <div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin"/>
+                                ) : (
+                                    <span className="text-white text-xs font-semibold">{userInitial}</span>
+                                )}
                             </div>
                             {!isCollapsed && (
                                 <>
                                     {/* Email */}
                                     <span className="text-sm text-white truncate flex-1 text-left">
-                                        {userEmail}'s Org
+                                        {isLoadingUser ? 'Loading...' : userEmail}
                                     </span>
                                     {/* Chevron */}
                                     <ChevronDown className="w-3.5 h-3.5 text-white flex-shrink-0"/>
