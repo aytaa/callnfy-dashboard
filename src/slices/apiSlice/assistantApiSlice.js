@@ -13,6 +13,11 @@ export const assistantApiSlice = apiSlice.injectEndpoints({
             ]
           : [{ type: 'Assistant', id: 'LIST' }],
     }),
+    getAssistantByBusiness: builder.query({
+      query: (businessId) => `/assistants?businessId=${businessId}`,
+      transformResponse: (response) => response?.data?.assistants?.[0] || null,
+      providesTags: ['Assistant'],
+    }),
     getAssistantDetail: builder.query({
       query: (id) => `/assistants/${id}`,
       providesTags: (result, error, id) => [{ type: 'Assistant', id }],
@@ -41,6 +46,7 @@ export const assistantApiSlice = apiSlice.injectEndpoints({
 
 export const {
   useGetAssistantQuery,
+  useGetAssistantByBusinessQuery,
   useGetAssistantDetailQuery,
   useCreateAssistantMutation,
   useUpdateAssistantMutation,
