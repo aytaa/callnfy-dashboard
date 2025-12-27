@@ -41,6 +41,17 @@ export const assistantApiSlice = apiSlice.injectEndpoints({
         { type: 'Assistant', id: 'LIST' },
       ],
     }),
+    patchAssistant: builder.mutation({
+      query: ({ id, ...assistant }) => ({
+        url: `/assistants/${id}`,
+        method: 'PATCH',
+        body: assistant,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'Assistant', id },
+        { type: 'Assistant', id: 'LIST' },
+      ],
+    }),
   }),
 });
 
@@ -50,4 +61,5 @@ export const {
   useGetAssistantDetailQuery,
   useCreateAssistantMutation,
   useUpdateAssistantMutation,
+  usePatchAssistantMutation,
 } = assistantApiSlice;

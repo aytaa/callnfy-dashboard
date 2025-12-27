@@ -15,7 +15,7 @@ import Overview from './pages/dashboard/Overview';
 import Calls from './pages/dashboard/Calls';
 import Appointments from './pages/dashboard/Appointments';
 import Customers from './pages/dashboard/Customers';
-import AIAssistant from './pages/dashboard/AIAssistant';
+import AIAssistantDetail from './pages/AIAssistant/AIAssistantDetail';
 import PhoneNumbers from './pages/dashboard/PhoneNumbers';
 import PhoneNumberSettings from './pages/dashboard/PhoneNumberSettings';
 import SelectPlan from './pages/dashboard/SelectPlan';
@@ -224,7 +224,7 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <AIAssistant />
+                <AIAssistantDetail />
               </Layout>
             </ProtectedRoute>
           }

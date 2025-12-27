@@ -137,7 +137,7 @@ function Sidebar({isOpen, onClose}) {
 
             <aside
                 className={clsx(
-                    'fixed top-0 left-0 z-50 h-screen bg-[#171717] transition-all duration-300 ease-in-out',
+                    'fixed top-0 left-0 z-50 h-screen bg-[#111114] border-r border-zinc-800 transition-all duration-300 ease-in-out',
                     'flex flex-col',
                     isCollapsed ? 'w-16' : 'w-60',
                     isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
@@ -219,7 +219,7 @@ function Sidebar({isOpen, onClose}) {
                         {emailDropdownOpen && (
                             <div
                                 className={clsx(
-                                    'absolute top-full mt-2 bg-[#171717] border border-[#303030] rounded-lg shadow-lg py-2 z-50',
+                                    'absolute top-full mt-2 bg-[#111114] border border-[#303030] rounded-lg shadow-lg py-2 z-50',
                                     isCollapsed ? 'left-16' : 'left-0 right-0'
                                 )}
                                 style={isCollapsed ? {minWidth: '200px'} : {}}

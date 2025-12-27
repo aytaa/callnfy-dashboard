@@ -71,7 +71,7 @@ export default function PhoneNumbers() {
     return (
       <div className="px-8 py-6">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-[#171717] border border-[#303030] rounded-xl p-12 text-center">
+          <div className="bg-[#1a1a1d] border border-zinc-800 rounded-xl p-12 text-center">
             <Phone className="w-12 h-12 text-red-400 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-white mb-2">Failed to load phone numbers</h3>
             <p className="text-sm text-gray-400 mb-4">
@@ -113,7 +113,7 @@ export default function PhoneNumbers() {
               return (
                 <div
                   key={business.id}
-                  className="bg-[#171717] border border-[#303030] rounded-xl p-6"
+                  className="bg-[#1a1a1d] border border-zinc-800 rounded-xl p-6"
                 >
                   {/* Business Header */}
                   <div className="flex items-center justify-between mb-4">
@@ -129,7 +129,7 @@ export default function PhoneNumbers() {
                   {phoneNumber ? (
                     <button
                       onClick={() => navigate(`/phone-numbers/${phoneNumber.id}`)}
-                      className="w-full bg-[#262626] border border-[#303030] rounded-lg p-4 hover:border-[#3a3a3a] transition-colors text-left group"
+                      className="w-full bg-[#1a1a1d] border border-zinc-800 rounded-lg p-4 hover:border-zinc-600 transition-colors text-left group"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3 flex-1">
@@ -188,7 +188,7 @@ export default function PhoneNumbers() {
                   ) : (
                     <button
                       onClick={() => setIsPurchaseModalOpen(true)}
-                      className="w-full bg-[#262626] border border-[#303030] rounded-lg p-6 hover:border-white transition-colors group"
+                      className="w-full bg-[#1a1a1d] border border-zinc-800 rounded-lg p-6 hover:border-white transition-colors group"
                     >
                       <div className="flex flex-col items-center justify-center text-center">
                         <div className="w-12 h-12 rounded-full bg-[#171717] flex items-center justify-center mb-3">
@@ -213,7 +213,7 @@ export default function PhoneNumbers() {
           </div>
         ) : (
           /* Empty State - No Businesses */
-          <div className="bg-[#171717] border border-[#303030] rounded-xl p-12">
+          <div className="bg-[#1a1a1d] border border-zinc-800 rounded-xl p-12">
             <div className="flex flex-col items-center justify-center text-center">
               <div className="w-16 h-16 rounded-full bg-[#262626] flex items-center justify-center mb-4">
                 <Phone className="w-8 h-8 text-gray-400" strokeWidth={1.5} />

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Phone, Save, Check } from 'lucide-react';
+import { ArrowLeft, Phone, Settings, Check, PhoneOutgoing, Calendar } from 'lucide-react';
 import {
   useGetPhoneNumberQuery,
   useUpdatePhoneNumberMutation,
@@ -10,73 +10,91 @@ import { useGetAssistantQuery } from '../../slices/apiSlice/assistantApiSlice';
 export default function PhoneNumberSettings() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [selectedAssistantId, setSelectedAssistantId] = useState('');
+
+  // Form state
   const [displayName, setDisplayName] = useState('');
+  const [selectedAssistantId, setSelectedAssistantId] = useState('');
+  const [fallbackCountryCode, setFallbackCountryCode] = useState('+1');
+  const [fallbackNumber, setFallbackNumber] = useState('');
+
+  // Outbound settings state
+  const [callMode, setCallMode] = useState('single');
+  const [outboundCountryCode, setOutboundCountryCode] = useState('+1');
+  const [outboundNumber, setOutboundNumber] = useState('');
+  const [outboundAssistantId, setOutboundAssistantId] = useState('');
+
+  // UI state
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [hasUnsavedName, setHasUnsavedName] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const { data: phoneData, isLoading: isLoadingPhone, error: phoneError } = useGetPhoneNumberQuery(id);
   const { data: assistants, isLoading: isLoadingAssistants } = useGetAssistantQuery();
   const [updatePhoneNumber, { isLoading: isUpdating }] = useUpdatePhoneNumberMutation();
-
-  // Debug: Log the raw API response
-  console.log('Phone Number Detail API Response:', phoneData);
 
   const phoneNumber = phoneData?.data?.phoneNumber;
 
   // Initialize form values when data loads
   useEffect(() => {
     if (phoneNumber) {
-      setSelectedAssistantId(phoneNumber.assistant?.id || '');
       setDisplayName(phoneNumber.name || '');
+      setSelectedAssistantId(phoneNumber.assistant?.id || '');
+
+      // Parse fallback number if it exists
+      if (phoneNumber.fallbackDestination) {
+        const fallback = phoneNumber.fallbackDestination;
+        // Extract country code and number (simple parsing)
+        if (fallback.startsWith('+')) {
+          const parts = fallback.match(/^(\+\d+)(.+)$/);
+          if (parts) {
+            setFallbackCountryCode(parts[1]);
+            setFallbackNumber(parts[2].replace(/\D/g, ''));
+          }
+        } else {
+          setFallbackNumber(fallback.replace(/\D/g, ''));
+        }
+      }
     }
   }, [phoneNumber]);
 
-  // Track unsaved changes for display name
+  // Track unsaved changes
   useEffect(() => {
     if (phoneNumber) {
-      setHasUnsavedName(displayName !== (phoneNumber.name || ''));
+      const fallbackDestination = fallbackNumber ? `${fallbackCountryCode}${fallbackNumber}` : '';
+      const hasChanges =
+        displayName !== (phoneNumber.name || '') ||
+        selectedAssistantId !== (phoneNumber.assistant?.id || '') ||
+        fallbackDestination !== (phoneNumber.fallbackDestination || '');
+      setHasUnsavedChanges(hasChanges);
     }
-  }, [displayName, phoneNumber]);
+  }, [displayName, selectedAssistantId, fallbackCountryCode, fallbackNumber, phoneNumber]);
 
   // Filter assistants by business
   const filteredAssistants = assistants?.filter(
     (assistant) => assistant.businessId === phoneNumber?.business?.id
   ) || [];
 
-  const handleAssistantChange = async (newAssistantId) => {
-    setError('');
-    setSuccess('');
-    setSelectedAssistantId(newAssistantId);
-
-    try {
-      await updatePhoneNumber({
-        id,
-        assistantId: newAssistantId || null,
-      }).unwrap();
-      setSuccess('Assistant updated successfully');
-      setTimeout(() => setSuccess(''), 3000);
-    } catch (err) {
-      setError(err?.data?.error?.message || err?.data?.message || 'Failed to update assistant');
-      // Revert on error
-      setSelectedAssistantId(phoneNumber?.assistant?.id || '');
-    }
-  };
-
-  const handleSaveDisplayName = async () => {
+  const handleSave = async () => {
     setError('');
     setSuccess('');
 
     try {
-      await updatePhoneNumber({
+      const updates = {
         id,
         name: displayName,
-      }).unwrap();
-      setSuccess('Display name updated successfully');
+        assistantId: selectedAssistantId || null,
+      };
+
+      // Add fallback destination if provided
+      if (fallbackNumber) {
+        updates.fallbackDestination = `${fallbackCountryCode}${fallbackNumber}`;
+      }
+
+      await updatePhoneNumber(updates).unwrap();
+      setSuccess('Phone number settings updated successfully');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError(err?.data?.error?.message || err?.data?.message || 'Failed to update display name');
+      setError(err?.data?.error?.message || err?.data?.message || 'Failed to update phone number settings');
     }
   };
 
@@ -95,8 +113,8 @@ export default function PhoneNumberSettings() {
     return (
       <div className="px-8 py-6 flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading phone number settings...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-400 mx-auto mb-4"></div>
+          <p className="text-zinc-400">Loading phone number settings...</p>
         </div>
       </div>
     );
@@ -106,15 +124,15 @@ export default function PhoneNumberSettings() {
     return (
       <div className="px-8 py-6">
         <div className="max-w-3xl mx-auto">
-          <div className="bg-[#171717] border border-[#303030] rounded-xl p-12 text-center">
-            <Phone className="w-12 h-12 text-red-400 mx-auto mb-4" />
+          <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-12 text-center">
+            <Phone className="w-12 h-12 text-zinc-400 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-white mb-2">Failed to load phone number</h3>
-            <p className="text-sm text-gray-400 mb-4">
+            <p className="text-sm text-zinc-400 mb-4">
               {phoneError?.data?.error?.message || phoneError?.data?.message || 'An error occurred while loading the phone number.'}
             </p>
             <button
               onClick={() => navigate('/phone-numbers')}
-              className="px-4 py-2 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-4 py-2 bg-white text-black font-medium rounded-md hover:bg-zinc-200 transition-colors"
             >
               Back to Phone Numbers
             </button>
@@ -128,13 +146,13 @@ export default function PhoneNumberSettings() {
     return (
       <div className="px-8 py-6">
         <div className="max-w-3xl mx-auto">
-          <div className="bg-[#171717] border border-[#303030] rounded-xl p-12 text-center">
-            <Phone className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-12 text-center">
+            <Phone className="w-12 h-12 text-zinc-400 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-white mb-2">Phone number not found</h3>
-            <p className="text-sm text-gray-400 mb-4">The phone number you're looking for doesn't exist.</p>
+            <p className="text-sm text-zinc-400 mb-4">The phone number you're looking for doesn't exist.</p>
             <button
               onClick={() => navigate('/phone-numbers')}
-              className="px-4 py-2 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-4 py-2 bg-white text-black font-medium rounded-md hover:bg-zinc-200 transition-colors"
             >
               Back to Phone Numbers
             </button>
@@ -146,96 +164,266 @@ export default function PhoneNumberSettings() {
 
   return (
     <div className="px-8 py-6">
-      <div className="max-w-3xl mx-auto space-y-6">
+      <div className="max-w-3xl mx-auto space-y-4">
         {/* Back Button */}
         <button
           onClick={() => navigate('/phone-numbers')}
-          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+          className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span className="text-sm">Back to Phone Numbers</span>
         </button>
 
+        {/* Error Message */}
         {error && (
-          <div className="p-3 bg-red-900/20 border border-red-800 rounded-lg">
+          <div className="p-3 bg-red-900/20 border border-red-800 rounded-md">
             <p className="text-sm text-red-400">{error}</p>
           </div>
         )}
 
+        {/* Success Message */}
         {success && (
-          <div className="p-3 bg-green-900/20 border border-green-800 rounded-lg flex items-center gap-2">
+          <div className="p-3 bg-green-900/20 border border-green-800 rounded-md flex items-center gap-2">
             <Check className="w-4 h-4 text-green-400" />
             <p className="text-sm text-green-400">{success}</p>
           </div>
         )}
 
-        {/* Phone Number Card */}
-        <div className="bg-[#171717] border border-[#303030] rounded-xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-2xl font-semibold text-white">
-              {formatPhoneNumber(phoneNumber.phoneNumber || phoneNumber.number)}
-            </span>
-            <span className={`px-3 py-1.5 text-sm font-medium rounded ${
-              phoneNumber.status === 'active'
-                ? 'bg-green-900/20 text-green-400 border border-green-800'
-                : 'bg-[#262626] text-gray-400 border border-[#404040]'
-            }`}>
-              {phoneNumber.status === 'active' ? 'Active' : phoneNumber.status || 'Activating'}
-            </span>
-          </div>
-          <div className="text-sm text-gray-400">
-            Provider: {phoneNumber.provider?.toUpperCase() || 'VAPI'}
-          </div>
-          {phoneNumber.business && (
-            <div className="text-sm text-gray-400">
-              Business: {phoneNumber.business.name}
+        {/* CARD 1: Phone Number Details */}
+        <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-6">
+          {/* Section Header */}
+          <div className="mb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Phone className="w-5 h-5 text-zinc-500" />
+              <h2 className="text-base font-medium text-white">Phone Number Details</h2>
             </div>
-          )}
+            <p className="text-sm text-zinc-500">
+              Give your phone number a descriptive name to help identify it in your list.
+            </p>
+          </div>
+
+          {/* Fields */}
+          <div className="space-y-4">
+            {/* Phone Number Label */}
+            <div>
+              <label className="block text-sm text-zinc-400 mb-1">Phone Number Label</label>
+              <input
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="e.g., Main Office Line"
+                className="w-full bg-[#111114] border border-zinc-700 rounded-md px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-zinc-600 focus:outline-none"
+              />
+            </div>
+
+            {/* Provider (readonly) */}
+            <div>
+              <label className="block text-sm text-zinc-400 mb-1">Provider</label>
+              <input
+                type="text"
+                value={phoneNumber.provider?.toUpperCase() || 'VAPI'}
+                readOnly
+                className="w-full bg-zinc-800/50 border border-zinc-700 rounded-md px-3 py-2 text-sm text-white cursor-not-allowed"
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Configuration Section */}
-        <div className="bg-[#171717] border border-[#303030] rounded-xl p-6">
-          <h3 className="text-lg font-medium text-white mb-4">Configuration</h3>
-
-          {/* Assistant Dropdown */}
+        {/* CARD 2: Inbound Settings */}
+        <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-6">
+          {/* Section Header */}
           <div className="mb-4">
-            <label className="block text-sm text-gray-400 mb-2">Assistant</label>
-            <select
-              value={selectedAssistantId}
-              onChange={(e) => handleAssistantChange(e.target.value)}
-              disabled={isUpdating}
-              className="w-full bg-[#262626] border border-[#303030] rounded-lg px-4 py-2 text-white focus:border-[#3a3a3a] focus:outline-none disabled:opacity-50"
-            >
-              <option value="">Select assistant...</option>
-              {filteredAssistants.map((assistant) => (
-                <option key={assistant.id} value={assistant.id}>
-                  {assistant.name}
-                </option>
-              ))}
-            </select>
-            {filteredAssistants.length === 0 && (
-              <p className="text-xs text-gray-400 mt-2">
-                No assistants available for this business. Create an assistant first.
+            <div className="flex items-center gap-2 mb-2">
+              <Settings className="w-5 h-5 text-zinc-500" />
+              <h2 className="text-base font-medium text-white">Inbound Settings</h2>
+            </div>
+            <p className="text-sm text-zinc-500">
+              Assign an assistant to handle incoming calls to this phone number.
+            </p>
+          </div>
+
+          {/* Fields */}
+          <div className="space-y-4">
+            {/* Inbound Phone Number (readonly) */}
+            <div>
+              <label className="block text-sm text-zinc-400 mb-1">Inbound Phone Number</label>
+              <input
+                type="text"
+                value={formatPhoneNumber(phoneNumber.phoneNumber || phoneNumber.number)}
+                readOnly
+                className="w-full bg-zinc-800/50 border border-zinc-700 rounded-md px-3 py-2 text-sm text-white cursor-not-allowed"
+              />
+            </div>
+
+            {/* Assistant Dropdown */}
+            <div>
+              <label className="block text-sm text-zinc-400 mb-1">Assistant</label>
+              <select
+                value={selectedAssistantId}
+                onChange={(e) => setSelectedAssistantId(e.target.value)}
+                className="w-full bg-[#111114] border border-zinc-700 rounded-md px-3 py-2 text-sm text-white focus:border-zinc-600 focus:outline-none"
+              >
+                <option value="">Select assistant...</option>
+                {filteredAssistants.map((assistant) => (
+                  <option key={assistant.id} value={assistant.id}>
+                    {assistant.name}
+                  </option>
+                ))}
+              </select>
+              {filteredAssistants.length === 0 && (
+                <p className="text-xs text-zinc-500 mt-1.5">
+                  No assistants available. Create an assistant first.
+                </p>
+              )}
+            </div>
+
+            {/* Fallback Destination */}
+            <div>
+              <label className="block text-sm text-zinc-400 mb-1">Fallback Destination</label>
+              <div className="flex gap-2">
+                {/* Country Code Dropdown */}
+                <select
+                  value={fallbackCountryCode}
+                  onChange={(e) => setFallbackCountryCode(e.target.value)}
+                  className="w-24 bg-[#111114] border border-zinc-700 rounded-md px-3 py-2 text-sm text-white focus:border-zinc-600 focus:outline-none"
+                >
+                  <option value="+1">+1</option>
+                  <option value="+44">+44</option>
+                  <option value="+91">+91</option>
+                  <option value="+61">+61</option>
+                  <option value="+81">+81</option>
+                  <option value="+86">+86</option>
+                </select>
+
+                {/* Phone Number Input */}
+                <input
+                  type="tel"
+                  value={fallbackNumber}
+                  onChange={(e) => setFallbackNumber(e.target.value.replace(/\D/g, ''))}
+                  placeholder="5551234567"
+                  className="flex-1 bg-[#111114] border border-zinc-700 rounded-md px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-zinc-600 focus:outline-none"
+                />
+              </div>
+              <p className="text-xs text-zinc-500 mt-1.5">
+                Transfer calls here when the assistant is unavailable.
               </p>
-            )}
+            </div>
+          </div>
+        </div>
+
+        {/* CARD 3: Outbound Settings */}
+        <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-6">
+          {/* Section Header */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <PhoneOutgoing className="w-5 h-5 text-zinc-500" />
+              <div>
+                <h2 className="text-base font-medium text-white">Outbound Settings</h2>
+                <p className="text-sm text-zinc-500">
+                  Configure outbound calling with assistant selection and batch options.
+                </p>
+              </div>
+            </div>
+            <span className="text-xs bg-zinc-700 text-zinc-400 px-2 py-0.5 rounded">Coming Soon</span>
           </div>
 
-          {/* Name Input */}
-          <div className="mb-4">
-            <label className="block text-sm text-gray-400 mb-2">Display Name</label>
-            <input
-              type="text"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="e.g., Main Office Line"
-              className="w-full bg-[#262626] border border-[#303030] rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:border-[#3a3a3a] focus:outline-none"
-            />
-          </div>
+          {/* Fields */}
+          <div className="space-y-4 opacity-60">
+            {/* Call Mode Radio Buttons */}
+            <div>
+              <label className="block text-sm text-zinc-400 mb-2">Call Mode</label>
+              <div className="flex gap-4">
+                <button
+                  disabled
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-md border border-zinc-700 bg-[#111114] text-zinc-400 opacity-50 cursor-not-allowed"
+                >
+                  <div className="w-4 h-4 rounded-full border-2 border-zinc-600 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-white"></div>
+                  </div>
+                  <span className="text-sm">Call One Number</span>
+                </button>
+                <button
+                  disabled
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-md border border-zinc-700 bg-[#111114] text-zinc-400 opacity-50 cursor-not-allowed"
+                >
+                  <div className="w-4 h-4 rounded-full border-2 border-zinc-600 flex items-center justify-center">
+                  </div>
+                  <span className="text-sm">Call Many Numbers (Upload CSV)</span>
+                </button>
+              </div>
+            </div>
 
+            {/* Outbound Phone Number */}
+            <div>
+              <label className="block text-sm text-zinc-400 mb-1">Outbound Phone Number</label>
+              <div className="flex gap-2">
+                {/* Country Code Dropdown */}
+                <select
+                  disabled
+                  value={outboundCountryCode}
+                  className="w-24 bg-[#111114] border border-zinc-700 rounded-md px-3 py-2 text-sm text-white opacity-50 cursor-not-allowed"
+                >
+                  <option value="+1">+1</option>
+                  <option value="+44">+44</option>
+                  <option value="+91">+91</option>
+                  <option value="+61">+61</option>
+                  <option value="+81">+81</option>
+                  <option value="+86">+86</option>
+                </select>
+
+                {/* Phone Number Input */}
+                <input
+                  type="tel"
+                  disabled
+                  value={outboundNumber}
+                  placeholder="Enter a phone number"
+                  className="flex-1 bg-[#111114] border border-zinc-700 rounded-md px-3 py-2 text-sm text-white placeholder:text-zinc-500 opacity-50 cursor-not-allowed"
+                />
+              </div>
+            </div>
+
+            {/* Assistant Dropdown */}
+            <div>
+              <label className="block text-sm text-zinc-400 mb-1">Assistant</label>
+              <select
+                disabled
+                value={outboundAssistantId}
+                className="w-full bg-[#111114] border border-zinc-700 rounded-md px-3 py-2 text-sm text-white opacity-50 cursor-not-allowed"
+              >
+                <option value="">Select Assistant...</option>
+                {filteredAssistants.map((assistant) => (
+                  <option key={assistant.id} value={assistant.id}>
+                    {assistant.name}
+                  </option>
+                ))}
+              </select>
+              {filteredAssistants.length === 0 && (
+                <p className="text-xs text-zinc-500 mt-1.5">
+                  No assistants available. Create an assistant first.
+                </p>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 pt-2">
+              <button disabled className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-700 text-white rounded-md text-sm font-medium opacity-50 cursor-not-allowed">
+                <Phone className="w-4 h-4" />
+                Make a Call
+              </button>
+              <button disabled className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-800 text-zinc-400 rounded-md text-sm font-medium opacity-50 cursor-not-allowed">
+                <Calendar className="w-4 h-4" />
+                Schedule Call
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Save Button */}
+        <div className="flex justify-end">
           <button
-            onClick={handleSaveDisplayName}
-            disabled={isUpdating || !hasUnsavedName}
-            className="bg-white hover:bg-gray-200 text-black px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleSave}
+            disabled={isUpdating || !hasUnsavedChanges}
+            className="px-6 py-2 text-sm font-medium text-black bg-white rounded-md hover:bg-zinc-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isUpdating ? 'Saving...' : 'Save Changes'}
           </button>

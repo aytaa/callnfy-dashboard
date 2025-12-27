@@ -137,7 +137,7 @@ export default function Customers() {
 
         {/* Customers Table */}
         {isLoading ? (
-          <div className="bg-[#171717] border border-[#303030] rounded-xl p-8 text-center">
+          <div className="bg-[#1a1a1d] border border-zinc-800 rounded-xl p-8 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
           </div>
         ) : customers.length > 0 ? (
@@ -171,7 +171,7 @@ export default function Customers() {
             )}
           </>
         ) : (
-          <div className="bg-[#171717] border border-[#303030] rounded-xl p-12">
+          <div className="bg-[#1a1a1d] border border-zinc-800 rounded-xl p-12">
             <div className="flex flex-col items-center justify-center text-center">
               <div className="w-16 h-16 rounded-full bg-[#262626] flex items-center justify-center mb-4">
                 <Phone className="w-8 h-8 text-gray-400" strokeWidth={1.5} />
@@ -217,7 +217,7 @@ export default function Customers() {
           {selectedCustomer && (
             <div className="space-y-6">
               {/* Customer Info */}
-              <div className="bg-[#212121] border border-[#303030] rounded-lg p-4">
+              <div className="bg-[#111114] border border-zinc-800 rounded-lg p-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-white opacity-60 mb-1">Name</p>
@@ -263,7 +263,7 @@ export default function Customers() {
                 <div className="space-y-2">
                   {selectedCustomer.callHistory.length > 0 ? (
                     selectedCustomer.callHistory.map((call, index) => (
-                      <div key={index} className="bg-[#171717] border border-[#303030] rounded-lg p-4">
+                      <div key={index} className="bg-[#1a1a1d] border border-zinc-800 rounded-lg p-4">
                         <div className="flex justify-between items-center">
                           <div>
                             <p className="text-white font-medium">{call.outcome}</p>
@@ -290,7 +290,7 @@ export default function Customers() {
                 <div className="space-y-2">
                   {selectedCustomer.appointments.length > 0 ? (
                     selectedCustomer.appointments.map((appointment, index) => (
-                      <div key={index} className="bg-[#171717] border border-[#303030] rounded-lg p-4">
+                      <div key={index} className="bg-[#1a1a1d] border border-zinc-800 rounded-lg p-4">
                         <div className="flex justify-between items-center">
                           <div>
                             <p className="text-white font-medium">{appointment.service}</p>
@@ -357,7 +357,7 @@ export default function Customers() {
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full bg-[#262626] border border-[#303030] rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-[#3a3a3a] focus:outline-none"
+                className="w-full bg-[#111114] border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-zinc-600 focus:outline-none"
                 placeholder="Customer name"
                 required
               />
@@ -369,7 +369,7 @@ export default function Customers() {
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full bg-[#262626] border border-[#303030] rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-[#3a3a3a] focus:outline-none"
+                className="w-full bg-[#111114] border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-zinc-600 focus:outline-none"
                 placeholder="+1 (555) 123-4567"
                 required
               />
@@ -381,7 +381,7 @@ export default function Customers() {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full bg-[#262626] border border-[#303030] rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-[#3a3a3a] focus:outline-none"
+                className="w-full bg-[#111114] border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-zinc-600 focus:outline-none"
                 placeholder="customer@email.com"
                 required
               />
