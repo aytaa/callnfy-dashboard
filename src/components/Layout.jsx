@@ -176,9 +176,9 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
               <Menu className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-xl font-semibold text-white">{getPageTitle().title}</h1>
+              <h1 className="text-lg font-semibold text-white">{getPageTitle().title}</h1>
               {getPageTitle().subtitle && (
-                <p className="text-sm text-zinc-500">{getPageTitle().subtitle}</p>
+                <p className="text-xs text-zinc-400">{getPageTitle().subtitle}</p>
               )}
             </div>
           </div>
@@ -186,9 +186,9 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
 
         {/* Desktop Header */}
         <div className="hidden lg:block bg-[#111114] border-b border-[#303030] px-8 py-4">
-          <h1 className="text-2xl font-semibold text-white">{getPageTitle().title}</h1>
+          <h1 className="text-xl font-semibold text-white">{getPageTitle().title}</h1>
           {getPageTitle().subtitle && (
-            <p className="text-sm text-zinc-500 mt-1">{getPageTitle().subtitle}</p>
+            <p className="text-xs text-zinc-400 mt-1">{getPageTitle().subtitle}</p>
           )}
         </div>
 

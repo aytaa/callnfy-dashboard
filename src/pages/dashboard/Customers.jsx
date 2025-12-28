@@ -322,6 +322,7 @@ export default function Customers() {
             setError('');
           }}
           title="Add New Customer"
+          size="sm"
           footer={
             <>
               <button

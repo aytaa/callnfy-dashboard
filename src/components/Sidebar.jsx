@@ -21,6 +21,7 @@ import clsx from 'clsx';
 import SearchModal from './SearchModal';
 import {logout} from '../slices/authSlice';
 import {useGetMeQuery} from '../slices/apiSlice/authApiSlice';
+import {useGetBusinessesQuery} from '../slices/apiSlice/businessApiSlice';
 
 
 function Sidebar({isOpen, onClose}) {
@@ -35,6 +36,7 @@ function Sidebar({isOpen, onClose}) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const {data: userData, isLoading: isLoadingUser, error: userError} = useGetMeQuery();
+    const {data: businessData, isLoading: isLoadingBusiness} = useGetBusinessesQuery();
 
     // Get user email and name from API data, with localStorage fallback
     const getUserFromStorage = () => {
@@ -52,10 +54,13 @@ function Sidebar({isOpen, onClose}) {
 
     const localUser = getUserFromStorage();
     const apiUser = userData?.data;
+    const business = businessData?.[0];
 
     // Prefer API data over localStorage
     const userEmail = apiUser?.email || localUser.email || 'User';
     const userName = apiUser?.name || localUser.name || 'User';
+    const businessName = business?.name || 'Business';
+    const businessInitial = businessName.charAt(0).toUpperCase();
     const userInitial = userName.charAt(0).toUpperCase();
 
     // Save collapse state to localStorage
@@ -192,22 +197,22 @@ function Sidebar({isOpen, onClose}) {
                                 'w-full flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-[#262626] transition-colors',
                                 isCollapsed && 'justify-center px-0'
                             )}
-                            title={isCollapsed ? userEmail : ''}
+                            title={isCollapsed ? businessName : ''}
                         >
                             {/* Avatar Circle */}
                             <div
                                 className="w-6 h-6 rounded-full bg-[#262626] flex items-center justify-center flex-shrink-0">
-                                {isLoadingUser ? (
+                                {isLoadingBusiness ? (
                                     <div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin"/>
                                 ) : (
-                                    <span className="text-white text-xs font-semibold">{userInitial}</span>
+                                    <span className="text-white text-xs font-semibold">{businessInitial}</span>
                                 )}
                             </div>
                             {!isCollapsed && (
                                 <>
-                                    {/* Email */}
+                                    {/* Business Name */}
                                     <span className="text-sm text-white truncate flex-1 text-left">
-                                        {isLoadingUser ? 'Loading...' : userEmail}
+                                        {isLoadingBusiness ? 'Loading...' : businessName}
                                     </span>
                                     {/* Chevron */}
                                     <ChevronDown className="w-3.5 h-3.5 text-white flex-shrink-0"/>
@@ -349,9 +354,13 @@ function Sidebar({isOpen, onClose}) {
                                         <>
                                             <span
                                                 className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded">
-                                                STARTER
+                                                {user?.planName?.toUpperCase() || 'STARTER'}
                                             </span>
-                                            <span className="text-xs text-white">125 / 150 min</span>
+                                            {user?.usageMinutes !== undefined && user?.planMinutes !== undefined && (
+                                                <span className="text-xs text-zinc-400">
+                                                    {user.usageMinutes} / {user.planMinutes} min
+                                                </span>
+                                            )}
                                         </>
                                     ) : (
                                         <>
