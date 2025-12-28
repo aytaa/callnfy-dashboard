@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Modal from './Modal';
+import Modal from './ui/Modal';
 import { Phone, Search, CheckCircle, AlertCircle } from 'lucide-react';
 import {
   useLazyListAvailableNumbersQuery,

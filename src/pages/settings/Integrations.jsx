@@ -154,10 +154,10 @@ export default function Integrations() {
 
       <div className="space-y-3">
         {/* Google Calendar Integration */}
-        <div className="bg-[#171717] border border-[#303030] rounded-xl p-4">
+        <div className="bg-[#1a1a1d] border border-[#303030] rounded-xl p-4">
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 bg-[#262626] rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 bg-[#1a1a1d] rounded-lg flex items-center justify-center flex-shrink-0">
                 <Calendar className="w-4 h-4 text-white" />
               </div>
               <div>
@@ -187,7 +187,7 @@ export default function Integrations() {
               {/* Connected Account */}
               <div className="pt-3 border-t border-[#303030]">
                 <label className="block text-xs text-gray-400 mb-1.5">Connected Account</label>
-                <div className="flex items-center justify-between bg-[#262626] border border-[#303030] rounded-lg px-2.5 py-1.5">
+                <div className="flex items-center justify-between bg-[#111114] border border-zinc-700 rounded-lg px-2.5 py-1.5">
                   <span className="text-xs text-white">{googleEmail}</span>
                   <button
                     onClick={handleDisconnectGoogle}
@@ -208,8 +208,8 @@ export default function Integrations() {
                     disabled={isUpdatingGoogle}
                     className={`px-2.5 py-1.5 text-xs rounded-lg border transition-colors ${
                       googleSyncMode === 'one-way'
-                        ? 'bg-[#262626] border-white text-white'
-                        : 'bg-[#1a1a1a] border-[#303030] text-gray-400 hover:border-gray-600'
+                        ? 'bg-[#1a1a1d] border-white text-white'
+                        : 'bg-[#111114] border-[#303030] text-gray-400 hover:border-gray-600'
                     }`}
                   >
                     One-way (Callnfy → Google)
@@ -219,8 +219,8 @@ export default function Integrations() {
                     disabled={isUpdatingGoogle}
                     className={`px-2.5 py-1.5 text-xs rounded-lg border transition-colors ${
                       googleSyncMode === 'two-way'
-                        ? 'bg-[#262626] border-white text-white'
-                        : 'bg-[#1a1a1a] border-[#303030] text-gray-400 hover:border-gray-600'
+                        ? 'bg-[#1a1a1d] border-white text-white'
+                        : 'bg-[#111114] border-[#303030] text-gray-400 hover:border-gray-600'
                     }`}
                   >
                     Two-way (Sync both ways)
@@ -248,10 +248,10 @@ export default function Integrations() {
         </div>
 
         {/* Zapier Integration */}
-        <div className="bg-[#171717] border border-[#303030] rounded-xl p-4">
+        <div className="bg-[#1a1a1d] border border-[#303030] rounded-xl p-4">
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 bg-[#262626] rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 bg-[#1a1a1d] rounded-lg flex items-center justify-center flex-shrink-0">
                 <Zap className="w-4 h-4 text-white" />
               </div>
               <div>
@@ -286,7 +286,7 @@ export default function Integrations() {
                     type={showApiKey ? "text" : "password"}
                     readOnly
                     value={zapierApiKey || ''}
-                    className="flex-1 bg-[#1a1a1a] border border-[#333] rounded px-2 py-1.5 text-xs text-white font-mono"
+                    className="flex-1 bg-[#111114] border border-zinc-700 rounded px-2 py-1.5 text-xs text-white font-mono"
                   />
                   <button
                     onClick={() => setShowApiKey(!showApiKey)}
@@ -313,7 +313,7 @@ export default function Integrations() {
                     type="text"
                     readOnly
                     value={zapierWebhookUrl || ''}
-                    className="flex-1 bg-[#1a1a1a] border border-[#333] rounded px-2 py-1.5 text-xs text-white font-mono truncate"
+                    className="flex-1 bg-[#111114] border border-zinc-700 rounded px-2 py-1.5 text-xs text-white font-mono truncate"
                   />
                   <button
                     onClick={() => copyToClipboard(zapierWebhookUrl, 'Webhook URL')}
