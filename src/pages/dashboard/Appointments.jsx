@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Calendar as CalendarIcon, List, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
-import DataTable from '../../components/DataTable';
-import Badge from '../../components/Badge';
-import Button from '../../components/Button';
-import Modal from '../../components/Modal';
-import Input from '../../components/Input';
-import Select from '../../components/Select';
-import Textarea from '../../components/Textarea';
-import Card from '../../components/Card';
+import DataTable from '../../components/ui/DataTable';
+import Badge from '../../components/ui/Badge';
+import { Button } from '../../components/ui/Button';
+import Modal from '../../components/ui/Modal';
+import Input from '../../components/ui/Input';
+import Select from '../../components/ui/Select';
+import Textarea from '../../components/ui/Textarea';
+import Card from '../../components/ui/Card';
 import { useGetBookingsQuery, useCreateBookingMutation } from '../../slices/apiSlice/bookingsApiSlice';
 import { useGetBusinessesQuery } from '../../slices/apiSlice/businessApiSlice';
 

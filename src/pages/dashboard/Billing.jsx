@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { CreditCard, Calendar, TrendingUp, Check } from 'lucide-react';
-import ProgressBar from '../../components/ProgressBar';
-import DataTable from '../../components/DataTable';
-import Modal from '../../components/Modal';
+import ProgressBar from '../../components/ui/ProgressBar';
+import DataTable from '../../components/ui/DataTable';
+import Modal from '../../components/ui/Modal';
 
 export default function Billing() {
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);

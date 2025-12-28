@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Search, Phone, Mail, Calendar } from 'lucide-react';
-import DataTable from '../../components/DataTable';
-import Badge from '../../components/Badge';
-import Input from '../../components/Input';
-import Modal from '../../components/Modal';
-import Button from '../../components/Button';
-import Card from '../../components/Card';
+import DataTable from '../../components/ui/DataTable';
+import Badge from '../../components/ui/Badge';
+import Input from '../../components/ui/Input';
+import Modal from '../../components/ui/Modal';
+import { Button } from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
 import {
   useGetCustomersQuery,
   useCreateCustomerMutation,

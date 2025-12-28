@@ -29,7 +29,7 @@ export default function SearchModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   const actions = [
-    { icon: ArrowRight, label: 'Switch Organization', shortcut: '⌘ 0', action: () => console.log('Switch org') }
+    { icon: ArrowRight, label: 'Switch Organization', shortcut: '⌘ 0', action: () => { /* TODO: Implement organization switching */ } }
   ];
 
   const pages = [

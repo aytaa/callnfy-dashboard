@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Phone, MoreVertical } from 'lucide-react';
 import { useGetCallsQuery, useGetCallStatsQuery } from '../../slices/apiSlice/callsApiSlice';
 import { useGetBusinessesQuery } from '../../slices/apiSlice/businessApiSlice';
-import DataTable from '../../components/DataTable';
-import Select from '../../components/Select';
-import Modal from '../../components/Modal';
-import Button from '../../components/Button';
+import DataTable from '../../components/ui/DataTable';
+import Select from '../../components/ui/Select';
+import Modal from '../../components/ui/Modal';
+import { Button } from '../../components/ui/Button';
 
 export default function Calls() {
   const [page, setPage] = useState(1);

@@ -6,8 +6,8 @@ import { selectCurrentUser } from '../../slices/authSlice';
 import { useGetBusinessesQuery } from '../../slices/apiSlice/businessApiSlice';
 import { useGetCallsQuery } from '../../slices/apiSlice/callsApiSlice';
 import { useGetAppointmentsQuery } from '../../slices/apiSlice/appointmentsApiSlice';
-import DataTable from '../../components/DataTable';
-import Card from '../../components/Card';
+import DataTable from '../../components/ui/DataTable';
+import Card from '../../components/ui/Card';
 
 export default function Overview() {
   const user = useSelector(selectCurrentUser);
