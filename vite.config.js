@@ -5,14 +5,6 @@ export default defineConfig({
     plugins: [react()],
     server: {
         port: 3000,
-        open: true,
-        proxy: {
-            '/api': {
-                target: 'https://api.callnfy.com',
-                changeOrigin: true,
-                secure: true,
-                rewrite: (path) => path.replace(/^\/api/, '/v1')
-            }
-        }
+        open: true
     }
 });

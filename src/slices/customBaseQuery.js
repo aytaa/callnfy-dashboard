@@ -2,7 +2,7 @@ import { fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { setCredentials, logout } from './authSlice';
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: import.meta.env.PROD ? '/api' : '/api',
+  baseUrl: 'https://api.callnfy.com/v1',
   credentials: 'include',
   prepareHeaders: (headers, { getState }) => {
     const token = getState().auth.accessToken;
