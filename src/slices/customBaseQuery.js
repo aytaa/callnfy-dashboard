@@ -1,80 +1,73 @@
-import { fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { setCredentials, logout } from './authSlice';
+import {fetchBaseQuery} from '@reduxjs/toolkit/query/react';
+import {logout, setCredentials} from './authSlice';
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: 'https://api.callnfy.com/v1',
-  credentials: 'include',
-  prepareHeaders: (headers, { getState }) => {
-    const token = getState().auth.accessToken;
+    baseUrl: import.meta.env.DEV
+        ? 'https://api.callnfy.com/v1'
+        : 'http://srv-captain--backend/v1',
+    credentials: 'include',
+    prepareHeaders: (headers, {getState}) => {
+        const token = getState().auth.accessToken;
 
-    if (token) {
-      headers.set('authorization', `Bearer ${token}`);
-    }
-    return headers;
-  },
-  paramsSerializer: (params) => {
-    // Convert page and limit to numbers
-    const serializedParams = { ...params };
-    if (serializedParams.page !== undefined) {
-      serializedParams.page = Number(serializedParams.page);
-    }
-    if (serializedParams.limit !== undefined) {
-      serializedParams.limit = Number(serializedParams.limit);
-    }
-    return new URLSearchParams(serializedParams).toString();
-  },
+        if (token) {
+            headers.set('authorization', `Bearer ${token}`);
+        }
+        return headers;
+    },
+    paramsSerializer: (params) => {
+        const serializedParams = {...params};
+        if (serializedParams.page !== undefined) {
+            serializedParams.page = Number(serializedParams.page);
+        }
+        if (serializedParams.limit !== undefined) {
+            serializedParams.limit = Number(serializedParams.limit);
+        }
+        return new URLSearchParams(serializedParams).toString();
+    },
 });
 
-// Mutex to prevent multiple simultaneous refresh attempts
 let refreshPromise = null;
 
 export const customBaseQuery = async (args, api, extraOptions) => {
-  let result = await baseQuery(args, api, extraOptions);
+    let result = await baseQuery(args, api, extraOptions);
 
-  if (result?.error?.status === 401) {
-    const refreshToken = api.getState().auth.refreshToken;
+    if (result?.error?.status === 401) {
+        const refreshToken = api.getState().auth.refreshToken;
 
-    if (refreshToken) {
-      // If a refresh is already in progress, wait for it
-      if (!refreshPromise) {
-        refreshPromise = baseQuery(
-          {
-            url: '/auth/refresh',
-            method: 'POST',
-            body: { refreshToken },
-          },
-          api,
-          extraOptions
-        ).finally(() => {
-          // Clear the promise when done (success or failure)
-          refreshPromise = null;
-        });
-      }
+        if (refreshToken) {
+            if (!refreshPromise) {
+                refreshPromise = baseQuery(
+                    {
+                        url: '/auth/refresh',
+                        method: 'POST',
+                        body: {refreshToken},
+                    },
+                    api,
+                    extraOptions
+                ).finally(() => {
+                    refreshPromise = null;
+                });
+            }
 
-      const refreshResult = await refreshPromise;
+            const refreshResult = await refreshPromise;
 
-      if (refreshResult?.data?.data) {
-        // CRITICAL: Keep existing refreshToken if backend doesn't return a new one
-        const currentRefreshToken = refreshToken; // Already retrieved earlier
+            if (refreshResult?.data?.data) {
+                api.dispatch(
+                    setCredentials({
+                        user: refreshResult.data.data.user,
+                        accessToken: refreshResult.data.data.accessToken,
+                        refreshToken: refreshResult.data.data.refreshToken || refreshToken,
+                    })
+                );
 
-        api.dispatch(
-          setCredentials({
-            user: refreshResult.data.data.user,
-            accessToken: refreshResult.data.data.accessToken,
-            // Keep existing refreshToken if backend doesn't return a new one
-            refreshToken: refreshResult.data.data.refreshToken || currentRefreshToken,
-          })
-        );
-
-        // Retry the original request with the new token
-        result = await baseQuery(args, api, extraOptions);
-      } else {
-        api.dispatch(logout());
-      }
-    } else {
-      api.dispatch(logout());
+                result = await baseQuery(args, api, extraOptions);
+            } else {
+                api.dispatch(logout());
+            }
+        } else {
+            api.dispatch(logout());
+        }
     }
-  }
 
-  return result;
+    return result;
 };
