@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CreditCard, Calendar, FileText, AlertCircle, Loader2 } from 'lucide-react';
+import { CreditCard, Calendar, FileText, AlertCircle, Loader2, Clock } from 'lucide-react';
 import {
   useGetSubscriptionQuery,
   useGetPaymentMethodQuery,
@@ -56,6 +56,15 @@ export default function Billing() {
   const formatAmount = (cents) => {
     if (typeof cents !== 'number') return '$0.00';
     return `$${(cents / 100).toFixed(2)}`;
+  };
+
+  const getDaysRemaining = (endDate) => {
+    if (!endDate) return 0;
+    const end = new Date(endDate);
+    const now = new Date();
+    const diffTime = end.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return Math.max(0, diffDays);
   };
 
   const getStatusBadge = (status) => {
@@ -119,6 +128,36 @@ export default function Billing() {
       <h1 className="text-lg font-semibold text-white mb-1">Billing</h1>
       <p className="text-sm text-gray-400 mb-6">Manage your subscription and billing details</p>
 
+      {/* Trial Banner */}
+      {plan.status === 'trialing' && plan.trialEnd && (
+        <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 mb-4">
+          <div className="flex items-start gap-3">
+            <div className="bg-blue-500/20 p-2 rounded-lg">
+              <Clock className="w-5 h-5 text-blue-400" strokeWidth={1.5} />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-white font-semibold mb-1">You're on a 7-day free trial</h3>
+              <div className="space-y-1">
+                <p className="text-blue-300 text-sm">
+                  Your trial ends on <span className="font-medium">{formatDate(plan.trialEnd)}</span>
+                </p>
+                <p className="text-blue-300 text-sm">
+                  <span className="font-medium">{getDaysRemaining(plan.trialEnd)} days</span> left
+                </p>
+                <p className="text-blue-400/70 text-sm mt-2">
+                  You won't be charged until {formatDate(plan.trialEnd)}
+                </p>
+              </div>
+            </div>
+            <div className="text-right">
+              <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                Trial
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Current Plan */}
       <div className="bg-[#1a1a1d] border border-[#303030] rounded-xl p-4 mb-4">
         <div className="flex items-center justify-between mb-4">
@@ -142,16 +181,6 @@ export default function Billing() {
           )}
           {plan.status && getStatusBadge(plan.status)}
         </div>
-
-        {/* Trial Info */}
-        {plan.status === 'trialing' && plan.trialEndsAt && (
-          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mb-4">
-            <div className="flex items-center gap-2 text-blue-400 text-sm">
-              <AlertCircle className="w-4 h-4" />
-              <span>Your trial ends on {formatDate(plan.trialEndsAt)}</span>
-            </div>
-          </div>
-        )}
 
         {/* Cancellation Notice */}
         {plan.cancelAtPeriodEnd && (
