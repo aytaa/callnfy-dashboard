@@ -118,8 +118,15 @@ export default function Billing() {
     );
   }
 
-  // Extract data with fallbacks
-  const plan = subscription || {};
+  // Extract data with fallbacks and normalize field names
+  const rawPlan = subscription || {};
+  const plan = {
+    ...rawPlan,
+    // Normalize trial end date field (API might use trialEnd, trialEndsAt, or trial_end)
+    trialEnd: rawPlan.trialEnd || rawPlan.trialEndsAt || rawPlan.trial_end,
+    // Normalize current period end field
+    currentPeriodEnd: rawPlan.currentPeriodEnd || rawPlan.current_period_end,
+  };
   const card = paymentMethod || null;
   const invoiceList = Array.isArray(invoices) ? invoices : [];
 

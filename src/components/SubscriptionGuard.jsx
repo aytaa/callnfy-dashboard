@@ -45,8 +45,16 @@ export default function SubscriptionGuard({ children }) {
   }
 
   // Check if subscription exists and is valid
-  const hasValidSubscription = subscription &&
-    (subscription.status === 'active' || subscription.status === 'trialing');
+  // Handle different possible API response structures
+  const status = subscription?.status || subscription?.data?.status;
+  const hasValidSubscription = status === 'active' || status === 'trialing';
+
+  // Debug logging (remove in production)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[SubscriptionGuard] Subscription data:', subscription);
+    console.log('[SubscriptionGuard] Status:', status);
+    console.log('[SubscriptionGuard] Has valid subscription:', hasValidSubscription);
+  }
 
   // If no valid subscription, redirect to plan page
   if (!hasValidSubscription) {
