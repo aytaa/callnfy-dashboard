@@ -28,9 +28,14 @@ export default function Plan() {
 
   const handleStartTrial = async () => {
     try {
+      const successUrl = `${window.location.origin}/checkout/success`;
+      const cancelUrl = `${window.location.origin}/plan`;
+
       const result = await createCheckout({
         planId: 'pro',
         trial: true,
+        successUrl,
+        cancelUrl,
       }).unwrap();
 
       if (result?.url || result?.sessionUrl) {

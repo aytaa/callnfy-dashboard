@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { useGetSubscriptionQuery } from '../slices/apiSlice/billingApiSlice';
@@ -14,10 +15,25 @@ import { useGetSubscriptionQuery } from '../slices/apiSlice/billingApiSlice';
  */
 export default function SubscriptionGuard({ children }) {
   const location = useLocation();
-  const { data: subscription, isLoading, error } = useGetSubscriptionQuery();
+  const {
+    data: subscription,
+    isLoading,
+    isFetching,
+    isUninitialized,
+    refetch,
+  } = useGetSubscriptionQuery(undefined, {
+    // Refetch on mount to ensure fresh data
+    refetchOnMountOrArgChange: true,
+  });
 
-  // Show loading state while checking subscription
-  if (isLoading) {
+  // Refetch subscription data on component mount
+  useEffect(() => {
+    // Force refetch to get latest subscription status
+    refetch();
+  }, [refetch]);
+
+  // Show loading state while checking subscription (initial load or refetching)
+  if (isLoading || isUninitialized || isFetching) {
     return (
       <div className="min-h-screen bg-[#111114] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">

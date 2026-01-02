@@ -21,6 +21,7 @@ import PhoneNumbers from './pages/dashboard/PhoneNumbers';
 import PhoneNumberSettings from './pages/dashboard/PhoneNumberSettings';
 import SelectPlan from './pages/dashboard/SelectPlan';
 import Plan from './pages/onboarding/Plan';
+import CheckoutSuccess from './pages/onboarding/CheckoutSuccess';
 
 // Settings pages
 import Organization from './pages/settings/Organization';
@@ -176,6 +177,16 @@ function App() {
           element={
             <ProtectedRoute>
               <Plan />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Checkout Success Route (Protected, no subscription check) */}
+        <Route
+          path="/checkout/success"
+          element={
+            <ProtectedRoute>
+              <CheckoutSuccess />
             </ProtectedRoute>
           }
         />
