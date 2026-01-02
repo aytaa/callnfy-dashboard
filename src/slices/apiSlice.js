@@ -14,6 +14,7 @@ export const apiSlice = createApi({
         'Assistant',
         'PhoneNumber',
         'Integration',
+        'Billing',
     ],
     endpoints: (builder) => ({}),
 });

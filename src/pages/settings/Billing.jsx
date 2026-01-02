@@ -1,66 +1,27 @@
 import React, { useState } from 'react';
 import { CreditCard, Calendar, FileText, AlertCircle, Loader2 } from 'lucide-react';
-import { useGetSubscriptionQuery, useGetPortalUrlMutation } from '../../slices/apiSlice/subscriptionApiSlice';
+import {
+  useGetSubscriptionQuery,
+  useGetPaymentMethodQuery,
+  useGetInvoicesQuery,
+  useGetPortalUrlMutation,
+  useCancelSubscriptionMutation,
+} from '../../slices/apiSlice/billingApiSlice';
 import toast from 'react-hot-toast';
 
 export default function Billing() {
   const [showCancelModal, setShowCancelModal] = useState(false);
 
-  const { data: subscription, isLoading, error } = useGetSubscriptionQuery();
+  // API queries
+  const { data: subscription, isLoading: isLoadingSubscription, error: subscriptionError } = useGetSubscriptionQuery();
+  const { data: paymentMethod, isLoading: isLoadingPayment } = useGetPaymentMethodQuery();
+  const { data: invoices, isLoading: isLoadingInvoices } = useGetInvoicesQuery();
+
+  // Mutations
   const [getPortalUrl, { isLoading: isLoadingPortal }] = useGetPortalUrlMutation();
+  const [cancelSubscription, { isLoading: isCanceling }] = useCancelSubscriptionMutation();
 
-  // Mock data fallback for development
-  const currentPlan = subscription?.plan || {
-    name: 'Professional',
-    price: 99,
-    interval: 'month',
-    status: 'active', // active, trialing, canceled, past_due
-    trialEndsAt: null, // '2026-01-15'
-    currentPeriodEnd: '2026-02-01',
-    cancelAtPeriodEnd: false,
-  };
-
-  const paymentMethod = subscription?.paymentMethod || {
-    brand: 'Visa',
-    last4: '4242',
-    expMonth: 12,
-    expYear: 2026,
-  };
-
-  const invoices = subscription?.invoices || [
-    {
-      id: 'inv_1',
-      date: '2026-01-01',
-      description: 'Professional Plan - Monthly',
-      amount: 9900,
-      status: 'paid',
-      pdfUrl: '#',
-    },
-    {
-      id: 'inv_2',
-      date: '2025-12-01',
-      description: 'Professional Plan - Monthly',
-      amount: 9900,
-      status: 'paid',
-      pdfUrl: '#',
-    },
-    {
-      id: 'inv_3',
-      date: '2025-11-01',
-      description: 'Professional Plan - Monthly',
-      amount: 9900,
-      status: 'paid',
-      pdfUrl: '#',
-    },
-    {
-      id: 'inv_4',
-      date: '2025-10-01',
-      description: 'Professional Plan - Monthly',
-      amount: 9900,
-      status: 'paid',
-      pdfUrl: '#',
-    },
-  ];
+  const isLoading = isLoadingSubscription || isLoadingPayment || isLoadingInvoices;
 
   const handleManageBilling = async () => {
     try {
@@ -75,15 +36,12 @@ export default function Billing() {
 
   const handleCancelSubscription = async () => {
     try {
-      // This would call the portal URL with cancel flow
-      const result = await getPortalUrl().unwrap();
-      if (result?.url) {
-        window.location.href = result.url;
-      }
+      await cancelSubscription().unwrap();
+      toast.success('Subscription canceled successfully');
+      setShowCancelModal(false);
     } catch (err) {
-      toast.error('Failed to cancel subscription');
+      toast.error(err?.data?.message || 'Failed to cancel subscription');
     }
-    setShowCancelModal(false);
   };
 
   const formatDate = (dateString) => {
@@ -96,6 +54,7 @@ export default function Billing() {
   };
 
   const formatAmount = (cents) => {
+    if (typeof cents !== 'number') return '$0.00';
     return `$${(cents / 100).toFixed(2)}`;
   };
 
@@ -108,6 +67,8 @@ export default function Billing() {
       paid: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
       open: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
       void: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20',
+      draft: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20',
+      uncollectible: 'bg-red-500/10 text-red-400 border-red-500/20',
     };
 
     const labels = {
@@ -118,6 +79,8 @@ export default function Billing() {
       paid: 'Paid',
       open: 'Open',
       void: 'Void',
+      draft: 'Draft',
+      uncollectible: 'Uncollectible',
     };
 
     return (
@@ -135,7 +98,7 @@ export default function Billing() {
     );
   }
 
-  if (error) {
+  if (subscriptionError) {
     return (
       <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
         <div className="flex items-center gap-2 text-red-400">
@@ -145,6 +108,11 @@ export default function Billing() {
       </div>
     );
   }
+
+  // Extract data with fallbacks
+  const plan = subscription || {};
+  const card = paymentMethod || null;
+  const invoiceList = Array.isArray(invoices) ? invoices : [];
 
   return (
     <div>
@@ -166,51 +134,57 @@ export default function Billing() {
         </div>
 
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-xl font-bold text-white">{currentPlan.name}</span>
-          <span className="text-lg text-gray-400">
-            ${currentPlan.price}/{currentPlan.interval === 'year' ? 'yr' : 'mo'}
-          </span>
-          {getStatusBadge(currentPlan.status)}
+          <span className="text-xl font-bold text-white">{plan.name || 'No Plan'}</span>
+          {plan.price !== undefined && (
+            <span className="text-lg text-gray-400">
+              ${plan.price}/{plan.interval === 'year' ? 'yr' : 'mo'}
+            </span>
+          )}
+          {plan.status && getStatusBadge(plan.status)}
         </div>
 
         {/* Trial Info */}
-        {currentPlan.status === 'trialing' && currentPlan.trialEndsAt && (
+        {plan.status === 'trialing' && plan.trialEndsAt && (
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mb-4">
             <div className="flex items-center gap-2 text-blue-400 text-sm">
               <AlertCircle className="w-4 h-4" />
-              <span>Your trial ends on {formatDate(currentPlan.trialEndsAt)}</span>
+              <span>Your trial ends on {formatDate(plan.trialEndsAt)}</span>
             </div>
           </div>
         )}
 
         {/* Cancellation Notice */}
-        {currentPlan.cancelAtPeriodEnd && (
+        {plan.cancelAtPeriodEnd && (
           <div className="bg-zinc-500/10 border border-zinc-500/20 rounded-lg p-3 mb-4">
             <div className="flex items-center gap-2 text-zinc-400 text-sm">
               <AlertCircle className="w-4 h-4" />
-              <span>Your subscription will end on {formatDate(currentPlan.currentPeriodEnd)}</span>
+              <span>Your subscription will end on {formatDate(plan.currentPeriodEnd)}</span>
             </div>
           </div>
         )}
 
-        <div className="pt-3 border-t border-[#303030]">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-white opacity-60 mb-1">Next Billing Date</p>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-gray-400" strokeWidth={1.5} />
-                <span className="text-white font-medium">{formatDate(currentPlan.currentPeriodEnd)}</span>
+        {plan.currentPeriodEnd && (
+          <div className="pt-3 border-t border-[#303030]">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-white opacity-60 mb-1">Next Billing Date</p>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-gray-400" strokeWidth={1.5} />
+                  <span className="text-white font-medium">{formatDate(plan.currentPeriodEnd)}</span>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm text-white opacity-60 mb-1">Amount Due</p>
+                <span className="text-white font-medium text-lg">
+                  {plan.price !== undefined ? `$${plan.price}.00` : '—'}
+                </span>
               </div>
             </div>
-            <div>
-              <p className="text-sm text-white opacity-60 mb-1">Amount Due</p>
-              <span className="text-white font-medium text-lg">${currentPlan.price}.00</span>
-            </div>
           </div>
-        </div>
+        )}
 
         {/* Cancel Subscription */}
-        {currentPlan.status !== 'canceled' && !currentPlan.cancelAtPeriodEnd && (
+        {plan.status && plan.status !== 'canceled' && !plan.cancelAtPeriodEnd && (
           <div className="pt-3 mt-3 border-t border-[#303030]">
             <button
               onClick={() => setShowCancelModal(true)}
@@ -231,21 +205,21 @@ export default function Billing() {
             disabled={isLoadingPortal}
             className="text-sm text-gray-400 hover:text-white transition-colors disabled:opacity-50"
           >
-            Update
+            {card ? 'Update' : 'Add'}
           </button>
         </div>
 
-        {paymentMethod ? (
+        {card ? (
           <div className="flex items-center gap-3">
             <div className="bg-[#111114] p-2.5 rounded-lg">
               <CreditCard className="w-5 h-5 text-gray-400" strokeWidth={1.5} />
             </div>
             <div>
               <p className="text-white text-sm font-medium">
-                {paymentMethod.brand} •••• {paymentMethod.last4}
+                {card.brand} •••• {card.last4}
               </p>
               <p className="text-gray-400 text-xs">
-                Expires {String(paymentMethod.expMonth).padStart(2, '0')}/{paymentMethod.expYear}
+                Expires {String(card.expMonth).padStart(2, '0')}/{card.expYear}
               </p>
             </div>
           </div>
@@ -258,7 +232,7 @@ export default function Billing() {
       <div className="bg-[#1a1a1d] border border-[#303030] rounded-xl overflow-hidden">
         <h2 className="text-base font-semibold text-white p-4 pb-3">Billing History</h2>
 
-        {invoices.length > 0 ? (
+        {invoiceList.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-[#111114]">
@@ -271,7 +245,7 @@ export default function Billing() {
                 </tr>
               </thead>
               <tbody>
-                {invoices.map((invoice) => (
+                {invoiceList.map((invoice) => (
                   <tr key={invoice.id} className="border-t border-[#303030]">
                     <td className="px-4 py-3 text-white text-sm">{formatDate(invoice.date)}</td>
                     <td className="px-4 py-3 text-white text-sm">{invoice.description}</td>
@@ -308,19 +282,22 @@ export default function Billing() {
           <div className="bg-[#1a1a1d] border border-[#303030] rounded-xl p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold text-white mb-2">Cancel Subscription</h3>
             <p className="text-gray-400 text-sm mb-6">
-              Are you sure you want to cancel your subscription? You'll continue to have access until {formatDate(currentPlan.currentPeriodEnd)}.
+              Are you sure you want to cancel your subscription? You'll continue to have access until {formatDate(plan.currentPeriodEnd)}.
             </p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowCancelModal(false)}
-                className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
+                disabled={isCanceling}
+                className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors disabled:opacity-50"
               >
                 Keep Subscription
               </button>
               <button
                 onClick={handleCancelSubscription}
-                className="px-4 py-2 text-sm bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition-colors"
+                disabled={isCanceling}
+                className="px-4 py-2 text-sm bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition-colors disabled:opacity-50 flex items-center gap-2"
               >
+                {isCanceling && <Loader2 className="w-3 h-3 animate-spin" />}
                 Cancel Subscription
               </button>
             </div>
