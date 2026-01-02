@@ -1,12 +1,12 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { Settings, CreditCard, Users, User, Puzzle } from 'lucide-react';
+import { Building2, CreditCard, Users, User, Puzzle } from 'lucide-react';
 
 export default function SettingsLayout() {
   const navItems = [
     {
       section: 'ORG SETTINGS',
       items: [
-        { icon: Settings, label: 'Org Settings', path: '/settings/organization' },
+        { icon: Building2, label: 'Org Settings', path: '/settings/organization' },
         { icon: CreditCard, label: 'Billing & Add-Ons', path: '/settings/billing' },
         { icon: Users, label: 'Members', path: '/settings/members' },
         { icon: Puzzle, label: 'Integrations', path: '/settings/integrations' },
@@ -24,11 +24,6 @@ export default function SettingsLayout() {
     <div className="flex h-screen bg-[#111114]">
       {/* Settings Sidebar */}
       <div className="w-64 border-r border-[#303030] p-4 flex-shrink-0">
-        <div className="flex items-center gap-2 mb-6">
-          <Settings className="w-5 h-5 text-gray-400" />
-          <span className="text-white font-semibold">Settings</span>
-        </div>
-
         {navItems.map((group, i) => (
           <div key={i} className="mb-6">
             <p className="text-xs text-gray-500 uppercase tracking-wider mb-2 px-2">
