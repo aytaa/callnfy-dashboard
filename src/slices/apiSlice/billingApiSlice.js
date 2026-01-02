@@ -39,6 +39,16 @@ export const billingApiSlice = apiSlice.injectEndpoints({
             }),
             invalidatesTags: ['Billing'],
         }),
+
+        // Create checkout session (for starting trial or subscribing)
+        createCheckout: builder.mutation({
+            query: (checkoutData) => ({
+                url: '/billing/checkout',
+                method: 'POST',
+                body: checkoutData,
+            }),
+            transformResponse: (response) => response?.data || response,
+        }),
     }),
 });
 
@@ -48,4 +58,5 @@ export const {
     useGetInvoicesQuery,
     useGetPortalUrlMutation,
     useCancelSubscriptionMutation,
+    useCreateCheckoutMutation,
 } = billingApiSlice;

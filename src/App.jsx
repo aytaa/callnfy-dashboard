@@ -9,6 +9,7 @@ import VerifyEmail from './pages/auth/VerifyEmail';
 import Layout from './components/Layout';
 import { AuthLayout } from './layouts/AuthLayout';
 import SettingsLayout from './layouts/SettingsLayout';
+import SubscriptionGuard from './components/SubscriptionGuard';
 
 // Dashboard pages
 import Overview from './pages/dashboard/Overview';
@@ -19,6 +20,7 @@ import AIAssistantDetail from './pages/AIAssistant/AIAssistantDetail';
 import PhoneNumbers from './pages/dashboard/PhoneNumbers';
 import PhoneNumberSettings from './pages/dashboard/PhoneNumberSettings';
 import SelectPlan from './pages/dashboard/SelectPlan';
+import Plan from './pages/onboarding/Plan';
 
 // Settings pages
 import Organization from './pages/settings/Organization';
@@ -168,7 +170,17 @@ function App() {
           }
         />
 
-        {/* Select Plan Route (Protected, but no subscription check) */}
+        {/* Plan/Onboarding Route (Protected, but no subscription check) */}
+        <Route
+          path="/plan"
+          element={
+            <ProtectedRoute>
+              <Plan />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Select Plan Route (for upgrades, no subscription check) */}
         <Route
           path="/select-plan"
           element={
@@ -178,14 +190,16 @@ function App() {
           }
         />
 
-        {/* Dashboard Routes (Protected) - Flat Structure */}
+        {/* Dashboard Routes (Protected + Subscription Required) */}
         <Route
           path="/overview"
           element={
             <ProtectedRoute>
-              <Layout>
-                <Overview />
-              </Layout>
+              <SubscriptionGuard>
+                <Layout>
+                  <Overview />
+                </Layout>
+              </SubscriptionGuard>
             </ProtectedRoute>
           }
         />
@@ -193,9 +207,11 @@ function App() {
           path="/calls"
           element={
             <ProtectedRoute>
-              <Layout>
-                <Calls />
-              </Layout>
+              <SubscriptionGuard>
+                <Layout>
+                  <Calls />
+                </Layout>
+              </SubscriptionGuard>
             </ProtectedRoute>
           }
         />
@@ -203,9 +219,11 @@ function App() {
           path="/appointments"
           element={
             <ProtectedRoute>
-              <Layout>
-                <Appointments />
-              </Layout>
+              <SubscriptionGuard>
+                <Layout>
+                  <Appointments />
+                </Layout>
+              </SubscriptionGuard>
             </ProtectedRoute>
           }
         />
@@ -213,9 +231,11 @@ function App() {
           path="/customers"
           element={
             <ProtectedRoute>
-              <Layout>
-                <Customers />
-              </Layout>
+              <SubscriptionGuard>
+                <Layout>
+                  <Customers />
+                </Layout>
+              </SubscriptionGuard>
             </ProtectedRoute>
           }
         />
@@ -223,9 +243,11 @@ function App() {
           path="/ai-assistant"
           element={
             <ProtectedRoute>
-              <Layout>
-                <AIAssistantDetail />
-              </Layout>
+              <SubscriptionGuard>
+                <Layout>
+                  <AIAssistantDetail />
+                </Layout>
+              </SubscriptionGuard>
             </ProtectedRoute>
           }
         />
@@ -233,9 +255,11 @@ function App() {
           path="/phone-numbers"
           element={
             <ProtectedRoute>
-              <Layout>
-                <PhoneNumbers />
-              </Layout>
+              <SubscriptionGuard>
+                <Layout>
+                  <PhoneNumbers />
+                </Layout>
+              </SubscriptionGuard>
             </ProtectedRoute>
           }
         />
@@ -243,9 +267,11 @@ function App() {
           path="/phone-numbers/:id"
           element={
             <ProtectedRoute>
-              <Layout>
-                <PhoneNumberSettings />
-              </Layout>
+              <SubscriptionGuard>
+                <Layout>
+                  <PhoneNumberSettings />
+                </Layout>
+              </SubscriptionGuard>
             </ProtectedRoute>
           }
         />
@@ -258,14 +284,16 @@ function App() {
         <Route path="/dashboard/ai-assistant" element={<Navigate to="/ai-assistant" replace />} />
         <Route path="/dashboard/phone-numbers" element={<Navigate to="/phone-numbers" replace />} />
 
-        {/* Settings Routes (Protected with SettingsLayout) */}
+        {/* Settings Routes (Protected + Subscription Required) */}
         <Route
           path="/settings"
           element={
             <ProtectedRoute>
-              <Layout>
-                <SettingsLayout />
-              </Layout>
+              <SubscriptionGuard>
+                <Layout>
+                  <SettingsLayout />
+                </Layout>
+              </SubscriptionGuard>
             </ProtectedRoute>
           }
         >
