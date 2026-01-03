@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Phone, Settings, Check, PhoneOutgoing, Calendar } from 'lucide-react';
+import { ArrowLeft, Phone, Settings, Check, PhoneOutgoing, Calendar, AlertTriangle, Info } from 'lucide-react';
 import {
   useGetPhoneNumberQuery,
   useUpdatePhoneNumberMutation,
@@ -27,6 +27,7 @@ export default function PhoneNumberSettings() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({});
 
   const { data: phoneData, isLoading: isLoadingPhone, error: phoneError } = useGetPhoneNumberQuery(id);
   const { data: assistants, isLoading: isLoadingAssistants } = useGetAssistantQuery();
@@ -34,37 +35,44 @@ export default function PhoneNumberSettings() {
 
   const phoneNumber = phoneData?.data?.phoneNumber;
 
-  // Initialize form values when data loads
+  // Initialize form values when data loads - use Vapi data as source of truth
   useEffect(() => {
     if (phoneNumber) {
-      setDisplayName(phoneNumber.name || '');
-      setSelectedAssistantId(phoneNumber.assistant?.id || '');
+      // Use vapiName if available, fallback to local name
+      setDisplayName(phoneNumber.vapiName || phoneNumber.name || '');
 
-      // Parse fallback number if it exists
-      if (phoneNumber.fallbackDestination) {
-        const fallback = phoneNumber.fallbackDestination;
+      // Check vapi.assistantId first, then local assistantId
+      const assistantId = phoneNumber.vapi?.assistantId || phoneNumber.assistant?.id || phoneNumber.assistantId || '';
+      setSelectedAssistantId(assistantId);
+
+      // Parse fallback number if it exists (from vapi.fallbackDestination or local)
+      const fallbackDest = phoneNumber.vapi?.fallbackDestination?.number || phoneNumber.fallbackDestination;
+      if (fallbackDest) {
         // Extract country code and number (simple parsing)
-        if (fallback.startsWith('+')) {
-          const parts = fallback.match(/^(\+\d+)(.+)$/);
+        if (fallbackDest.startsWith('+')) {
+          const parts = fallbackDest.match(/^(\+\d+)(.+)$/);
           if (parts) {
             setFallbackCountryCode(parts[1]);
             setFallbackNumber(parts[2].replace(/\D/g, ''));
           }
         } else {
-          setFallbackNumber(fallback.replace(/\D/g, ''));
+          setFallbackNumber(fallbackDest.replace(/\D/g, ''));
         }
       }
     }
   }, [phoneNumber]);
 
-  // Track unsaved changes
+  // Track unsaved changes - compare against Vapi data
   useEffect(() => {
     if (phoneNumber) {
       const fallbackDestination = fallbackNumber ? `${fallbackCountryCode}${fallbackNumber}` : '';
+      const originalName = phoneNumber.vapiName || phoneNumber.name || '';
+      const originalAssistantId = phoneNumber.vapi?.assistantId || phoneNumber.assistant?.id || phoneNumber.assistantId || '';
+      const originalFallback = phoneNumber.vapi?.fallbackDestination?.number || phoneNumber.fallbackDestination || '';
       const hasChanges =
-        displayName !== (phoneNumber.name || '') ||
-        selectedAssistantId !== (phoneNumber.assistant?.id || '') ||
-        fallbackDestination !== (phoneNumber.fallbackDestination || '');
+        displayName !== originalName ||
+        selectedAssistantId !== originalAssistantId ||
+        fallbackDestination !== originalFallback;
       setHasUnsavedChanges(hasChanges);
     }
   }, [displayName, selectedAssistantId, fallbackCountryCode, fallbackNumber, phoneNumber]);
@@ -74,14 +82,50 @@ export default function PhoneNumberSettings() {
     (assistant) => assistant.businessId === phoneNumber?.business?.id
   ) || [];
 
+  // Parse API error details into user-friendly message
+  const parseErrorDetails = (err) => {
+    // Check for validation error details object
+    const details = err?.data?.error?.details;
+    if (details && typeof details === 'object') {
+      // Parse validation errors like { "body.name": "\"body.name\" is not allowed to be empty" }
+      const messages = Object.entries(details).map(([field, message]) => {
+        // Convert field names to user-friendly labels
+        const fieldName = field.replace('body.', '').replace('name', 'Label');
+        if (message.includes('not allowed to be empty')) {
+          return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`;
+        }
+        return message;
+      });
+      return messages.join('. ');
+    }
+    // Check for string details
+    if (typeof details === 'string') {
+      return details;
+    }
+    // Fallback to message
+    return err?.data?.error?.message || err?.data?.message || 'Failed to update phone number settings';
+  };
+
   const handleSave = async () => {
     setError('');
     setSuccess('');
+    setValidationErrors({});
+
+    // Frontend validation
+    const errors = {};
+    if (!displayName.trim()) {
+      errors.displayName = 'Label is required';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
 
     try {
       const updates = {
         id,
-        name: displayName,
+        name: displayName.trim(),
         assistantId: selectedAssistantId || null,
       };
 
@@ -94,7 +138,8 @@ export default function PhoneNumberSettings() {
       setSuccess('Phone number settings updated successfully');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError(err?.data?.error?.message || err?.data?.message || 'Failed to update phone number settings');
+      const errorMessage = parseErrorDetails(err);
+      setError(errorMessage);
     }
   };
 
@@ -189,6 +234,49 @@ export default function PhoneNumberSettings() {
           </div>
         )}
 
+        {/* Vapi Sync Warning */}
+        {phoneNumber.vapiError && (
+          <div className="p-3 bg-yellow-900/20 border border-yellow-700 rounded-md flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-sm text-yellow-400 font-medium">Could not sync with Vapi</p>
+              <p className="text-xs text-yellow-400/70 mt-0.5">{phoneNumber.vapiError}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Vapi Info Card */}
+        {phoneNumber.vapi && (
+          <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Info className="w-4 h-4 text-zinc-500" />
+              <h3 className="text-sm font-medium text-white">Vapi Details</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div>
+                <p className="text-xs text-zinc-500 mb-0.5">Provider</p>
+                <p className="text-white">{phoneNumber.vapi.provider || phoneNumber.provider || 'vapi'}</p>
+              </div>
+              <div>
+                <p className="text-xs text-zinc-500 mb-0.5">Status</p>
+                <p className="text-white capitalize">{phoneNumber.status || 'active'}</p>
+              </div>
+              {phoneNumber.vapi.createdAt && (
+                <div>
+                  <p className="text-xs text-zinc-500 mb-0.5">Created in Vapi</p>
+                  <p className="text-white">{new Date(phoneNumber.vapi.createdAt).toLocaleDateString()}</p>
+                </div>
+              )}
+              {phoneNumber.vapiId && (
+                <div>
+                  <p className="text-xs text-zinc-500 mb-0.5">Vapi ID</p>
+                  <p className="text-white font-mono text-xs truncate">{phoneNumber.vapiId}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* CARD 1: Phone Number Details */}
         <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-6">
           {/* Section Header */}
@@ -206,14 +294,28 @@ export default function PhoneNumberSettings() {
           <div className="space-y-4">
             {/* Phone Number Label */}
             <div>
-              <label className="block text-sm text-zinc-400 mb-1">Phone Number Label</label>
+              <label className="block text-sm text-zinc-400 mb-1">
+                Phone Number Label <span className="text-red-400">*</span>
+              </label>
               <input
                 type="text"
                 value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
+                onChange={(e) => {
+                  setDisplayName(e.target.value);
+                  if (validationErrors.displayName) {
+                    setValidationErrors((prev) => ({ ...prev, displayName: '' }));
+                  }
+                }}
                 placeholder="e.g., Main Office Line"
-                className="w-full bg-[#111114] border border-zinc-700 rounded-md px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-zinc-600 focus:outline-none"
+                className={`w-full bg-[#111114] border rounded-md px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:outline-none ${
+                  validationErrors.displayName
+                    ? 'border-red-500 focus:border-red-500'
+                    : 'border-zinc-700 focus:border-zinc-600'
+                }`}
               />
+              {validationErrors.displayName && (
+                <p className="text-red-400 text-xs mt-1">{validationErrors.displayName}</p>
+              )}
             </div>
 
             {/* Provider (readonly) */}

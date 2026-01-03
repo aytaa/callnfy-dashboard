@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { Building2, CreditCard, Users, User, Puzzle } from 'lucide-react';
+import { Building2, CreditCard, Users, User, Puzzle, Bell } from 'lucide-react';
 
 export default function SettingsLayout() {
   const navItems = [
@@ -16,6 +16,7 @@ export default function SettingsLayout() {
       section: 'ACCOUNT SETTINGS',
       items: [
         { icon: User, label: 'Profile', path: '/settings/profile' },
+        { icon: Bell, label: 'Notifications', path: '/settings/notifications' },
       ]
     }
   ];

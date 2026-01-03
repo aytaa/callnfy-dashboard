@@ -29,6 +29,10 @@ import Billing from './pages/settings/Billing';
 import Members from './pages/settings/Members';
 import Profile from './pages/settings/Profile';
 import Integrations from './pages/settings/Integrations';
+import NotificationSettings from './pages/settings/NotificationSettings';
+
+// Other pages
+import Notifications from './pages/Notifications';
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
@@ -286,6 +290,18 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <SubscriptionGuard>
+                <Layout>
+                  <Notifications />
+                </Layout>
+              </SubscriptionGuard>
+            </ProtectedRoute>
+          }
+        />
 
         {/* Redirects for old dashboard routes */}
         <Route path="/dashboard" element={<Navigate to="/overview" replace />} />
@@ -314,6 +330,7 @@ function App() {
           <Route path="members" element={<Members />} />
           <Route path="integrations" element={<Integrations />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="notifications" element={<NotificationSettings />} />
         </Route>
 
         {/* 404 Fallback */}

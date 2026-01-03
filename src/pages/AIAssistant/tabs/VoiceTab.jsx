@@ -1,11 +1,14 @@
 import { useState } from 'react';
 
 export default function VoiceTab({ assistant, onUpdate }) {
+  // Use Vapi data as source of truth, fallback to local data
+  const vapiVoice = assistant?.vapiVoice || assistant?.voice;
+
   const [formData, setFormData] = useState({
-    provider: assistant?.voice?.provider || 'elevenlabs',
-    voiceId: assistant?.voice?.voiceId || '',
-    speed: assistant?.voice?.speed || 1.0,
-    pitch: assistant?.voice?.pitch || 1.0,
+    provider: vapiVoice?.provider || 'elevenlabs',
+    voiceId: vapiVoice?.voiceId || vapiVoice?.voice || '',
+    speed: vapiVoice?.speed || 1.0,
+    pitch: vapiVoice?.pitch || 1.0,
   });
 
   const handleChange = (field, value) => {

@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import { Check, ChevronRight, Phone, Calendar, Building2, Bot, Loader2 } from 'lucide-react';
 import { useCreateBusinessMutation, useGetBusinessesQuery } from '../slices/apiSlice/businessApiSlice';
 import { useCreateAssistantMutation, useGetAssistantQuery } from '../slices/apiSlice/assistantApiSlice';
-import { useLazyListAvailableNumbersQuery, usePurchasePhoneNumberMutation, useGetPhoneNumbersQuery } from '../slices/apiSlice/phoneApiSlice';
+import { usePurchasePhoneNumberMutation, useGetPhoneNumbersQuery } from '../slices/apiSlice/phoneApiSlice';
 import { useConnectGoogleCalendarMutation, useGetIntegrationStatusQuery } from '../slices/apiSlice/integrationsApiSlice';
 import { useTestCallMutation } from '../slices/apiSlice/callsApiSlice';
 import { useUpdateUserOnboardingMutation } from '../slices/apiSlice/authApiSlice';
@@ -58,14 +58,6 @@ const VOICE_OPTIONS = [
   { value: 'alloy', label: 'Alloy (Neutral)', provider: 'openai' },
 ];
 
-// Area codes
-const AREA_CODES = [
-  { value: '212', label: '212 - New York' },
-  { value: '310', label: '310 - Los Angeles' },
-  { value: '305', label: '305 - Miami' },
-  { value: '312', label: '312 - Chicago' },
-  { value: '713', label: '713 - Houston' },
-];
 
 // Carriers
 const CARRIERS = [
@@ -99,12 +91,9 @@ export default function OnboardingModal({ onComplete, initialUserData }) {
 
   // Step 3: Phone
   const [phoneTab, setPhoneTab] = useState('new');
-  const [areaCode, setAreaCode] = useState('212');
+  const [areaCode, setAreaCode] = useState('');
   const [existingPhone, setExistingPhone] = useState('');
   const [carrier, setCarrier] = useState('');
-  const [availableNumbers, setAvailableNumbers] = useState([]);
-  const [selectedNumber, setSelectedNumber] = useState(null);
-  const [isSearchingNumbers, setIsSearchingNumbers] = useState(false);
 
   // Step 4: Calendar
   const [calendarConnected, setCalendarConnected] = useState(false);
@@ -117,7 +106,6 @@ export default function OnboardingModal({ onComplete, initialUserData }) {
   const [createBusiness, { isLoading: isCreatingBusiness }] = useCreateBusinessMutation();
   const [updateUserOnboarding, { isLoading: isUpdatingOnboarding }] = useUpdateUserOnboardingMutation();
   const [createAssistant, { isLoading: isCreatingAssistant }] = useCreateAssistantMutation();
-  const [listAvailableNumbers] = useLazyListAvailableNumbersQuery();
   const [purchasePhoneNumber, { isLoading: isPurchasingNumber }] = usePurchasePhoneNumberMutation();
   const [connectGoogleCalendar, { isLoading: isConnectingCalendar }] = useConnectGoogleCalendarMutation();
   const [testCall] = useTestCallMutation();
@@ -234,40 +222,31 @@ export default function OnboardingModal({ onComplete, initialUserData }) {
   };
 
   // Step 3: Phone
-  const handleSearchNumbers = async () => {
-    if (!savedBusinessId) return;
-    setIsSearchingNumbers(true);
-    try {
-      const result = await listAvailableNumbers({
-        provider: 'vapi',
-        businessId: savedBusinessId,
-        areaCode,
-        country: 'US',
-      }).unwrap();
-      const nums = result?.data?.phoneNumbers || result?.phoneNumbers || [];
-      setAvailableNumbers(nums);
-      if (nums.length > 0) setSelectedNumber(nums[0]);
-      else toast.error('No numbers available');
-    } catch {
-      toast.error('Failed to search numbers');
-    } finally {
-      setIsSearchingNumbers(false);
-    }
-  };
-
   const handleSavePhone = async () => {
-    if (phoneTab === 'new' && selectedNumber) {
+    if (phoneTab === 'new') {
+      // Validate area code
+      if (!areaCode || areaCode.length !== 3) {
+        toast.error('Please enter a valid 3-digit area code');
+        return;
+      }
       try {
-        await purchasePhoneNumber({
+        // Direct creation with area code - backend assigns the number
+        const result = await purchasePhoneNumber({
           provider: 'vapi',
-          phoneNumber: selectedNumber.phoneNumber || selectedNumber.number,
+          areaCode,
           businessId: savedBusinessId,
           assistantId: savedAssistantId,
         }).unwrap();
-        setSavedPhoneNumber(selectedNumber.phoneNumber || selectedNumber.number);
-        toast.success('Number purchased!');
+        // Extract the assigned phone number from response
+        const assignedNumber = result?.data?.phoneNumber?.phoneNumber ||
+                               result?.phoneNumber?.phoneNumber ||
+                               result?.phoneNumber ||
+                               result?.number;
+        setSavedPhoneNumber(assignedNumber);
+        toast.success('Number created!');
       } catch (err) {
-        toast.error(err?.data?.message || 'Failed to purchase number');
+        const errorMessage = err?.data?.error?.details || err?.data?.error?.message || err?.data?.message || 'Failed to create number';
+        toast.error(errorMessage);
         return;
       }
     } else if (phoneTab === 'existing') {
@@ -538,49 +517,25 @@ export default function OnboardingModal({ onComplete, initialUserData }) {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm text-white/60 mb-1.5">Area Code</label>
-                    <div className="flex gap-2">
-                      <select
-                        value={areaCode}
-                        onChange={(e) => setAreaCode(e.target.value)}
-                        className="flex-1 bg-[#111114] border border-[#303030] rounded-lg px-3 py-1.5 text-sm text-white focus:border-white/40 focus:outline-none"
-                        disabled={isSearchingNumbers}
-                      >
-                        {AREA_CODES.map((c) => (
-                          <option key={c.value} value={c.value}>{c.label}</option>
-                        ))}
-                      </select>
-                      <button
-                        onClick={handleSearchNumbers}
-                        disabled={isSearchingNumbers}
-                        className="px-3 py-1.5 bg-white/10 text-white text-sm border border-white/20 rounded-lg hover:bg-white/20 transition-colors disabled:opacity-50 whitespace-nowrap"
-                      >
-                        {isSearchingNumbers ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Find Numbers'}
-                      </button>
-                    </div>
+                    <input
+                      type="text"
+                      value={areaCode}
+                      onChange={(e) => setAreaCode(e.target.value.replace(/\D/g, '').slice(0, 3))}
+                      placeholder="e.g. 415, 212, 346"
+                      className="w-full bg-[#111114] border border-[#303030] rounded-lg px-3 py-2.5 text-white placeholder:text-white/30 focus:border-white/40 focus:outline-none"
+                    />
                   </div>
 
-                  {availableNumbers.length > 0 && (
-                    <div className="space-y-2 max-h-32 overflow-y-auto">
-                      {availableNumbers.map((num) => (
-                        <label
-                          key={num.phoneNumber || num.number}
-                          className={`flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
-                            (selectedNumber?.phoneNumber || selectedNumber?.number) === (num.phoneNumber || num.number)
-                              ? 'bg-white/10 border-white/40'
-                              : 'bg-[#111114] border-[#303030] hover:border-white/20'
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            checked={(selectedNumber?.phoneNumber || selectedNumber?.number) === (num.phoneNumber || num.number)}
-                            onChange={() => setSelectedNumber(num)}
-                            className="sr-only"
-                          />
-                          <span className="text-white font-mono text-sm">{num.phoneNumber || num.number}</span>
-                        </label>
-                      ))}
+                  {/* Info Box */}
+                  <div className="bg-[#111114] border border-[#303030] rounded-lg p-3">
+                    <div className="flex items-start gap-2">
+                      <Phone className="w-4 h-4 text-white/40 mt-0.5 flex-shrink-0" />
+                      <div className="space-y-1">
+                        <p className="text-xs text-white/60">Free US phone numbers</p>
+                        <p className="text-xs text-white/40">Up to 10 per account • Instant setup</p>
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </div>
               )}
 
@@ -643,7 +598,7 @@ export default function OnboardingModal({ onComplete, initialUserData }) {
                 </button>
                 <button
                   onClick={handleSavePhone}
-                  disabled={isLoading || (phoneTab === 'new' && !selectedNumber)}
+                  disabled={isLoading || (phoneTab === 'new' && (!areaCode || areaCode.length !== 3))}
                   className="flex-1 bg-white text-black text-sm font-medium py-1.5 px-3 rounded-lg hover:bg-white/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isPurchasingNumber ? <Loader2 className="w-4 h-4 animate-spin" /> : null}

@@ -2,14 +2,19 @@ import { useState } from 'react';
 import { Sparkles } from 'lucide-react';
 
 export default function ModelTab({ assistant, onUpdate }) {
+  // Use Vapi data as source of truth, fallback to local data
+  const vapiModel = assistant?.vapiModel || assistant?.model;
+  const vapiFirstMessage = assistant?.vapiFirstMessage || assistant?.firstMessage;
+  const vapiSystemPrompt = assistant?.vapiSystemPrompt || assistant?.systemPrompt;
+
   const [formData, setFormData] = useState({
-    provider: assistant?.model?.provider || 'openai',
-    model: assistant?.model?.model || 'gpt-4',
+    provider: vapiModel?.provider || 'openai',
+    model: vapiModel?.model || 'gpt-4',
     firstMessageMode: assistant?.firstMessageMode || 'assistant-speaks-first',
-    firstMessage: assistant?.firstMessage || '',
-    systemPrompt: assistant?.systemPrompt || '',
-    maxTokens: assistant?.model?.maxTokens || 1000,
-    temperature: assistant?.model?.temperature || 0.7,
+    firstMessage: vapiFirstMessage || '',
+    systemPrompt: vapiSystemPrompt || '',
+    maxTokens: vapiModel?.maxTokens || 1000,
+    temperature: vapiModel?.temperature || 0.7,
   });
 
   const handleChange = (field, value) => {

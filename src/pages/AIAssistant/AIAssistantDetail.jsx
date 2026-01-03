@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Phone, MessageSquare, TestTube, Sparkles } from 'lucide-react';
+import { Phone, MessageSquare, TestTube, Sparkles, AlertTriangle, Info } from 'lucide-react';
 import {
   useGetAssistantQuery,
   useUpdateAssistantMutation,
@@ -156,15 +156,70 @@ export default function AIAssistantDetail() {
     );
   }
 
+  // Helper to format voice display
+  const formatVoice = (voice) => {
+    if (!voice) return 'Not configured';
+    const provider = voice.provider || 'Unknown';
+    const voiceId = voice.voiceId || voice.voice || 'Unknown';
+    return `${provider.charAt(0).toUpperCase() + provider.slice(1)} - ${voiceId}`;
+  };
+
+  // Helper to format model display
+  const formatModel = (model) => {
+    if (!model) return 'Not configured';
+    const provider = model.provider || 'Unknown';
+    const modelName = model.model || 'Unknown';
+    return `${provider.charAt(0).toUpperCase() + provider.slice(1)} ${modelName}`;
+  };
+
   return (
     <div className="px-8 py-6">
       <div className="max-w-5xl mx-auto space-y-4">
+        {/* Vapi Sync Warning */}
+        {assistant.vapiError && (
+          <div className="p-3 bg-yellow-900/20 border border-yellow-700 rounded-md flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-sm text-yellow-400 font-medium">Could not sync with Vapi</p>
+              <p className="text-xs text-yellow-400/70 mt-0.5">{assistant.vapiError}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Vapi Info Card */}
+        <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Info className="w-4 h-4 text-zinc-500" />
+            <h3 className="text-sm font-medium text-white">Assistant Details (from Vapi)</h3>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <p className="text-xs text-zinc-500 mb-1">Name</p>
+              <p className="text-sm text-white">{assistant.vapiName || assistant.name || 'Unnamed'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-zinc-500 mb-1">Voice</p>
+              <p className="text-sm text-white">{formatVoice(assistant.vapiVoice || assistant.voice)}</p>
+            </div>
+            <div>
+              <p className="text-xs text-zinc-500 mb-1">AI Model</p>
+              <p className="text-sm text-white">{formatModel(assistant.vapiModel || assistant.model)}</p>
+            </div>
+            <div>
+              <p className="text-xs text-zinc-500 mb-1">Greeting</p>
+              <p className="text-sm text-white truncate" title={assistant.vapiFirstMessage || assistant.firstMessage || 'Not set'}>
+                {assistant.vapiFirstMessage || assistant.firstMessage || 'Not set'}
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Header */}
         <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-4">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h1 className="text-lg font-semibold text-white">AI Receptionist</h1>
-              <p className="text-xs text-zinc-400 mt-0.5">{assistant.id}</p>
+              <h1 className="text-lg font-semibold text-white">{assistant.vapiName || assistant.name || 'AI Receptionist'}</h1>
+              <p className="text-xs text-zinc-400 mt-0.5">{assistant.vapiId || assistant.id}</p>
             </div>
             <div className="flex items-center gap-2">
               <button
