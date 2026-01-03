@@ -4,7 +4,11 @@ import { useGetMeQuery } from '../../slices/apiSlice/authApiSlice';
 import toast from 'react-hot-toast';
 
 export default function Profile() {
-  const { data: userData, isLoading, error } = useGetMeQuery();
+  const { data: userData, isLoading, error } = useGetMeQuery(undefined, {
+    refetchOnMountOrArgChange: false,
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
+  });
 
   // Normalize user data from API (data.name, data.email, data.businessName)
   const user = userData?.data || userData || {};

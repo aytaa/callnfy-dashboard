@@ -12,7 +12,7 @@ export default function CheckoutSuccess() {
   useEffect(() => {
     const handleSuccess = async () => {
       // Invalidate all billing-related cache to force refetch
-      dispatch(apiSlice.util.invalidateTags(['Billing', 'Subscription']));
+      dispatch(apiSlice.util.invalidateTags(['Billing', 'Subscription', 'User']));
 
       // Short delay to show success state
       setStatus('success');
@@ -22,7 +22,7 @@ export default function CheckoutSuccess() {
 
       setStatus('redirecting');
 
-      // Navigate to dashboard
+      // Redirect to overview - SubscriptionGuard will show onboarding modal if needed
       navigate('/overview', { replace: true });
     };
 
@@ -34,11 +34,11 @@ export default function CheckoutSuccess() {
       <div className="max-w-md w-full text-center">
         {status === 'processing' && (
           <>
-            <Loader2 className="w-12 h-12 text-gray-400 animate-spin mx-auto mb-4" />
+            <Loader2 className="w-12 h-12 text-white/40 animate-spin mx-auto mb-4" />
             <h1 className="text-xl font-semibold text-white mb-2">
               Processing...
             </h1>
-            <p className="text-gray-400 text-sm">
+            <p className="text-white/40 text-sm">
               Please wait while we confirm your subscription
             </p>
           </>
@@ -46,19 +46,19 @@ export default function CheckoutSuccess() {
 
         {(status === 'success' || status === 'redirecting') && (
           <>
-            <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-8 h-8 text-emerald-500" />
+            <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-xl font-semibold text-white mb-2">
               You're all set!
             </h1>
-            <p className="text-gray-400 text-sm mb-4">
+            <p className="text-white/40 text-sm mb-4">
               Your 7-day free trial has started
             </p>
             {status === 'redirecting' && (
-              <div className="flex items-center justify-center gap-2 text-gray-500 text-sm">
+              <div className="flex items-center justify-center gap-2 text-white/30 text-sm">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Redirecting to dashboard...</span>
+                <span>Setting up your account...</span>
               </div>
             )}
           </>

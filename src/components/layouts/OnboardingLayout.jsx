@@ -1,17 +1,20 @@
-function OnboardingLayout({ children, currentStep = 1 }) {
-  const totalSteps = 3;
-  const progress = (currentStep / totalSteps) * 100;
-
-  const steps = [
+function OnboardingLayout({ children, currentStep = 1, steps: customSteps }) {
+  const defaultSteps = [
     { number: 1, label: 'Business Info' },
-    { number: 2, label: 'Phone Setup' },
-    { number: 3, label: 'AI Configuration' },
+    { number: 2, label: 'AI Assistant' },
+    { number: 3, label: 'Phone Setup' },
+    { number: 4, label: 'Calendar' },
+    { number: 5, label: 'Complete' },
   ];
 
+  const steps = customSteps || defaultSteps;
+  const totalSteps = steps.length;
+  const progress = (currentStep / totalSteps) * 100;
+
   return (
-    <div className="min-h-screen bg-light-bg dark:bg-dark-bg">
+    <div className="min-h-screen bg-[#111114]">
       {/* Header */}
-      <div className="bg-white dark:bg-dark-sidebar border-b border-gray-200 dark:border-dark-border">
+      <div className="bg-[#1a1a1d] border-b border-zinc-800">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-teal-500 to-emerald-500 bg-clip-text text-transparent">
             Callnfy
@@ -20,7 +23,7 @@ function OnboardingLayout({ children, currentStep = 1 }) {
       </div>
 
       {/* Progress Bar */}
-      <div className="bg-white dark:bg-dark-sidebar border-b border-gray-200 dark:border-dark-border">
+      <div className="bg-[#1a1a1d] border-b border-zinc-800">
         <div className="max-w-4xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between mb-4">
             {steps.map((step, index) => (
@@ -30,23 +33,29 @@ function OnboardingLayout({ children, currentStep = 1 }) {
                     className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${
                       currentStep >= step.number
                         ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white'
-                        : 'bg-gray-200 dark:bg-dark-card text-gray-500 dark:text-gray-400'
+                        : 'bg-zinc-800 text-gray-400'
                     }`}
                   >
-                    {step.number}
+                    {currentStep > step.number ? (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : (
+                      step.number
+                    )}
                   </div>
                   <span
-                    className={`mt-2 text-xs font-medium ${
+                    className={`mt-2 text-xs font-medium whitespace-nowrap ${
                       currentStep >= step.number
-                        ? 'text-teal-600 dark:text-teal-400'
-                        : 'text-gray-500 dark:text-gray-400'
+                        ? 'text-teal-400'
+                        : 'text-gray-500'
                     }`}
                   >
                     {step.label}
                   </span>
                 </div>
                 {index < steps.length - 1 && (
-                  <div className="flex-1 h-1 mx-4 bg-gray-200 dark:bg-dark-card rounded-full overflow-hidden">
+                  <div className="flex-1 h-1 mx-2 bg-zinc-800 rounded-full overflow-hidden">
                     <div
                       className={`h-full transition-all duration-300 ${
                         currentStep > step.number
@@ -62,11 +71,11 @@ function OnboardingLayout({ children, currentStep = 1 }) {
 
           {/* Overall Progress */}
           <div className="mt-4">
-            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
+            <div className="flex justify-between text-sm text-gray-400 mb-2">
               <span>Step {currentStep} of {totalSteps}</span>
               <span>{Math.round(progress)}% Complete</span>
             </div>
-            <div className="w-full h-2 bg-gray-200 dark:bg-dark-card rounded-full overflow-hidden">
+            <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-teal-500 to-emerald-500 transition-all duration-300"
                 style={{ width: `${progress}%` }}
@@ -78,7 +87,7 @@ function OnboardingLayout({ children, currentStep = 1 }) {
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-8">
-        <div className="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-8">
+        <div className="bg-[#1a1a1d] rounded-xl border border-zinc-800 p-8">
           {children}
         </div>
       </div>

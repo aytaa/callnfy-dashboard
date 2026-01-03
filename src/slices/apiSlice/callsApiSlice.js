@@ -35,6 +35,13 @@ export const callsApiSlice = apiSlice.injectEndpoints({
       }),
       providesTags: [{ type: 'Call', id: 'STATS' }],
     }),
+    testCall: builder.mutation({
+      query: ({ businessId, phoneNumber }) => ({
+        url: '/calls/test',
+        method: 'POST',
+        body: { businessId, phoneNumber },
+      }),
+    }),
   }),
 });
 
@@ -42,4 +49,5 @@ export const {
   useGetCallsQuery,
   useGetCallDetailQuery,
   useGetCallStatsQuery,
+  useTestCallMutation,
 } = callsApiSlice;

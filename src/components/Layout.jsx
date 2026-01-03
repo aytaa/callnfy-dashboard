@@ -15,8 +15,10 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
   });
   const location = useLocation();
   const navigate = useNavigate();
-  const { data: userData, isLoading: isLoadingUser, error: meError, refetch } = useGetMeQuery(undefined, {
-    refetchOnMountOrArgChange: true,
+  const { data: userData, isLoading: isLoadingUser, error: meError } = useGetMeQuery(undefined, {
+    refetchOnMountOrArgChange: false,
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
   });
   const { data: businesses, isLoading: businessesLoading } = useGetBusinessesQuery();
   const [logout] = useLogoutMutation();
@@ -83,11 +85,6 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
       clearInterval(interval);
     };
   }, []);
-
-  // Refetch user data on route change
-  useEffect(() => {
-    refetch();
-  }, [location.pathname, refetch]);
 
   // Handle authentication errors
   useEffect(() => {

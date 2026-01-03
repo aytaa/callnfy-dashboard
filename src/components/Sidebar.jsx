@@ -35,7 +35,11 @@ function Sidebar({isOpen, onClose}) {
     const dropdownRef = useRef(null);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const {data: userData, isLoading: isLoadingUser, error: userError} = useGetMeQuery();
+    const {data: userData, isLoading: isLoadingUser, error: userError} = useGetMeQuery(undefined, {
+        refetchOnMountOrArgChange: false,
+        refetchOnFocus: false,
+        refetchOnReconnect: false,
+    });
     const {data: businessData, isLoading: isLoadingBusiness} = useGetBusinessesQuery();
 
     // Get user email and name from API data, with localStorage fallback

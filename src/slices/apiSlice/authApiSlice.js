@@ -67,6 +67,14 @@ export const authApiSlice = apiSlice.injectEndpoints({
         body: { token, password },
       }),
     }),
+    updateUserOnboarding: builder.mutation({
+      query: ({ step, completed }) => ({
+        url: '/users/onboarding',
+        method: 'PATCH',
+        body: { step, completed },
+      }),
+      invalidatesTags: ['User'],
+    }),
   }),
 });
 
@@ -80,4 +88,5 @@ export const {
   useResendVerificationMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
+  useUpdateUserOnboardingMutation,
 } = authApiSlice;

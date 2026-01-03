@@ -6,7 +6,11 @@ import { useCreateCheckoutMutation } from '../../slices/apiSlice/subscriptionApi
 import { toast } from 'react-hot-toast';
 
 export default function SelectPlan() {
-  const { data: userData } = useGetMeQuery();
+  const { data: userData } = useGetMeQuery(undefined, {
+    refetchOnMountOrArgChange: false,
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
+  });
   const [createCheckout, { isLoading }] = useCreateCheckoutMutation();
 
   const user = userData?.data;
