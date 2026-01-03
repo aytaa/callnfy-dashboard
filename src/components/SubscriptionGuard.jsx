@@ -39,21 +39,41 @@ export default function SubscriptionGuard({ children }) {
     // Skip if already checked or still loading
     if (hasCheckedOnboarding.current || isLoadingUser || !userData) return;
 
-    const user = userData?.data?.user || userData?.user || userData;
+    // Extract user from various possible response structures
+    const user = userData?.data?.user || userData?.data || userData?.user || userData;
     const onboardingCompleted = user?.onboardingCompleted === true;
 
+    // Debug logging
+    console.log('[SubscriptionGuard] Raw userData:', userData);
+    console.log('[SubscriptionGuard] Extracted user:', user);
+    console.log('[SubscriptionGuard] onboardingCompleted:', onboardingCompleted);
+
     if (!onboardingCompleted) {
+      console.log('[SubscriptionGuard] Showing onboarding modal');
       setShowOnboarding(true);
+    } else {
+      console.log('[SubscriptionGuard] Onboarding already completed, skipping modal');
+      setShowOnboarding(false);
     }
 
     hasCheckedOnboarding.current = true;
   }, [userData, isLoadingUser]);
 
   // Handle onboarding completion - only refetch here
-  const handleOnboardingComplete = () => {
+  const handleOnboardingComplete = async () => {
+    console.log('[SubscriptionGuard] handleOnboardingComplete called');
     setShowOnboarding(false);
-    hasCheckedOnboarding.current = false; // Allow re-check after completion
-    refetchUser();
+
+    // Refetch first, then allow re-check
+    try {
+      await refetchUser();
+      console.log('[SubscriptionGuard] User data refetched');
+    } catch (err) {
+      console.error('[SubscriptionGuard] Refetch failed:', err);
+    }
+
+    // Reset check flag AFTER refetch completes so effect runs with new data
+    hasCheckedOnboarding.current = false;
   };
 
   // Show loading state
@@ -79,7 +99,8 @@ export default function SubscriptionGuard({ children }) {
 
   // Show onboarding modal if not completed
   if (showOnboarding) {
-    const user = userData?.data?.user || userData?.user || userData;
+    const user = userData?.data?.user || userData?.data || userData?.user || userData;
+    console.log('[SubscriptionGuard] Rendering modal with user:', user);
     return (
       <>
         {children}

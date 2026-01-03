@@ -71,15 +71,15 @@ export default function PhoneNumbers() {
     return (
       <div className="px-8 py-6">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-[#1a1a1d] border border-zinc-800 rounded-xl p-12 text-center">
-            <Phone className="w-12 h-12 text-red-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-white mb-2">Failed to load phone numbers</h3>
-            <p className="text-sm text-gray-400 mb-4">
+          <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-8 text-center">
+            <Phone className="w-10 h-10 text-gray-500 mx-auto mb-3" />
+            <h3 className="text-sm font-medium text-white mb-2">Failed to load phone numbers</h3>
+            <p className="text-xs text-gray-500 mb-4">
               {phonesError?.data?.error?.message || phonesError?.data?.message || 'An error occurred while loading phone numbers.'}
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-3 py-1.5 bg-white text-black text-xs font-medium rounded-md hover:bg-gray-200 transition-colors"
             >
               Retry
             </button>
@@ -113,13 +113,13 @@ export default function PhoneNumbers() {
               return (
                 <div
                   key={business.id}
-                  className="bg-[#1a1a1d] border border-zinc-800 rounded-xl p-6"
+                  className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-4"
                 >
                   {/* Business Header */}
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-3">
                     <div>
-                      <h3 className="text-lg font-semibold text-white">{business.name}</h3>
-                      <p className="text-sm text-gray-400 mt-0.5">
+                      <h3 className="text-sm font-medium text-white">{business.name}</h3>
+                      <p className="text-xs text-gray-500 mt-0.5">
                         {business.industry || 'Business'}
                       </p>
                     </div>
@@ -129,38 +129,38 @@ export default function PhoneNumbers() {
                   {phoneNumber ? (
                     <button
                       onClick={() => navigate(`/phone-numbers/${phoneNumber.id}`)}
-                      className="w-full bg-[#1a1a1d] border border-zinc-800 rounded-lg p-4 hover:border-zinc-600 transition-colors text-left group"
+                      className="w-full bg-[#111114] border border-[#303030] rounded-md p-3 hover:border-[#404040] transition-colors text-left group"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3 flex-1">
-                          <div className="w-10 h-10 rounded-full bg-[#171717] flex items-center justify-center">
-                            <Phone className="w-5 h-5 text-gray-400" strokeWidth={1.5} />
+                          <div className="w-8 h-8 rounded-full bg-[#1a1a1d] flex items-center justify-center">
+                            <Phone className="w-4 h-4 text-gray-500" strokeWidth={1.5} />
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <p className="text-base font-medium text-white">
+                              <p className="text-sm font-medium text-white">
                                 {phoneNumber.phoneNumber || phoneNumber.number}
                               </p>
                               <span className={`px-2 py-0.5 text-xs font-medium rounded ${
                                 phoneNumber.status === 'active'
-                                  ? 'bg-green-900/20 text-green-400 border border-green-800'
-                                  : 'bg-[#171717] text-gray-400 border border-[#404040]'
+                                  ? 'bg-white/10 text-white border border-white/20'
+                                  : 'bg-[#111114] text-gray-400 border border-[#303030]'
                               }`}>
                                 {phoneNumber.status || 'Active'}
                               </span>
                               {phoneNumber.provider && (
-                                <span className="px-2 py-0.5 text-xs font-medium rounded bg-[#171717] text-white border border-[#303030]">
+                                <span className="px-2 py-0.5 text-xs font-medium rounded bg-[#111114] text-white border border-[#303030]">
                                   {phoneNumber.provider.toUpperCase()}
                                 </span>
                               )}
                             </div>
                             {phoneNumber.assistant?.name && (
-                              <p className="text-sm text-gray-400">
+                              <p className="text-xs text-gray-500">
                                 Assistant: {phoneNumber.assistant.name}
                               </p>
                             )}
                             {phoneNumber.name && (
-                              <p className="text-sm text-gray-400">
+                              <p className="text-xs text-gray-500">
                                 {phoneNumber.name}
                               </p>
                             )}
@@ -172,7 +172,7 @@ export default function PhoneNumbers() {
                               e.stopPropagation();
                               handleCopy(phoneNumber.phoneNumber || phoneNumber.number, phoneNumber.id);
                             }}
-                            className="p-2 text-gray-400 hover:text-white hover:bg-[#171717] rounded-lg transition-colors"
+                            className="p-1.5 text-gray-500 hover:text-white hover:bg-white/10 rounded-md transition-colors"
                             title="Copy number"
                           >
                             {copiedId === phoneNumber.id ? (
@@ -181,26 +181,26 @@ export default function PhoneNumbers() {
                               <Copy className="w-4 h-4" strokeWidth={1.5} />
                             )}
                           </button>
-                          <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
+                          <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" />
                         </div>
                       </div>
                     </button>
                   ) : (
                     <button
                       onClick={() => setIsPurchaseModalOpen(true)}
-                      className="w-full bg-[#1a1a1d] border border-zinc-800 rounded-lg p-6 hover:border-white transition-colors group"
+                      className="w-full bg-[#111114] border border-[#303030] rounded-md p-4 hover:border-white/40 transition-colors group"
                     >
                       <div className="flex flex-col items-center justify-center text-center">
-                        <div className="w-12 h-12 rounded-full bg-[#171717] flex items-center justify-center mb-3">
-                          <Phone className="w-6 h-6 text-gray-400 group-hover:text-white transition-colors" strokeWidth={1.5} />
+                        <div className="w-10 h-10 rounded-full bg-[#1a1a1d] flex items-center justify-center mb-2">
+                          <Phone className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" strokeWidth={1.5} />
                         </div>
-                        <h4 className="text-base font-medium text-white mb-1">
+                        <h4 className="text-sm font-medium text-white mb-1">
                           No phone number
                         </h4>
-                        <p className="text-sm text-gray-400 mb-3">
+                        <p className="text-xs text-gray-500 mb-3">
                           Get a phone number for this business
                         </p>
-                        <div className="flex items-center gap-2 px-4 py-2 bg-white text-black text-sm font-medium rounded-lg">
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-white text-black text-xs font-medium rounded-md">
                           <Plus className="w-4 h-4" />
                           Get Phone Number
                         </div>
@@ -213,15 +213,15 @@ export default function PhoneNumbers() {
           </div>
         ) : (
           /* Empty State - No Businesses */
-          <div className="bg-[#1a1a1d] border border-zinc-800 rounded-xl p-12">
+          <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-8">
             <div className="flex flex-col items-center justify-center text-center">
-              <div className="w-16 h-16 rounded-full bg-[#262626] flex items-center justify-center mb-4">
-                <Phone className="w-8 h-8 text-gray-400" strokeWidth={1.5} />
+              <div className="w-12 h-12 rounded-full bg-[#111114] flex items-center justify-center mb-3">
+                <Phone className="w-6 h-6 text-gray-500" strokeWidth={1.5} />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-1">
+              <h3 className="text-sm font-medium text-white mb-1">
                 No businesses found
               </h3>
-              <p className="text-sm text-white opacity-60 mb-4">
+              <p className="text-xs text-gray-500 mb-4">
                 Create a business first to get a phone number
               </p>
             </div>

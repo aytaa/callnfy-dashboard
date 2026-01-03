@@ -344,9 +344,9 @@ export default function OnboardingModal({ onComplete, initialUserData }) {
   if (showLoading) {
     return (
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-        <div className="bg-[#1a1a1d] rounded-xl border border-[#303030] p-8">
-          <Loader2 className="w-8 h-8 text-white/40 animate-spin mx-auto" />
-          <p className="text-white/60 text-sm mt-3">Loading...</p>
+        <div className="bg-[#1a1a1d] rounded-lg border border-[#303030] p-6">
+          <Loader2 className="w-6 h-6 text-white/40 animate-spin mx-auto" />
+          <p className="text-white/60 text-xs mt-2">Loading...</p>
         </div>
       </div>
     );
@@ -354,7 +354,7 @@ export default function OnboardingModal({ onComplete, initialUserData }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1a1a1d] rounded-xl border border-[#303030] w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#1a1a1d] rounded-lg border border-[#303030] w-full max-w-lg max-h-[90vh] overflow-y-auto">
         {/* Step Indicator */}
         <div className="p-4 border-b border-[#303030]">
           <div className="flex items-center justify-center gap-2">

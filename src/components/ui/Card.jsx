@@ -17,8 +17,8 @@ export default function Card({
   return (
     <div
       className={clsx(
-        'bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm transition-colors duration-200',
-        !noPadding && 'p-6',
+        'bg-[#1a1a1d] rounded-lg border border-[#303030] transition-colors duration-200',
+        !noPadding && 'p-4',
         className
       )}
       {...props}

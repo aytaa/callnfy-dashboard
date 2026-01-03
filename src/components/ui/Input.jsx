@@ -29,21 +29,21 @@ export default function Input({
 }) {
   const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
 
-  const baseStyles = 'w-full px-4 py-2 rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseStyles = 'w-full px-3 py-2 rounded-md border transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed';
 
-  const normalStyles = 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-teal-500 focus:border-teal-500';
+  const normalStyles = 'border-[#303030] bg-[#111114] text-white placeholder:text-gray-600 focus:border-[#404040]';
 
-  const errorStyles = 'border-red-500 dark:border-red-400 bg-red-50 dark:bg-red-900/20 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-red-500 focus:border-red-500';
+  const errorStyles = 'border-red-500 bg-[#111114] text-white placeholder:text-gray-600 focus:border-red-500';
 
   return (
     <div className="w-full">
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+          className="block text-xs text-gray-500 mb-1"
         >
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="text-red-400 ml-1">*</span>}
         </label>
       )}
       <input
@@ -62,7 +62,7 @@ export default function Input({
         {...props}
       />
       {error && (
-        <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">
+        <p className="mt-1 text-xs text-red-400">
           {error}
         </p>
       )}

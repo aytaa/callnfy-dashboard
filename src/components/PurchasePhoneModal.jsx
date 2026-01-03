@@ -110,9 +110,9 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
     <Modal isOpen={isOpen} onClose={handleClose} title="Buy Phone Number" size="md">
       <div className="space-y-4">
         {error && (
-          <div className="p-3 bg-red-900/20 border border-red-800 rounded-lg flex items-start gap-2">
+          <div className="p-2.5 bg-red-900/20 border border-red-800 rounded-md flex items-start gap-2">
             <AlertCircle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-red-400">{error}</p>
+            <p className="text-xs text-red-400">{error}</p>
           </div>
         )}
 
@@ -120,7 +120,7 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
           <>
             {/* Business Selection */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-xs text-gray-500 mb-1">
                 Select Business
               </label>
               <select
@@ -129,7 +129,7 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
                   setSelectedBusiness(e.target.value);
                   setError('');
                 }}
-                className="w-full bg-[#262626] border border-[#303030] rounded-lg px-3 py-2 text-white focus:border-[#3a3a3a] focus:outline-none"
+                className="w-full bg-[#111114] border border-[#303030] rounded-md px-2.5 py-1.5 text-sm text-white focus:border-[#404040] focus:outline-none"
               >
                 <option value="">Choose a business...</option>
                 {businesses?.map((business) => (
@@ -142,46 +142,46 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
 
             {/* Provider Selection */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-xs text-gray-500 mb-1">
                 Choose Provider
               </label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2">
                 {/* Vapi Option */}
                 <button
                   onClick={() => handleProviderSelect('vapi')}
                   disabled={!selectedBusiness}
-                  className={`p-4 rounded-lg border-2 transition-all text-left ${
+                  className={`p-3 rounded-md border transition-all text-left ${
                     provider === 'vapi'
-                      ? 'border-white bg-white/10'
-                      : 'border-[#303030] hover:border-[#3a3a3a]'
+                      ? 'border-white/20 bg-white/10'
+                      : 'border-[#303030] hover:border-[#404040]'
                   } ${!selectedBusiness ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <div className="flex items-start gap-2 mb-2">
-                    <Phone className="w-5 h-5 text-gray-400" />
+                    <Phone className="w-4 h-4 text-gray-500" />
                     <div className="flex-1">
-                      <h3 className="font-semibold text-white">Vapi</h3>
-                      <p className="text-xs text-gray-400 mt-1">Free SIP Number</p>
+                      <h3 className="text-sm font-medium text-white">Vapi</h3>
+                      <p className="text-xs text-gray-500 mt-0.5">Free SIP Number</p>
                     </div>
                     {provider === 'vapi' && (
-                      <CheckCircle className="w-5 h-5 text-white" />
+                      <CheckCircle className="w-4 h-4 text-white" />
                     )}
                   </div>
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-xs text-gray-400">
-                      <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <span className="w-1 h-1 bg-gray-500 rounded-full"></span>
                       <span>US Only</span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-400">
-                      <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <span className="w-1 h-1 bg-gray-500 rounded-full"></span>
                       <span>Limit: 10 numbers</span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-400">
-                      <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <span className="w-1 h-1 bg-gray-500 rounded-full"></span>
                       <span>Instant setup</span>
                     </div>
                   </div>
-                  <div className="mt-3 pt-3 border-t border-[#303030]">
-                    <span className="text-lg font-bold text-white">Free</span>
+                  <div className="mt-2 pt-2 border-t border-[#303030]">
+                    <span className="text-sm font-semibold text-white">Free</span>
                   </div>
                 </button>
 
@@ -189,38 +189,38 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
                 <button
                   onClick={() => handleProviderSelect('twilio')}
                   disabled={!selectedBusiness}
-                  className={`p-4 rounded-lg border-2 transition-all text-left ${
+                  className={`p-3 rounded-md border transition-all text-left ${
                     provider === 'twilio'
-                      ? 'border-white bg-white/10'
-                      : 'border-[#303030] hover:border-[#3a3a3a]'
+                      ? 'border-white/20 bg-white/10'
+                      : 'border-[#303030] hover:border-[#404040]'
                   } ${!selectedBusiness ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <div className="flex items-start gap-2 mb-2">
-                    <Phone className="w-5 h-5 text-gray-400" />
+                    <Phone className="w-4 h-4 text-gray-500" />
                     <div className="flex-1">
-                      <h3 className="font-semibold text-white">Twilio</h3>
-                      <p className="text-xs text-gray-400 mt-1">Premium Numbers</p>
+                      <h3 className="text-sm font-medium text-white">Twilio</h3>
+                      <p className="text-xs text-gray-500 mt-0.5">Premium Numbers</p>
                     </div>
                     {provider === 'twilio' && (
-                      <CheckCircle className="w-5 h-5 text-white" />
+                      <CheckCircle className="w-4 h-4 text-white" />
                     )}
                   </div>
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-xs text-gray-400">
-                      <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <span className="w-1 h-1 bg-gray-500 rounded-full"></span>
                       <span>International</span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-400">
-                      <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <span className="w-1 h-1 bg-gray-500 rounded-full"></span>
                       <span>Choose area code</span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-400">
-                      <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <span className="w-1 h-1 bg-gray-500 rounded-full"></span>
                       <span>SMS & Voice</span>
                     </div>
                   </div>
-                  <div className="mt-3 pt-3 border-t border-[#303030]">
-                    <span className="text-lg font-bold text-white">Paid</span>
+                  <div className="mt-2 pt-2 border-t border-[#303030]">
+                    <span className="text-sm font-semibold text-white">Paid</span>
                   </div>
                 </button>
               </div>
@@ -229,7 +229,7 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
             {/* Vapi Area Code Input */}
             {provider === 'vapi' && (
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
+                <label className="block text-xs text-gray-500 mb-1">
                   Area Code <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -237,19 +237,19 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
                   value={areaCode}
                   onChange={(e) => setAreaCode(e.target.value.replace(/\D/g, '').slice(0, 3))}
                   placeholder="e.g. 415, 212, 346"
-                  className="w-full bg-[#262626] border border-[#303030] rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:border-[#3a3a3a] focus:outline-none"
+                  className="w-full bg-[#111114] border border-[#303030] rounded-md px-2.5 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-[#404040] focus:outline-none"
                 />
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-gray-500 mt-1">
                   Enter US area code for free Vapi number
                 </p>
               </div>
             )}
 
             {/* Action Buttons */}
-            <div className="flex justify-end gap-2 pt-4">
+            <div className="flex justify-end gap-2 pt-3">
               <button
                 onClick={handleClose}
-                className="px-4 py-2 text-sm border border-[#303030] text-white rounded-lg hover:border-[#3a3a3a] transition-colors"
+                className="px-3 py-1.5 text-xs border border-[#303030] text-white rounded-md hover:border-[#404040] transition-colors"
               >
                 Cancel
               </button>
@@ -257,7 +257,7 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
                 <button
                   onClick={() => handlePurchase()}
                   disabled={isPurchasing || !selectedBusiness || areaCode.length !== 3}
-                  className="px-4 py-2 text-sm bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 text-xs bg-white text-black font-medium rounded-md hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isPurchasing ? 'Creating...' : 'Get Free Number'}
                 </button>
@@ -270,7 +270,7 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
           <>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
+                <label className="block text-xs text-gray-500 mb-1">
                   Area Code (Optional)
                 </label>
                 <input
@@ -278,9 +278,9 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
                   value={areaCode}
                   onChange={(e) => setAreaCode(e.target.value.replace(/\D/g, '').slice(0, 3))}
                   placeholder="e.g., 415"
-                  className="w-full bg-[#262626] border border-[#303030] rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:border-[#3a3a3a] focus:outline-none"
+                  className="w-full bg-[#111114] border border-[#303030] rounded-md px-2.5 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-[#404040] focus:outline-none"
                 />
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-gray-500 mt-1">
                   Leave empty to search all available numbers
                 </p>
               </div>
@@ -288,23 +288,23 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setStep('provider')}
-                  className="px-4 py-2 text-sm border border-[#303030] text-white rounded-lg hover:border-[#3a3a3a] transition-colors"
+                  className="px-3 py-1.5 text-xs border border-[#303030] text-white rounded-md hover:border-[#404040] transition-colors"
                 >
                   Back
                 </button>
                 <button
                   onClick={handleTwilioSearch}
                   disabled={isSearching}
-                  className="px-4 py-2 text-sm bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 flex items-center gap-2"
+                  className="px-3 py-1.5 text-xs bg-white text-black font-medium rounded-md hover:bg-gray-200 transition-colors disabled:opacity-50 flex items-center gap-2"
                 >
                   {isSearching ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-black border-t-transparent" />
+                      <div className="animate-spin rounded-full h-3 w-3 border-2 border-black border-t-transparent" />
                       Searching...
                     </>
                   ) : (
                     <>
-                      <Search className="w-4 h-4" />
+                      <Search className="w-3.5 h-3.5" />
                       Search Numbers
                     </>
                   )}
@@ -318,7 +318,7 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
           <>
             <div className="space-y-4">
               <div>
-                <h3 className="text-sm font-medium text-white mb-2">
+                <h3 className="text-xs text-gray-500 mb-2">
                   Available Numbers
                   {availableNumbers?.availableNumbers && (
                     <span className="text-gray-400 ml-2">
@@ -326,32 +326,32 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
                     </span>
                   )}
                 </h3>
-                <div className="max-h-96 overflow-y-auto space-y-2">
+                <div className="max-h-80 overflow-y-auto space-y-2">
                   {availableNumbers?.availableNumbers?.map((num) => (
                     <button
                       key={num.phoneNumber}
                       onClick={() => setSelectedNumber(num.phoneNumber)}
-                      className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
+                      className={`w-full p-3 rounded-md border transition-all text-left ${
                         selectedNumber === num.phoneNumber
-                          ? 'border-white bg-white/10'
-                          : 'border-[#303030] hover:border-[#3a3a3a]'
+                          ? 'border-white/20 bg-white/10'
+                          : 'border-[#303030] hover:border-[#404040]'
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <p className="font-medium text-white">{num.phoneNumber}</p>
-                          <p className="text-xs text-gray-400 mt-1">
+                          <p className="text-sm font-medium text-white">{num.phoneNumber}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">
                             {num.locality}, {num.region}
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
                           {num.capabilities?.voice && (
-                            <span className="px-2 py-1 text-xs bg-[#262626] text-white rounded border border-[#303030]">
+                            <span className="px-2 py-0.5 text-xs bg-[#111114] text-white rounded border border-[#303030]">
                               Voice
                             </span>
                           )}
                           {num.capabilities?.sms && (
-                            <span className="px-2 py-1 text-xs bg-[#1a1a1a] text-gray-300 rounded border border-[#404040]">
+                            <span className="px-2 py-0.5 text-xs bg-[#111114] text-gray-400 rounded border border-[#303030]">
                               SMS
                             </span>
                           )}
@@ -365,14 +365,14 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setStep('twilio-search')}
-                  className="px-4 py-2 text-sm border border-[#303030] text-white rounded-lg hover:border-[#3a3a3a] transition-colors"
+                  className="px-3 py-1.5 text-xs border border-[#303030] text-white rounded-md hover:border-[#404040] transition-colors"
                 >
                   Back
                 </button>
                 <button
                   onClick={() => handlePurchase(selectedNumber)}
                   disabled={isPurchasing || !selectedNumber}
-                  className="px-4 py-2 text-sm bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                  className="px-3 py-1.5 text-xs bg-white text-black font-medium rounded-md hover:bg-gray-200 transition-colors disabled:opacity-50"
                 >
                   {isPurchasing ? 'Purchasing...' : 'Purchase Number'}
                 </button>

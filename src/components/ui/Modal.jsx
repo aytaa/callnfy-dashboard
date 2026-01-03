@@ -73,7 +73,7 @@ export default function Modal({
       <div className="flex min-h-full items-center justify-center p-4">
         <div
           className={clsx(
-            'relative w-full bg-white dark:bg-gray-800 rounded-lg shadow-xl transform transition-all',
+            'relative w-full bg-[#1a1a1d] rounded-lg border border-[#303030] shadow-xl transform transition-all',
             sizes[size],
             className
           )}
@@ -81,27 +81,27 @@ export default function Modal({
         >
           {/* Header */}
           {title && (
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[#303030]">
+              <h3 className="text-sm font-semibold text-white">
                 {title}
               </h3>
               <button
                 onClick={onClose}
-                className="p-1 rounded-lg text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="p-1 rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition-colors focus:outline-none"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
           )}
 
           {/* Content */}
-          <div className="px-6 py-4">
+          <div className="px-4 py-4">
             {children}
           </div>
 
           {/* Footer */}
           {footer && (
-            <div className="flex items-center justify-end space-x-3 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-[#303030]">
               {footer}
             </div>
           )}

@@ -10,20 +10,20 @@ export function Button({
   className = '',
   ...props
 }) {
-  const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseStyles = 'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variants = {
-    primary: 'bg-teal-500 hover:bg-teal-600 active:bg-teal-700 text-white focus:ring-teal-500 shadow-sm',
-    secondary: 'bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:active:bg-gray-500 dark:text-white focus:ring-gray-500',
-    ghost: 'bg-transparent hover:bg-gray-100 active:bg-gray-200 text-gray-700 dark:hover:bg-gray-800 dark:active:bg-gray-700 dark:text-gray-300 focus:ring-gray-400',
-    outline: 'border-2 border-gray-600 text-gray-300 hover:bg-gray-800 focus:ring-gray-500',
-    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'
+    primary: 'bg-white hover:bg-gray-200 text-black',
+    secondary: 'bg-white/10 hover:bg-white/20 text-white border border-white/20',
+    ghost: 'bg-transparent hover:bg-white/10 text-white',
+    outline: 'border border-[#303030] text-white hover:border-[#404040]',
+    danger: 'bg-white/10 border border-red-600 text-red-400 hover:bg-red-600 hover:text-white'
   };
 
   const sizes = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg'
+    sm: 'px-3 py-1.5 text-xs',
+    md: 'px-3 py-1.5 text-sm',
+    lg: 'px-4 py-2 text-sm'
   };
 
   return (

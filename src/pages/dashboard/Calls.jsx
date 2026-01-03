@@ -146,51 +146,51 @@ export default function Calls() {
         {statsLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="bg-[#1a1a1d] border border-zinc-800 rounded-xl p-4 animate-pulse">
-                <div className="h-4 bg-gray-700 rounded w-20 mb-2"></div>
-                <div className="h-8 bg-gray-700 rounded w-12"></div>
+              <div key={i} className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-4 animate-pulse">
+                <div className="h-4 bg-[#262626] rounded w-20 mb-2"></div>
+                <div className="h-8 bg-[#262626] rounded w-12"></div>
               </div>
             ))}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Total Calls */}
-            <div className="bg-[#1a1a1d] border border-zinc-800 rounded-xl p-4">
-              <p className="text-sm text-gray-500 mb-2">Total Calls</p>
+            <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-4">
+              <p className="text-xs text-gray-500 mb-2">Total Calls</p>
               <p className="text-2xl font-bold text-white mb-1">{stats?.totalCalls || 0}</p>
-              <p className="text-sm text-gray-600">
+              <p className="text-xs text-gray-500">
                 {stats?.percentChange > 0 ? '+' : ''}{stats?.percentChange || 0}%
               </p>
             </div>
 
             {/* Avg Duration */}
-            <div className="bg-[#1a1a1d] border border-zinc-800 rounded-xl p-4">
-              <p className="text-sm text-gray-500 mb-2">Avg Duration</p>
+            <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-4">
+              <p className="text-xs text-gray-500 mb-2">Avg Duration</p>
               <p className="text-2xl font-bold text-white mb-1">
                 {stats?.avgDuration ? `${Math.floor(stats.avgDuration / 60)}:${String(stats.avgDuration % 60).padStart(2, '0')}` : '0:00'}
               </p>
-              <p className="text-sm text-gray-600">Average call time</p>
+              <p className="text-xs text-gray-500">Average call time</p>
             </div>
 
             {/* Completed */}
-            <div className="bg-[#1a1a1d] border border-zinc-800 rounded-xl p-4">
-              <p className="text-sm text-gray-500 mb-2">Completed</p>
+            <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-4">
+              <p className="text-xs text-gray-500 mb-2">Completed</p>
               <p className="text-2xl font-bold text-white mb-1">{stats?.completedCalls || 0}</p>
-              <p className="text-sm text-gray-600">Successful calls</p>
+              <p className="text-xs text-gray-500">Successful calls</p>
             </div>
 
             {/* Missed */}
-            <div className="bg-[#1a1a1d] border border-zinc-800 rounded-xl p-4">
-              <p className="text-sm text-gray-500 mb-2">Missed</p>
+            <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-4">
+              <p className="text-xs text-gray-500 mb-2">Missed</p>
               <p className="text-2xl font-bold text-white mb-1">{stats?.missedCalls || 0}</p>
-              <p className="text-sm text-gray-600">Missed calls</p>
+              <p className="text-xs text-gray-500">Missed calls</p>
             </div>
           </div>
         )}
 
         {/* Calls Table */}
         {callsLoading ? (
-          <div className="bg-[#1a1a1d] border border-zinc-800 rounded-xl p-8 text-center">
+          <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-8 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
           </div>
         ) : calls.length > 0 ? (
@@ -223,13 +223,13 @@ export default function Calls() {
             )}
           </>
         ) : (
-          <div className="bg-[#1a1a1d] border border-zinc-800 rounded-xl p-8">
+          <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-8">
             <div className="flex flex-col items-center justify-center">
-              <div className="w-16 h-16 rounded-full bg-[#262626] flex items-center justify-center mb-4">
-                <Phone className="w-8 h-8 text-gray-500" strokeWidth={1.5} />
+              <div className="w-12 h-12 rounded-full bg-[#111114] flex items-center justify-center mb-3">
+                <Phone className="w-6 h-6 text-gray-500" strokeWidth={1.5} />
               </div>
-              <p className="text-white font-semibold mb-1">No calls found</p>
-              <p className="text-sm text-gray-500">Try adjusting your filters</p>
+              <p className="text-white font-medium text-sm mb-1">No calls found</p>
+              <p className="text-xs text-gray-500">Try adjusting your filters</p>
             </div>
           </div>
         )}
@@ -273,8 +273,8 @@ export default function Calls() {
 
               {selectedCall.transcript && (
                 <div>
-                  <p className="text-sm text-gray-400 mb-2">Transcript</p>
-                  <div className="bg-[#111114] border border-zinc-800 rounded-lg p-4">
+                  <p className="text-xs text-gray-500 mb-1.5">Transcript</p>
+                  <div className="bg-[#111114] border border-[#303030] rounded-md p-3">
                     <p className="text-white text-sm">{selectedCall.transcript}</p>
                   </div>
                 </div>
@@ -282,8 +282,8 @@ export default function Calls() {
 
               {selectedCall.summary && (
                 <div>
-                  <p className="text-sm text-gray-400 mb-2">Summary</p>
-                  <div className="bg-[#111114] border border-zinc-800 rounded-lg p-4">
+                  <p className="text-xs text-gray-500 mb-1.5">Summary</p>
+                  <div className="bg-[#111114] border border-[#303030] rounded-md p-3">
                     <p className="text-white text-sm">{selectedCall.summary}</p>
                   </div>
                 </div>

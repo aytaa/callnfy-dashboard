@@ -137,7 +137,7 @@ export default function Customers() {
 
         {/* Customers Table */}
         {isLoading ? (
-          <div className="bg-[#1a1a1d] border border-zinc-800 rounded-xl p-8 text-center">
+          <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-8 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
           </div>
         ) : customers.length > 0 ? (
@@ -171,18 +171,18 @@ export default function Customers() {
             )}
           </>
         ) : (
-          <div className="bg-[#1a1a1d] border border-zinc-800 rounded-xl p-12">
+          <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-8">
             <div className="flex flex-col items-center justify-center text-center">
-              <div className="w-16 h-16 rounded-full bg-[#262626] flex items-center justify-center mb-4">
-                <Phone className="w-8 h-8 text-gray-400" strokeWidth={1.5} />
+              <div className="w-12 h-12 rounded-full bg-[#111114] flex items-center justify-center mb-3">
+                <Phone className="w-6 h-6 text-gray-500" strokeWidth={1.5} />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-1">No customers yet</h3>
-              <p className="text-sm text-white opacity-60 mb-6">
+              <h3 className="text-sm font-medium text-white mb-1">No customers yet</h3>
+              <p className="text-xs text-gray-500 mb-4">
                 Get started by adding your first customer
               </p>
               <button
                 onClick={() => setIsAddModalOpen(true)}
-                className="bg-white text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                className="bg-white text-black px-3 py-1.5 text-xs font-medium rounded-md hover:bg-gray-200 transition-colors"
               >
                 Add Customer
               </button>
@@ -215,97 +215,97 @@ export default function Customers() {
           }
         >
           {selectedCustomer && (
-            <div className="space-y-6">
+            <div className="space-y-4">
               {/* Customer Info */}
-              <div className="bg-[#111114] border border-zinc-800 rounded-lg p-4">
-                <div className="grid grid-cols-2 gap-4">
+              <div className="bg-[#111114] border border-[#303030] rounded-md p-3">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <p className="text-sm text-white opacity-60 mb-1">Name</p>
-                    <p className="text-white font-medium">{selectedCustomer.name}</p>
+                    <p className="text-xs text-gray-500 mb-1">Name</p>
+                    <p className="text-white text-sm">{selectedCustomer.name}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-white opacity-60 mb-1">Status</p>
-                    <span className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded">
+                    <p className="text-xs text-gray-500 mb-1">Status</p>
+                    <span className="inline-block px-2 py-0.5 bg-[#1a1a1d] text-white text-xs font-medium rounded">
                       {selectedCustomer.status}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-white opacity-60" />
+                    <Phone className="w-4 h-4 text-gray-500" />
                     <div>
-                      <p className="text-sm text-white opacity-60">Phone</p>
-                      <p className="text-white">{selectedCustomer.phone}</p>
+                      <p className="text-xs text-gray-500">Phone</p>
+                      <p className="text-white text-sm">{selectedCustomer.phone}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-white opacity-60" />
+                    <Mail className="w-4 h-4 text-gray-500" />
                     <div>
-                      <p className="text-sm text-white opacity-60">Email</p>
-                      <p className="text-white">{selectedCustomer.email}</p>
+                      <p className="text-xs text-gray-500">Email</p>
+                      <p className="text-white text-sm">{selectedCustomer.email}</p>
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-white opacity-60">Join Date</p>
-                    <p className="text-white">{selectedCustomer.joinDate}</p>
+                    <p className="text-xs text-gray-500">Join Date</p>
+                    <p className="text-white text-sm">{selectedCustomer.joinDate}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-white opacity-60">Total Calls</p>
-                    <p className="text-white font-semibold">{selectedCustomer.totalCalls}</p>
+                    <p className="text-xs text-gray-500">Total Calls</p>
+                    <p className="text-white text-sm font-medium">{selectedCustomer.totalCalls}</p>
                   </div>
                 </div>
               </div>
 
               {/* Call History */}
               <div>
-                <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
+                <h3 className="text-sm font-medium text-white mb-2 flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-gray-500" />
                   Call History
                 </h3>
                 <div className="space-y-2">
                   {selectedCustomer.callHistory.length > 0 ? (
                     selectedCustomer.callHistory.map((call, index) => (
-                      <div key={index} className="bg-[#1a1a1d] border border-zinc-800 rounded-lg p-4">
+                      <div key={index} className="bg-[#1a1a1d] border border-[#303030] rounded-md p-3">
                         <div className="flex justify-between items-center">
                           <div>
-                            <p className="text-white font-medium">{call.outcome}</p>
-                            <p className="text-sm text-white opacity-60">{call.date}</p>
+                            <p className="text-white text-sm">{call.outcome}</p>
+                            <p className="text-xs text-gray-500">{call.date}</p>
                           </div>
-                          <span className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded">
+                          <span className="inline-block px-2 py-0.5 bg-[#111114] text-white text-xs font-medium rounded">
                             {call.duration}
                           </span>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <p className="text-gray-500 text-center py-4">No call history</p>
+                    <p className="text-gray-500 text-xs text-center py-3">No call history</p>
                   )}
                 </div>
               </div>
 
               {/* Appointment History */}
               <div>
-                <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
+                <h3 className="text-sm font-medium text-white mb-2 flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-gray-500" />
                   Appointments
                 </h3>
                 <div className="space-y-2">
                   {selectedCustomer.appointments.length > 0 ? (
                     selectedCustomer.appointments.map((appointment, index) => (
-                      <div key={index} className="bg-[#1a1a1d] border border-zinc-800 rounded-lg p-4">
+                      <div key={index} className="bg-[#1a1a1d] border border-[#303030] rounded-md p-3">
                         <div className="flex justify-between items-center">
                           <div>
-                            <p className="text-white font-medium">{appointment.service}</p>
-                            <p className="text-sm text-white opacity-60">
+                            <p className="text-white text-sm">{appointment.service}</p>
+                            <p className="text-xs text-gray-500">
                               {appointment.date} at {appointment.time}
                             </p>
                           </div>
-                          <span className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded">
+                          <span className="inline-block px-2 py-0.5 bg-[#111114] text-white text-xs font-medium rounded">
                             {appointment.status}
                           </span>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <p className="text-gray-500 text-center py-4">No appointments scheduled</p>
+                    <p className="text-gray-500 text-xs text-center py-3">No appointments scheduled</p>
                   )}
                 </div>
               </div>
@@ -347,42 +347,42 @@ export default function Customers() {
         >
           <form onSubmit={handleAddCustomer} className="space-y-4">
             {error && (
-              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+              <div className="p-2.5 bg-red-900/20 border border-red-800 rounded-md">
+                <p className="text-xs text-red-400">{error}</p>
               </div>
             )}
 
             <div>
-              <label className="block text-sm text-white opacity-60 mb-2">Name</label>
+              <label className="block text-xs text-gray-500 mb-1">Name</label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full bg-[#111114] border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-zinc-600 focus:outline-none"
+                className="w-full bg-[#111114] border border-[#303030] rounded-md px-2.5 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-[#404040] focus:outline-none"
                 placeholder="Customer name"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm text-white opacity-60 mb-2">Phone</label>
+              <label className="block text-xs text-gray-500 mb-1">Phone</label>
               <input
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full bg-[#111114] border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-zinc-600 focus:outline-none"
+                className="w-full bg-[#111114] border border-[#303030] rounded-md px-2.5 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-[#404040] focus:outline-none"
                 placeholder="+1 (555) 123-4567"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm text-white opacity-60 mb-2">Email</label>
+              <label className="block text-xs text-gray-500 mb-1">Email</label>
               <input
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full bg-[#111114] border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-zinc-600 focus:outline-none"
+                className="w-full bg-[#111114] border border-[#303030] rounded-md px-2.5 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-[#404040] focus:outline-none"
                 placeholder="customer@email.com"
                 required
               />
