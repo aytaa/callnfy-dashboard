@@ -6,6 +6,7 @@ import { useGetBusinessesQuery } from '../slices/apiSlice/businessApiSlice';
 import { useGetPhoneNumberQuery } from '../slices/apiSlice/phoneApiSlice';
 import Sidebar from './Sidebar';
 import CreateBusinessModal from './CreateBusinessModal';
+import NotificationBell from './NotificationBell';
 
 export default function Layout({ children, skipSubscriptionCheck = false }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -63,6 +64,7 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
     if (path === '/appointments') return { title: 'Appointments' };
     if (path === '/phone-numbers') return { title: 'Phone Numbers' };
     if (path === '/ai-assistant') return { title: 'AI Assistant' };
+    if (path === '/notifications') return { title: 'Notifications' };
     if (path.startsWith('/settings')) return { title: 'Settings' };
     return { title: 'Dashboard' };
   };
@@ -165,28 +167,34 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
       <div className={`flex-1 flex flex-col bg-[#111114] transition-all duration-300 ${isCollapsed ? 'lg:pl-16' : 'lg:pl-60'}`}>
         {/* Mobile Header */}
         <div className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-[#111114] border-b border-[#303030] p-4">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="text-white hover:text-white"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-            <div>
-              <h1 className="text-lg font-semibold text-white">{getPageTitle().title}</h1>
-              {getPageTitle().subtitle && (
-                <p className="text-xs text-zinc-400">{getPageTitle().subtitle}</p>
-              )}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="text-white hover:text-white"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+              <div>
+                <h1 className="text-lg font-semibold text-white">{getPageTitle().title}</h1>
+                {getPageTitle().subtitle && (
+                  <p className="text-xs text-zinc-400">{getPageTitle().subtitle}</p>
+                )}
+              </div>
             </div>
+            <NotificationBell />
           </div>
         </div>
 
         {/* Desktop Header */}
-        <div className="hidden lg:block bg-[#111114] border-b border-[#303030] px-8 py-4">
-          <h1 className="text-xl font-semibold text-white">{getPageTitle().title}</h1>
-          {getPageTitle().subtitle && (
-            <p className="text-xs text-zinc-400 mt-1">{getPageTitle().subtitle}</p>
-          )}
+        <div className="hidden lg:flex items-center justify-between bg-[#111114] border-b border-[#303030] px-8 py-4">
+          <div>
+            <h1 className="text-xl font-semibold text-white">{getPageTitle().title}</h1>
+            {getPageTitle().subtitle && (
+              <p className="text-xs text-zinc-400 mt-1">{getPageTitle().subtitle}</p>
+            )}
+          </div>
+          <NotificationBell />
         </div>
 
         <main className="flex-1 overflow-y-auto pt-20 lg:pt-0 bg-[#111114]">

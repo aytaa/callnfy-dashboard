@@ -19,7 +19,6 @@ import {
 } from 'lucide-react';
 import clsx from 'clsx';
 import SearchModal from './SearchModal';
-import NotificationBell from './NotificationBell';
 import {logout} from '../slices/authSlice';
 import {useGetMeQuery} from '../slices/apiSlice/authApiSlice';
 import {useGetBusinessesQuery} from '../slices/apiSlice/businessApiSlice';
@@ -284,15 +283,6 @@ function Sidebar({isOpen, onClose}) {
                         </button>
                     )}
 
-                    {/* Notification Bell */}
-                    {!isCollapsed ? (
-                        <div className="flex items-center justify-between px-2">
-                            <span className="text-xs text-white/40">Notifications</span>
-                            <NotificationBell isCollapsed={false} />
-                        </div>
-                    ) : (
-                        <NotificationBell isCollapsed={true} />
-                    )}
                 </div>
 
                 {/* Navigation */}

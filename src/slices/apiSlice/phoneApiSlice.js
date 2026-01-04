@@ -91,6 +91,27 @@ export const phoneApiSlice = apiSlice.injectEndpoints({
                 {type: 'PhoneNumber', id: 'LIST'},
             ],
         }),
+        assignAssistant: builder.mutation({
+            query: ({id, assistantId}) => ({
+                url: `/phone-numbers/${id}/assign-assistant`,
+                method: 'PATCH',
+                body: {assistantId},
+            }),
+            invalidatesTags: (result, error, {id}) => [
+                {type: 'PhoneNumber', id},
+                {type: 'PhoneNumber', id: 'LIST'},
+            ],
+        }),
+        resyncPhoneNumber: builder.mutation({
+            query: (id) => ({
+                url: `/phone-numbers/${id}/resync`,
+                method: 'POST',
+            }),
+            invalidatesTags: (result, error, id) => [
+                {type: 'PhoneNumber', id},
+                {type: 'PhoneNumber', id: 'LIST'},
+            ],
+        }),
     }),
 });
 
@@ -105,4 +126,6 @@ export const {
     useAssignPhoneNumberMutation,
     useReleasePhoneNumberMutation,
     useDeletePhoneNumberMutation,
+    useAssignAssistantMutation,
+    useResyncPhoneNumberMutation,
 } = phoneApiSlice;

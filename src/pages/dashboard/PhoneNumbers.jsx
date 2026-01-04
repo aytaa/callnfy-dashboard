@@ -1,12 +1,33 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Phone, Plus, Copy, Check, Settings, ChevronRight } from 'lucide-react';
+import { Phone, Plus, Copy, Check, Trash2, ChevronRight, AlertTriangle, Bot } from 'lucide-react';
 import {
   useGetPhoneNumbersQuery,
   useDeletePhoneNumberMutation,
 } from '../../slices/apiSlice/phoneApiSlice';
 import { useGetBusinessesQuery } from '../../slices/apiSlice/businessApiSlice';
 import PurchasePhoneModal from '../../components/PurchasePhoneModal';
+
+const formatPhoneNumber = (number) => {
+  if (!number) return '';
+  const cleaned = number.replace(/\D/g, '');
+  if (cleaned.length === 11 && cleaned.startsWith('1')) {
+    return `+1 (${cleaned.slice(1, 4)}) ${cleaned.slice(4, 7)}-${cleaned.slice(7)}`;
+  }
+  if (cleaned.length === 10) {
+    return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+  }
+  return number;
+};
+
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  return new Date(dateString).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+};
 
 export default function PhoneNumbers() {
   const [copiedId, setCopiedId] = useState(null);
@@ -18,10 +39,6 @@ export default function PhoneNumbers() {
   const { data: phoneNumbersData, isLoading: isLoadingPhones, error: phonesError } = useGetPhoneNumbersQuery();
   const { data: businessesData, isLoading: isLoadingBusinesses } = useGetBusinessesQuery();
   const [deletePhoneNumber, { isLoading: isDeleting }] = useDeletePhoneNumberMutation();
-
-  // Debug: Log the raw API response
-  console.log('Phone Numbers List API Response:', phoneNumbersData);
-  console.log('Businesses API Response:', businessesData);
 
   const phoneNumbers = phoneNumbersData?.data?.phoneNumbers || [];
   const businesses = businessesData || [];
@@ -40,7 +57,8 @@ export default function PhoneNumbers() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleDelete = async (phoneId) => {
+  const handleDelete = async (e, phoneId) => {
+    e.stopPropagation();
     if (!window.confirm('Are you sure you want to delete this phone number? This action cannot be undone.')) return;
 
     setError('');
@@ -125,61 +143,96 @@ export default function PhoneNumbers() {
                     </div>
                   </div>
 
-                  {/* Phone Number or CTA */}
+                  {/* Phone Number Card or CTA */}
                   {phoneNumber ? (
                     <button
                       onClick={() => navigate(`/phone-numbers/${phoneNumber.id}`)}
-                      className="w-full bg-[#111114] border border-[#303030] rounded-md p-3 hover:border-[#404040] transition-colors text-left group"
+                      className="w-full bg-[#111114] border border-[#303030] rounded-md p-4 hover:border-[#404040] transition-colors text-left group"
                     >
+                      {/* Sync Warning Banner */}
+                      {phoneNumber.syncWarning && (
+                        <div className="flex items-center gap-2 mb-3 p-2 bg-orange-900/20 border border-orange-700/50 rounded-md">
+                          <AlertTriangle className="w-4 h-4 text-orange-400 flex-shrink-0" />
+                          <p className="text-xs text-orange-400">Sync issue detected - click to view details</p>
+                        </div>
+                      )}
+
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3 flex-1">
-                          <div className="w-8 h-8 rounded-full bg-[#1a1a1d] flex items-center justify-center">
-                            <Phone className="w-4 h-4 text-gray-500" strokeWidth={1.5} />
+                          <div className="w-10 h-10 rounded-full bg-[#1a1a1d] flex items-center justify-center">
+                            <Phone className="w-5 h-5 text-gray-500" strokeWidth={1.5} />
                           </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
+                          <div className="flex-1 min-w-0">
+                            {/* Phone Number & Badges */}
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
                               <p className="text-sm font-medium text-white">
-                                {phoneNumber.phoneNumber || phoneNumber.number}
+                                {formatPhoneNumber(phoneNumber.number || phoneNumber.phoneNumber)}
                               </p>
+                              {/* Status Badge */}
                               <span className={`px-2 py-0.5 text-xs font-medium rounded ${
-                                phoneNumber.status === 'active'
-                                  ? 'bg-white/10 text-white border border-white/20'
-                                  : 'bg-[#111114] text-gray-400 border border-[#303030]'
+                                phoneNumber.status === 'assigned'
+                                  ? 'bg-green-900/30 text-green-400 border border-green-700/50'
+                                  : 'bg-[#262626] text-gray-400 border border-[#303030]'
                               }`}>
-                                {phoneNumber.status || 'Active'}
+                                {phoneNumber.status === 'assigned' ? 'Assigned' : phoneNumber.status || 'Active'}
                               </span>
+                              {/* Provider Badge */}
                               {phoneNumber.provider && (
-                                <span className="px-2 py-0.5 text-xs font-medium rounded bg-[#111114] text-white border border-[#303030]">
+                                <span className="px-2 py-0.5 text-xs font-medium rounded bg-[#262626] text-white border border-[#303030]">
                                   {phoneNumber.provider.toUpperCase()}
                                 </span>
                               )}
                             </div>
-                            {phoneNumber.assistant?.name && (
-                              <p className="text-xs text-gray-500">
-                                Assistant: {phoneNumber.assistant.name}
+
+                            {/* Label/Name */}
+                            {phoneNumber.name && (
+                              <p className="text-xs text-gray-400 mb-1">
+                                {phoneNumber.name}
                               </p>
                             )}
-                            {phoneNumber.name && (
-                              <p className="text-xs text-gray-500">
-                                {phoneNumber.name}
+
+                            {/* Assistant Info */}
+                            <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                              <Bot className="w-3 h-3" />
+                              <span>
+                                {phoneNumber.localAssistantName || phoneNumber.assistant?.name
+                                  ? `Assistant: ${phoneNumber.localAssistantName || phoneNumber.assistant?.name}`
+                                  : 'No assistant assigned'}
+                              </span>
+                            </div>
+
+                            {/* Created Date */}
+                            {phoneNumber.createdAt && (
+                              <p className="text-xs text-gray-600 mt-1">
+                                Added {formatDate(phoneNumber.createdAt)}
                               </p>
                             )}
                           </div>
                         </div>
+
+                        {/* Actions */}
                         <div className="flex items-center gap-2">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleCopy(phoneNumber.phoneNumber || phoneNumber.number, phoneNumber.id);
+                              handleCopy(phoneNumber.number || phoneNumber.phoneNumber, phoneNumber.id);
                             }}
-                            className="p-1.5 text-gray-500 hover:text-white hover:bg-white/10 rounded-md transition-colors"
+                            className="p-2 text-gray-500 hover:text-white hover:bg-white/10 rounded-md transition-colors"
                             title="Copy number"
                           >
                             {copiedId === phoneNumber.id ? (
-                              <Check className="w-4 h-4 text-white" strokeWidth={1.5} />
+                              <Check className="w-4 h-4 text-green-400" strokeWidth={1.5} />
                             ) : (
                               <Copy className="w-4 h-4" strokeWidth={1.5} />
                             )}
+                          </button>
+                          <button
+                            onClick={(e) => handleDelete(e, phoneNumber.id)}
+                            disabled={isDeleting}
+                            className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-900/20 rounded-md transition-colors disabled:opacity-50"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4" strokeWidth={1.5} />
                           </button>
                           <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" />
                         </div>
