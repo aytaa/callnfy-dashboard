@@ -48,12 +48,8 @@ export default function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Get unread count for badge
-  const { data: unreadCount = 0 } = useGetUnreadCountQuery(undefined, {
-    pollingInterval: 30000,
-    refetchOnFocus: true,
-    refetchOnReconnect: true,
-  });
+  // Get unread count for badge (no polling - will use WebSocket later)
+  const { data: unreadCount = 0 } = useGetUnreadCountQuery();
 
   // Get recent notifications for dropdown (limit to 5)
   const { data: notificationsData } = useGetNotificationsQuery(

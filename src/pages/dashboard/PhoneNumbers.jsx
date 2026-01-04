@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Phone, Plus, Copy, Check, Trash2, ChevronRight, AlertTriangle, Bot } from 'lucide-react';
+import { Phone, Plus, Copy, Check, Trash2, ChevronRight, AlertTriangle, Bot, Loader2 } from 'lucide-react';
 import {
   useGetPhoneNumbersQuery,
   useDeletePhoneNumberMutation,
@@ -36,8 +36,12 @@ export default function PhoneNumbers() {
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  const { data: phoneNumbersData, isLoading: isLoadingPhones, error: phonesError } = useGetPhoneNumbersQuery();
-  const { data: businessesData, isLoading: isLoadingBusinesses } = useGetBusinessesQuery();
+  const { data: phoneNumbersData, isLoading: isLoadingPhones, error: phonesError } = useGetPhoneNumbersQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+  const { data: businessesData, isLoading: isLoadingBusinesses } = useGetBusinessesQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
   const [deletePhoneNumber, { isLoading: isDeleting }] = useDeletePhoneNumberMutation();
 
   const phoneNumbers = phoneNumbersData?.data?.phoneNumbers || [];
@@ -77,10 +81,7 @@ export default function PhoneNumbers() {
   if (isLoading) {
     return (
       <div className="px-8 py-6 flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading phone numbers...</p>
-        </div>
+        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
       </div>
     );
   }

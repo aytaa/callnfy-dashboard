@@ -324,8 +324,7 @@ export default function OnboardingModal({ onComplete, initialUserData }) {
     return (
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
         <div className="bg-[#1a1a1d] rounded-lg border border-[#303030] p-6">
-          <Loader2 className="w-6 h-6 text-white/40 animate-spin mx-auto" />
-          <p className="text-white/60 text-xs mt-2">Loading...</p>
+          <Loader2 className="w-6 h-6 text-gray-400 animate-spin mx-auto" />
         </div>
       </div>
     );

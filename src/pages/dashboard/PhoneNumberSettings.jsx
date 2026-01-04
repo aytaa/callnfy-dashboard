@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Phone, Settings, Check, PhoneOutgoing, Calendar, AlertTriangle, Bot, RefreshCw, Clock, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Phone, Settings, Check, PhoneOutgoing, Calendar, AlertTriangle, Bot, RefreshCw, Clock, ExternalLink, Loader2 } from 'lucide-react';
 import {
   useGetPhoneNumberQuery,
   useUpdatePhoneNumberMutation,
@@ -49,8 +49,12 @@ export default function PhoneNumberSettings() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
 
-  const { data: phoneData, isLoading: isLoadingPhone, error: phoneError } = useGetPhoneNumberQuery(id);
-  const { data: assistants, isLoading: isLoadingAssistants } = useGetAssistantQuery();
+  const { data: phoneData, isLoading: isLoadingPhone, error: phoneError } = useGetPhoneNumberQuery(id, {
+    refetchOnMountOrArgChange: true,
+  });
+  const { data: assistants, isLoading: isLoadingAssistants } = useGetAssistantQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
   const [updatePhoneNumber, { isLoading: isUpdating }] = useUpdatePhoneNumberMutation();
   const [assignAssistant, { isLoading: isAssigning }] = useAssignAssistantMutation();
   const [resyncPhoneNumber, { isLoading: isResyncing }] = useResyncPhoneNumberMutation();
@@ -166,10 +170,7 @@ export default function PhoneNumberSettings() {
   if (isLoadingPhone || isLoadingAssistants) {
     return (
       <div className="px-8 py-6 flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-400 mx-auto mb-4"></div>
-          <p className="text-zinc-400">Loading phone number settings...</p>
-        </div>
+        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
       </div>
     );
   }

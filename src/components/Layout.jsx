@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu } from 'lucide-react';
+import { Menu, Loader2 } from 'lucide-react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useGetMeQuery, useLogoutMutation } from '../slices/apiSlice/authApiSlice';
 import { useGetBusinessesQuery } from '../slices/apiSlice/businessApiSlice';
@@ -16,12 +16,17 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
   });
   const location = useLocation();
   const navigate = useNavigate();
-  const { data: userData, isLoading: isLoadingUser, error: meError } = useGetMeQuery(undefined, {
-    refetchOnMountOrArgChange: false,
-    refetchOnFocus: false,
-    refetchOnReconnect: false,
+  const { data: userData, isLoading: isLoadingUser, error: meError, refetch: refetchUser } = useGetMeQuery(undefined, {
+    refetchOnMountOrArgChange: true,
   });
-  const { data: businesses, isLoading: businessesLoading } = useGetBusinessesQuery();
+  const { data: businesses, isLoading: businessesLoading } = useGetBusinessesQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  // Refetch user data on route change
+  useEffect(() => {
+    refetchUser();
+  }, [location.pathname, refetchUser]);
   const [logout] = useLogoutMutation();
 
   // Extract phone number ID from route if on phone number detail page
@@ -149,7 +154,7 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
   if (!skipSubscriptionCheck && (isLoadingUser || businessesLoading)) {
     return (
       <div className="flex h-screen bg-[#111114] items-center justify-center">
-        <div className="text-white">Loading...</div>
+        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
       </div>
     );
   }

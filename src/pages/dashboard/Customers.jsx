@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Phone, Mail, Calendar } from 'lucide-react';
+import { Search, Phone, Mail, Calendar, Loader2 } from 'lucide-react';
 import DataTable from '../../components/ui/DataTable';
 import Badge from '../../components/ui/Badge';
 import Input from '../../components/ui/Input';
@@ -24,7 +24,9 @@ export default function Customers() {
   const [error, setError] = useState('');
 
   // Fetch business first to get businessId
-  const { data: businessData } = useGetBusinessesQuery();
+  const { data: businessData } = useGetBusinessesQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
   const businessId = businessData?.[0]?.id;
 
   const { data: customersData, isLoading } = useGetCustomersQuery(
@@ -34,7 +36,7 @@ export default function Customers() {
       limit: 10,
       search: searchQuery,
     },
-    { skip: !businessId }
+    { skip: !businessId, refetchOnMountOrArgChange: true }
   );
 
   const [createCustomer, { isLoading: isCreating }] = useCreateCustomerMutation();
@@ -102,10 +104,7 @@ export default function Customers() {
   if (isLoading && page === 1) {
     return (
       <div className="px-8 py-6 flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading customers...</p>
-        </div>
+        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
       </div>
     );
   }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar as CalendarIcon, List, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar as CalendarIcon, List, Plus, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import DataTable from '../../components/ui/DataTable';
 import Badge from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
@@ -26,7 +26,9 @@ export default function Appointments() {
   const [error, setError] = useState('');
 
   // Fetch business first to get businessId
-  const { data: businessData } = useGetBusinessesQuery();
+  const { data: businessData } = useGetBusinessesQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
   const businessId = businessData?.[0]?.id;
 
   // Fetch appointments from API with businessId
@@ -36,7 +38,7 @@ export default function Appointments() {
       page: Number(page),
       limit: 100
     },
-    { skip: !businessId }
+    { skip: !businessId, refetchOnMountOrArgChange: true }
   );
   const [createBooking, { isLoading: isCreating }] = useCreateBookingMutation();
 
@@ -165,10 +167,7 @@ export default function Appointments() {
   if (isLoading) {
     return (
       <div className="px-8 py-6 flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading appointments...</p>
-        </div>
+        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
       </div>
     );
   }

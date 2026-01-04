@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, TrendingUp, Plus } from 'lucide-react';
+import { Phone, TrendingUp, Plus, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../slices/authSlice';
@@ -11,17 +11,19 @@ import Card from '../../components/ui/Card';
 
 export default function Overview() {
   const user = useSelector(selectCurrentUser);
-  const { data: businesses, isLoading: businessesLoading } = useGetBusinessesQuery();
+  const { data: businesses, isLoading: businessesLoading } = useGetBusinessesQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
   const business = businesses?.[0];
   const businessId = business?.id;
 
   const { data: callsData, isLoading: callsLoading } = useGetCallsQuery(
     { businessId, page: 1, limit: 5 },
-    { skip: !businessId }
+    { skip: !businessId, refetchOnMountOrArgChange: true }
   );
   const { data: appointmentsData, isLoading: appointmentsLoading } = useGetAppointmentsQuery(
     { businessId, page: 1, limit: 10 },
-    { skip: !businessId }
+    { skip: !businessId, refetchOnMountOrArgChange: true }
   );
 
   const userName = user?.name || 'User';
@@ -79,10 +81,7 @@ export default function Overview() {
   if (businessesLoading) {
     return (
       <div className="px-8 py-6 flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading...</p>
-        </div>
+        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
       </div>
     );
   }

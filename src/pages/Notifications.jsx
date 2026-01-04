@@ -17,6 +17,8 @@ export default function Notifications() {
     limit,
     offset: (page - 1) * limit,
     unreadOnly: filter === 'unread',
+  }, {
+    refetchOnMountOrArgChange: true,
   });
 
   const [markAsRead] = useMarkAsReadMutation();
@@ -111,9 +113,8 @@ export default function Notifications() {
         {/* Content */}
         <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg overflow-hidden">
           {isLoading ? (
-            <div className="py-16 flex flex-col items-center justify-center">
-              <Loader2 className="w-8 h-8 text-white/40 animate-spin mb-3" />
-              <p className="text-sm text-white/40">Loading notifications...</p>
+            <div className="py-16 flex items-center justify-center">
+              <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
             </div>
           ) : notifications.length > 0 ? (
             <div className="divide-y divide-[#303030]">

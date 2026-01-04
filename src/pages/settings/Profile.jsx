@@ -5,9 +5,7 @@ import toast from 'react-hot-toast';
 
 export default function Profile() {
   const { data: userData, isLoading, error } = useGetMeQuery(undefined, {
-    refetchOnMountOrArgChange: false,
-    refetchOnFocus: false,
-    refetchOnReconnect: false,
+    refetchOnMountOrArgChange: true,
   });
 
   // Normalize user data from API (data.name, data.email, data.businessName)

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Phone, MessageSquare, TestTube, Sparkles, AlertTriangle, Info } from 'lucide-react';
+import { Phone, MessageSquare, TestTube, Sparkles, AlertTriangle, Info, Loader2 } from 'lucide-react';
 import {
   useGetAssistantQuery,
   useUpdateAssistantMutation,
@@ -18,8 +18,12 @@ export default function AIAssistantDetail() {
   const [successMessage, setSuccessMessage] = useState('');
 
   // API hooks
-  const { data: assistantsData, isLoading, isError, error: queryError } = useGetAssistantQuery();
-  const { data: businesses } = useGetBusinessesQuery();
+  const { data: assistantsData, isLoading, isError, error: queryError } = useGetAssistantQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+  const { data: businesses } = useGetBusinessesQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
   const [updateAssistant, { isLoading: isUpdating }] = useUpdateAssistantMutation();
   const [createAssistant, { isLoading: isCreating }] = useCreateAssistantMutation();
 
@@ -85,10 +89,7 @@ export default function AIAssistantDetail() {
   if (isLoading) {
     return (
       <div className="px-8 py-6 flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-400 mx-auto mb-4"></div>
-          <p className="text-zinc-400">Loading assistant...</p>
-        </div>
+        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
       </div>
     );
   }

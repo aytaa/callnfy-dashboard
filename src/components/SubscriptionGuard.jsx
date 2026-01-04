@@ -80,10 +80,7 @@ export default function SubscriptionGuard({ children }) {
   if (isLoadingSubscription || isLoadingUser) {
     return (
       <div className="min-h-screen bg-[#111114] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-8 h-8 text-white/40 animate-spin" />
-          <p className="text-white/40 text-sm">Loading...</p>
-        </div>
+        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
       </div>
     );
   }

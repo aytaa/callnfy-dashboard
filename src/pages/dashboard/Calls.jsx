@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, MoreVertical } from 'lucide-react';
+import { Phone, MoreVertical, Loader2 } from 'lucide-react';
 import { useGetCallsQuery, useGetCallStatsQuery } from '../../slices/apiSlice/callsApiSlice';
 import { useGetBusinessesQuery } from '../../slices/apiSlice/businessApiSlice';
 import DataTable from '../../components/ui/DataTable';
@@ -15,7 +15,9 @@ export default function Calls() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fetch business first to get businessId
-  const { data: businessData } = useGetBusinessesQuery();
+  const { data: businessData } = useGetBusinessesQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
   const businessId = businessData?.[0]?.id;
 
   const { data: callsData, isLoading: callsLoading } = useGetCallsQuery(
@@ -25,11 +27,11 @@ export default function Calls() {
       dateRange: dateFilter,
       status: statusFilter !== 'all' ? statusFilter : undefined
     },
-    { skip: !businessId }
+    { skip: !businessId, refetchOnMountOrArgChange: true }
   );
   const { data: stats, isLoading: statsLoading } = useGetCallStatsQuery(
     { businessId, dateRange: dateFilter },
-    { skip: !businessId }
+    { skip: !businessId, refetchOnMountOrArgChange: true }
   );
 
   const calls = callsData?.calls || [];
@@ -111,10 +113,7 @@ export default function Calls() {
   if (callsLoading && page === 1) {
     return (
       <div className="px-8 py-6 flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading calls...</p>
-        </div>
+        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
       </div>
     );
   }

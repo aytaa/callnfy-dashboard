@@ -2,6 +2,37 @@ import { apiSlice } from '../apiSlice';
 
 export const notificationApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    // Get notification settings (new API)
+    // Response: { success: true, data: { settings: {...} } }
+    getNotificationSettings: builder.query({
+      query: () => '/notifications/settings',
+      transformResponse: (response) => response?.data?.settings || response?.settings || response,
+      providesTags: ['NotificationSettings'],
+    }),
+
+    // Update notification settings (new API)
+    // Response: { success: true, data: { settings: {...}, message: '...' } }
+    updateNotificationSettings: builder.mutation({
+      query: (settings) => ({
+        url: '/notifications/settings',
+        method: 'PUT',
+        body: settings,
+      }),
+      transformResponse: (response) => response?.data?.settings || response?.settings || response,
+      invalidatesTags: ['NotificationSettings'],
+    }),
+
+    // Reset notification settings to defaults
+    // Response: { success: true, data: { settings: {...}, message: '...' } }
+    resetNotificationSettings: builder.mutation({
+      query: () => ({
+        url: '/notifications/settings/reset',
+        method: 'POST',
+      }),
+      transformResponse: (response) => response?.data?.settings || response?.settings || response,
+      invalidatesTags: ['NotificationSettings'],
+    }),
+
     // Get notifications list with pagination
     getNotifications: builder.query({
       query: ({ limit = 20, offset = 0, unreadOnly = false } = {}) => ({
@@ -83,6 +114,9 @@ export const notificationApiSlice = apiSlice.injectEndpoints({
 });
 
 export const {
+  useGetNotificationSettingsQuery,
+  useUpdateNotificationSettingsMutation,
+  useResetNotificationSettingsMutation,
   useGetNotificationsQuery,
   useGetUnreadCountQuery,
   useGetNotificationPreferencesQuery,
