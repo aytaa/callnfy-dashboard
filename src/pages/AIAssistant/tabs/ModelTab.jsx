@@ -45,30 +45,30 @@ export default function ModelTab({ assistant, onUpdate }) {
   return (
     <div className="space-y-4">
       {/* Cost & Latency Display */}
-      <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-3">
+      <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-md p-3">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="text-xs text-zinc-400 mb-1">Estimated Cost</p>
-            <p className="text-sm text-white font-medium">~$0.11/min</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Estimated Cost</p>
+            <p className="text-sm text-gray-900 dark:text-white font-medium">~$0.11/min</p>
           </div>
           <div>
-            <p className="text-xs text-zinc-400 mb-1">Latency</p>
-            <p className="text-sm text-white font-medium">~1200ms</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Latency</p>
+            <p className="text-sm text-gray-900 dark:text-white font-medium">~1200ms</p>
           </div>
         </div>
       </div>
 
       {/* Provider & Model */}
-      <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-3">
-        <h3 className="text-sm font-semibold text-white mb-3">Model Configuration</h3>
+      <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-md p-3">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Model Configuration</h3>
         <div className="space-y-3">
           <div>
-            <label className="block text-xs text-zinc-400 mb-1.5">Provider</label>
+            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Provider</label>
             <select
               value={formData.provider}
               onChange={(e) => handleChange('provider', e.target.value)}
               onBlur={handleBlur}
-              className="w-full bg-[#111114] border border-zinc-700 rounded-md px-3 py-2 text-sm text-white focus:border-zinc-600 focus:outline-none"
+              className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
             >
               <option value="openai">OpenAI</option>
               <option value="anthropic">Anthropic</option>
@@ -78,12 +78,12 @@ export default function ModelTab({ assistant, onUpdate }) {
             </select>
           </div>
           <div>
-            <label className="block text-xs text-zinc-400 mb-1.5">Model</label>
+            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Model</label>
             <select
               value={formData.model}
               onChange={(e) => handleChange('model', e.target.value)}
               onBlur={handleBlur}
-              className="w-full bg-[#111114] border border-zinc-700 rounded-md px-3 py-2 text-sm text-white focus:border-zinc-600 focus:outline-none"
+              className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
             >
               {formData.provider === 'openai' && (
                 <>
@@ -125,16 +125,16 @@ export default function ModelTab({ assistant, onUpdate }) {
       </div>
 
       {/* First Message */}
-      <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-3">
-        <h3 className="text-sm font-semibold text-white mb-3">First Message</h3>
+      <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-md p-3">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">First Message</h3>
         <div className="space-y-3">
           <div>
-            <label className="block text-xs text-zinc-400 mb-1.5">Mode</label>
+            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Mode</label>
             <select
               value={formData.firstMessageMode}
               onChange={(e) => handleChange('firstMessageMode', e.target.value)}
               onBlur={handleBlur}
-              className="w-full bg-[#111114] border border-zinc-700 rounded-md px-3 py-2 text-sm text-white focus:border-zinc-600 focus:outline-none"
+              className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
             >
               <option value="assistant-speaks-first">Assistant speaks first</option>
               <option value="assistant-waits">Assistant waits for user</option>
@@ -144,26 +144,26 @@ export default function ModelTab({ assistant, onUpdate }) {
             </select>
           </div>
           <div>
-            <label className="block text-xs text-zinc-400 mb-1.5">Message</label>
+            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Message</label>
             <textarea
               value={formData.firstMessage}
               onChange={(e) => handleChange('firstMessage', e.target.value)}
               onBlur={handleBlur}
               rows={2}
               placeholder="Hello! Thanks for calling. How can I help you today?"
-              className="w-full bg-[#111114] border border-zinc-700 rounded-md px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-zinc-600 focus:outline-none resize-none"
+              className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none resize-none"
             />
           </div>
         </div>
       </div>
 
       {/* System Prompt */}
-      <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-3">
+      <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-md p-3">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-white">System Prompt</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">System Prompt</h3>
           <button
             onClick={handleGeneratePrompt}
-            className="flex items-center gap-1.5 bg-white text-black text-xs font-medium px-3 py-1.5 rounded-md hover:bg-zinc-200 transition-colors"
+            className="flex items-center gap-1.5 bg-gray-900 dark:bg-white text-white dark:text-black text-xs font-medium px-3 py-1.5 rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
           >
             <Sparkles className="w-3.5 h-3.5" />
             Generate
@@ -175,16 +175,16 @@ export default function ModelTab({ assistant, onUpdate }) {
           onBlur={handleBlur}
           rows={6}
           placeholder="You are a helpful AI assistant. Your role is to..."
-          className="w-full bg-[#111114] border border-zinc-700 rounded-md px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-zinc-600 focus:outline-none resize-none"
+          className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none resize-none"
         />
       </div>
 
       {/* Advanced Settings */}
-      <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-3">
-        <h3 className="text-sm font-semibold text-white mb-3">Advanced Settings</h3>
+      <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-md p-3">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Advanced Settings</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-xs text-zinc-400 mb-1.5">Max Tokens</label>
+            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Max Tokens</label>
             <input
               type="number"
               value={formData.maxTokens}
@@ -192,13 +192,13 @@ export default function ModelTab({ assistant, onUpdate }) {
               onBlur={handleBlur}
               min="100"
               max="4000"
-              className="w-full bg-[#111114] border border-zinc-700 rounded-md px-3 py-2 text-sm text-white focus:border-zinc-600 focus:outline-none"
+              className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
             />
           </div>
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs text-zinc-400">Temperature</label>
-              <span className="text-xs text-zinc-400">{formData.temperature}</span>
+              <label className="block text-xs text-gray-500 dark:text-gray-400">Temperature</label>
+              <span className="text-xs text-gray-500 dark:text-gray-400">{formData.temperature}</span>
             </div>
             <input
               type="range"
@@ -209,9 +209,9 @@ export default function ModelTab({ assistant, onUpdate }) {
               onChange={(e) => handleChange('temperature', parseFloat(e.target.value))}
               onMouseUp={handleBlur}
               onTouchEnd={handleBlur}
-              className="w-full h-1.5 bg-zinc-700 rounded-md appearance-none cursor-pointer slider"
+              className="w-full h-1.5 bg-gray-200 dark:bg-zinc-700 rounded-md appearance-none cursor-pointer slider"
               style={{
-                background: `linear-gradient(to right, #71717a 0%, #71717a ${formData.temperature * 100}%, #3f3f46 ${formData.temperature * 100}%, #3f3f46 100%)`
+                background: `linear-gradient(to right, #6b7280 0%, #6b7280 ${formData.temperature * 100}%, #d1d5db ${formData.temperature * 100}%, #d1d5db 100%)`
               }}
             />
           </div>

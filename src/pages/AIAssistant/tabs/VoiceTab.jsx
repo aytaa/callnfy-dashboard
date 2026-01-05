@@ -84,10 +84,10 @@ export default function VoiceTab({ assistant, onUpdate }) {
   return (
     <div className="space-y-4">
       {/* Voice Provider */}
-      <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-3">
-        <h3 className="text-sm font-semibold text-white mb-3">Voice Provider</h3>
+      <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-md p-3">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Voice Provider</h3>
         <div>
-          <label className="block text-xs text-zinc-400 mb-1.5">Provider</label>
+          <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Provider</label>
           <select
             value={formData.provider}
             onChange={(e) => {
@@ -95,7 +95,7 @@ export default function VoiceTab({ assistant, onUpdate }) {
               handleChange('voiceId', ''); // Reset voice when provider changes
             }}
             onBlur={handleBlur}
-            className="w-full bg-[#111114] border border-zinc-700 rounded-md px-3 py-2 text-sm text-white focus:border-zinc-600 focus:outline-none"
+            className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
           >
             <option value="elevenlabs">ElevenLabs</option>
             <option value="playht">PlayHT</option>
@@ -110,16 +110,16 @@ export default function VoiceTab({ assistant, onUpdate }) {
       </div>
 
       {/* Voice Selection */}
-      <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-3">
-        <h3 className="text-sm font-semibold text-white mb-3">Voice Selection</h3>
+      <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-md p-3">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Voice Selection</h3>
         <div>
-          <label className="block text-xs text-zinc-400 mb-1.5">Voice</label>
+          <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Voice</label>
           {getVoiceOptions().length > 0 ? (
             <select
               value={formData.voiceId}
               onChange={(e) => handleChange('voiceId', e.target.value)}
               onBlur={handleBlur}
-              className="w-full bg-[#111114] border border-zinc-700 rounded-md px-3 py-2 text-sm text-white focus:border-zinc-600 focus:outline-none"
+              className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
             >
               <option value="">Select a voice</option>
               {getVoiceOptions().map((voice) => (
@@ -135,21 +135,21 @@ export default function VoiceTab({ assistant, onUpdate }) {
               onChange={(e) => handleChange('voiceId', e.target.value)}
               onBlur={handleBlur}
               placeholder="Enter voice ID"
-              className="w-full bg-[#111114] border border-zinc-700 rounded-md px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-zinc-600 focus:outline-none"
+              className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
             />
           )}
         </div>
       </div>
 
       {/* Voice Settings */}
-      <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-3">
-        <h3 className="text-sm font-semibold text-white mb-3">Voice Settings</h3>
+      <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-md p-3">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Voice Settings</h3>
         <div className="space-y-4">
           {/* Speed Slider */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs text-zinc-400">Speed</label>
-              <span className="text-xs text-zinc-400">{formData.speed.toFixed(1)}x</span>
+              <label className="block text-xs text-gray-500 dark:text-gray-400">Speed</label>
+              <span className="text-xs text-gray-500 dark:text-gray-400">{formData.speed.toFixed(1)}x</span>
             </div>
             <input
               type="range"
@@ -160,22 +160,22 @@ export default function VoiceTab({ assistant, onUpdate }) {
               onChange={(e) => handleChange('speed', parseFloat(e.target.value))}
               onMouseUp={handleBlur}
               onTouchEnd={handleBlur}
-              className="w-full h-1.5 bg-zinc-700 rounded-md appearance-none cursor-pointer"
+              className="w-full h-1.5 bg-gray-200 dark:bg-zinc-700 rounded-md appearance-none cursor-pointer"
               style={{
-                background: `linear-gradient(to right, #71717a 0%, #71717a ${((formData.speed - 0.5) / 1.5) * 100}%, #3f3f46 ${((formData.speed - 0.5) / 1.5) * 100}%, #3f3f46 100%)`
+                background: `linear-gradient(to right, #6b7280 0%, #6b7280 ${((formData.speed - 0.5) / 1.5) * 100}%, #d1d5db ${((formData.speed - 0.5) / 1.5) * 100}%, #d1d5db 100%)`
               }}
             />
             <div className="flex justify-between mt-1">
-              <span className="text-xs text-zinc-500">0.5x</span>
-              <span className="text-xs text-zinc-500">2.0x</span>
+              <span className="text-xs text-gray-400 dark:text-zinc-500">0.5x</span>
+              <span className="text-xs text-gray-400 dark:text-zinc-500">2.0x</span>
             </div>
           </div>
 
           {/* Pitch Slider */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs text-zinc-400">Pitch</label>
-              <span className="text-xs text-zinc-400">{formData.pitch.toFixed(1)}x</span>
+              <label className="block text-xs text-gray-500 dark:text-gray-400">Pitch</label>
+              <span className="text-xs text-gray-500 dark:text-gray-400">{formData.pitch.toFixed(1)}x</span>
             </div>
             <input
               type="range"
@@ -186,14 +186,14 @@ export default function VoiceTab({ assistant, onUpdate }) {
               onChange={(e) => handleChange('pitch', parseFloat(e.target.value))}
               onMouseUp={handleBlur}
               onTouchEnd={handleBlur}
-              className="w-full h-1.5 bg-zinc-700 rounded-md appearance-none cursor-pointer"
+              className="w-full h-1.5 bg-gray-200 dark:bg-zinc-700 rounded-md appearance-none cursor-pointer"
               style={{
-                background: `linear-gradient(to right, #71717a 0%, #71717a ${((formData.pitch - 0.5) / 1.5) * 100}%, #3f3f46 ${((formData.pitch - 0.5) / 1.5) * 100}%, #3f3f46 100%)`
+                background: `linear-gradient(to right, #6b7280 0%, #6b7280 ${((formData.pitch - 0.5) / 1.5) * 100}%, #d1d5db ${((formData.pitch - 0.5) / 1.5) * 100}%, #d1d5db 100%)`
               }}
             />
             <div className="flex justify-between mt-1">
-              <span className="text-xs text-zinc-500">0.5x</span>
-              <span className="text-xs text-zinc-500">2.0x</span>
+              <span className="text-xs text-gray-400 dark:text-zinc-500">0.5x</span>
+              <span className="text-xs text-gray-400 dark:text-zinc-500">2.0x</span>
             </div>
           </div>
         </div>

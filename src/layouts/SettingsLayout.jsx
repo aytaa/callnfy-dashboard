@@ -22,12 +22,12 @@ export default function SettingsLayout() {
   ];
 
   return (
-    <div className="flex h-screen bg-[#111114]">
+    <div className="flex h-screen bg-gray-50 dark:bg-[#111114]">
       {/* Settings Sidebar */}
-      <div className="w-64 border-r border-[#303030] p-4 flex-shrink-0">
+      <div className="w-64 bg-white dark:bg-[#111114] border-r border-gray-200 dark:border-[#303030] p-4 flex-shrink-0">
         {navItems.map((group, i) => (
           <div key={i} className="mb-6">
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2 px-2">
+            <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 px-2">
               {group.section}
             </p>
             {group.items.map((item, j) => (
@@ -37,8 +37,8 @@ export default function SettingsLayout() {
                 className={({ isActive }) =>
                   `flex items-center gap-2 px-2 py-2 rounded-lg text-sm transition-colors ${
                     isActive
-                      ? 'bg-[#1a1a1d] text-white'
-                      : 'text-gray-400 hover:bg-[#1a1a1d] hover:text-white'
+                      ? 'bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white'
+                      : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white'
                   }`
                 }
               >

@@ -86,10 +86,10 @@ export default function NotificationBell() {
       {/* Bell Icon Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[#262626] transition-colors"
+        className="relative w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-[#262626] transition-colors"
         title="Notifications"
       >
-        <Bell className="w-5 h-5 text-white/60" />
+        <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" />
         {unreadCount > 0 && (
           <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-semibold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -99,18 +99,18 @@ export default function NotificationBell() {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-[#1a1a1d] border border-[#303030] rounded-lg shadow-lg z-50 overflow-hidden">
+        <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg shadow-lg z-50 overflow-hidden">
           {/* Header */}
-          <div className="px-4 py-3 border-b border-[#303030]">
-            <h3 className="font-medium text-white">Notifications</h3>
+          <div className="px-4 py-3 border-b border-gray-200 dark:border-[#303030]">
+            <h3 className="font-medium text-gray-900 dark:text-white">Notifications</h3>
           </div>
 
           {/* Notification List */}
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
               <div className="px-4 py-8 text-center">
-                <Bell className="w-8 h-8 mx-auto mb-2 text-white/20" />
-                <p className="text-sm text-white/40">No notifications</p>
+                <Bell className="w-8 h-8 mx-auto mb-2 text-gray-300 dark:text-white/20" />
+                <p className="text-sm text-gray-400 dark:text-white/40">No notifications</p>
               </div>
             ) : (
               notifications.map((notification) => {
@@ -120,18 +120,18 @@ export default function NotificationBell() {
                   <button
                     key={notification.id}
                     onClick={() => handleNotificationClick(notification)}
-                    className={`w-full flex items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-white/5 border-b border-[#303030] last:border-b-0 ${
-                      isUnread ? 'bg-blue-500/5' : ''
+                    className={`w-full flex items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50 dark:hover:bg-white/5 border-b border-gray-200 dark:border-[#303030] last:border-b-0 ${
+                      isUnread ? 'bg-blue-50 dark:bg-blue-500/10' : ''
                     }`}
                   >
-                    <div className="w-8 h-8 rounded-full bg-[#262626] flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Icon className="w-4 h-4 text-white/60" />
+                    <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#262626] flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Icon className="w-4 h-4 text-gray-500 dark:text-white/60" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm line-clamp-2 ${isUnread ? 'text-white font-medium' : 'text-white/70'}`}>
+                      <p className={`text-sm line-clamp-2 ${isUnread ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-600 dark:text-white/70'}`}>
                         {notification.message || notification.title}
                       </p>
-                      <p className="text-xs text-white/40 mt-1">
+                      <p className="text-xs text-gray-400 dark:text-white/40 mt-1">
                         {formatTimeAgo(notification.createdAt)}
                       </p>
                     </div>
@@ -145,11 +145,11 @@ export default function NotificationBell() {
           </div>
 
           {/* Footer - View All Link */}
-          <div className="border-t border-[#303030]">
+          <div className="border-t border-gray-200 dark:border-[#303030]">
             <Link
               to="/notifications"
               onClick={() => setIsOpen(false)}
-              className="block px-4 py-3 text-center text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+              className="block px-4 py-3 text-center text-sm text-gray-500 dark:text-white/60 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
             >
               View all notifications
             </Link>
