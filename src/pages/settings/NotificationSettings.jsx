@@ -16,11 +16,11 @@ function Toggle({ checked, onChange, disabled = false }) {
       disabled={disabled}
       className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
         disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-      } ${checked ? 'bg-white' : 'bg-[#303030]'}`}
+      } ${checked ? 'bg-gray-900 dark:bg-white' : 'bg-gray-200 dark:bg-[#303030]'}`}
     >
       <span
         className={`inline-block h-3.5 w-3.5 transform rounded-full transition-transform ${
-          checked ? 'translate-x-[18px] bg-black' : 'translate-x-1 bg-white/60'
+          checked ? 'translate-x-[18px] bg-white dark:bg-black' : 'translate-x-1 bg-gray-400 dark:bg-white/60'
         }`}
       />
     </button>
@@ -280,31 +280,31 @@ export default function NotificationSettings() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+        <Loader2 className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-zinc-500/10 border border-zinc-500/20 rounded-lg p-3">
-        <p className="text-zinc-400 text-sm">Failed to load notification settings</p>
+      <div className="bg-red-50 dark:bg-zinc-500/10 border border-red-200 dark:border-zinc-500/20 rounded-lg p-3">
+        <p className="text-red-600 dark:text-zinc-400 text-sm">Failed to load notification settings</p>
       </div>
     );
   }
 
   return (
     <div>
-      <h1 className="text-lg font-semibold text-white mb-1">Notifications</h1>
-      <p className="text-sm text-gray-400 mb-4">
+      <h1 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Notifications</h1>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
         Manage how and when you receive notifications
       </p>
 
       {/* Notification Types */}
-      <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-3 mb-3">
-        <div className="flex items-center gap-2 mb-3 pb-3 border-b border-[#303030]">
-          <Bell className="w-4 h-4 text-white/60" />
-          <h2 className="text-sm font-medium text-white">Notification Types</h2>
+      <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-3 mb-3">
+        <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-200 dark:border-[#303030]">
+          <Bell className="w-4 h-4 text-gray-400 dark:text-white/60" />
+          <h2 className="text-sm font-medium text-gray-900 dark:text-white">Notification Types</h2>
         </div>
 
         {/* Table Header */}
@@ -325,10 +325,10 @@ export default function NotificationSettings() {
                 {category.types.map((type) => (
                   <div
                     key={type.key}
-                    className="flex items-center justify-between py-2 px-1 hover:bg-white/5 rounded transition-colors"
+                    className="flex items-center justify-between py-2 px-1 hover:bg-gray-50 dark:hover:bg-white/5 rounded transition-colors"
                   >
                     <div>
-                      <p className="text-sm text-white">{type.label}</p>
+                      <p className="text-sm text-gray-900 dark:text-white">{type.label}</p>
                       <p className="text-xs text-gray-500">{type.description}</p>
                     </div>
                     <div className="flex items-center gap-6">
@@ -354,17 +354,17 @@ export default function NotificationSettings() {
       </div>
 
       {/* Quiet Hours */}
-      <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-3 mb-3">
-        <div className="flex items-center gap-2 mb-3 pb-3 border-b border-[#303030]">
-          <Clock className="w-4 h-4 text-white/60" />
-          <h2 className="text-sm font-medium text-white">Quiet Hours</h2>
+      <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-3 mb-3">
+        <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-200 dark:border-[#303030]">
+          <Clock className="w-4 h-4 text-gray-400 dark:text-white/60" />
+          <h2 className="text-sm font-medium text-gray-900 dark:text-white">Quiet Hours</h2>
         </div>
 
         <div className="space-y-3">
           {/* Enable Quiet Hours */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-white">Enable Quiet Hours</p>
+              <p className="text-sm text-gray-900 dark:text-white">Enable Quiet Hours</p>
               <p className="text-xs text-gray-500">Pause non-critical notifications during set hours</p>
             </div>
             <Toggle
@@ -375,7 +375,7 @@ export default function NotificationSettings() {
 
           {/* Quiet Hours Settings */}
           {settings.quietHours.enabled && (
-            <div className="pt-3 border-t border-[#303030] space-y-3">
+            <div className="pt-3 border-t border-gray-200 dark:border-[#303030] space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 {/* Start Time */}
                 <div>
@@ -384,7 +384,7 @@ export default function NotificationSettings() {
                     type="time"
                     value={settings.quietHours.start}
                     onChange={(e) => handleQuietHoursChange('start', e.target.value)}
-                    className="w-full bg-[#111114] border border-[#303030] rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-white/40"
+                    className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-gray-300 dark:focus:border-white/40"
                   />
                 </div>
 
@@ -395,7 +395,7 @@ export default function NotificationSettings() {
                     type="time"
                     value={settings.quietHours.end}
                     onChange={(e) => handleQuietHoursChange('end', e.target.value)}
-                    className="w-full bg-[#111114] border border-[#303030] rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-white/40"
+                    className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-gray-300 dark:focus:border-white/40"
                   />
                 </div>
               </div>
@@ -406,7 +406,7 @@ export default function NotificationSettings() {
                 <select
                   value={settings.timezone}
                   onChange={(e) => handleTimezoneChange(e.target.value)}
-                  className="w-full bg-[#111114] border border-[#303030] rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-white/40"
+                  className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-gray-300 dark:focus:border-white/40"
                 >
                   {TIMEZONES.map((tz) => (
                     <option key={tz} value={tz}>
@@ -426,17 +426,17 @@ export default function NotificationSettings() {
       </div>
 
       {/* Email Digest */}
-      <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-3 mb-3">
-        <div className="flex items-center gap-2 mb-3 pb-3 border-b border-[#303030]">
-          <Mail className="w-4 h-4 text-white/60" />
-          <h2 className="text-sm font-medium text-white">Email Digest</h2>
+      <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-3 mb-3">
+        <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-200 dark:border-[#303030]">
+          <Mail className="w-4 h-4 text-gray-400 dark:text-white/60" />
+          <h2 className="text-sm font-medium text-gray-900 dark:text-white">Email Digest</h2>
         </div>
 
         <div className="space-y-3">
           {/* Enable Email Digest */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-white">Enable Email Digest</p>
+              <p className="text-sm text-gray-900 dark:text-white">Enable Email Digest</p>
               <p className="text-xs text-gray-500">Receive a summary of notifications via email</p>
             </div>
             <Toggle
@@ -447,7 +447,7 @@ export default function NotificationSettings() {
 
           {/* Frequency */}
           {settings.emailDigest.enabled && (
-            <div className="pt-3 border-t border-[#303030]">
+            <div className="pt-3 border-t border-gray-200 dark:border-[#303030]">
               <label className="block text-xs text-gray-500 mb-2">Frequency</label>
               <div className="flex gap-3">
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -457,9 +457,9 @@ export default function NotificationSettings() {
                     value="daily"
                     checked={settings.emailDigest.frequency === 'daily'}
                     onChange={(e) => handleEmailDigestFrequencyChange(e.target.value)}
-                    className="w-4 h-4 text-white bg-[#111114] border-[#303030] focus:ring-0 focus:ring-offset-0"
+                    className="w-4 h-4 text-gray-900 dark:text-white bg-white dark:bg-[#111114] border-gray-200 dark:border-[#303030] focus:ring-0 focus:ring-offset-0"
                   />
-                  <span className="text-sm text-white">Daily</span>
+                  <span className="text-sm text-gray-900 dark:text-white">Daily</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -468,9 +468,9 @@ export default function NotificationSettings() {
                     value="weekly"
                     checked={settings.emailDigest.frequency === 'weekly'}
                     onChange={(e) => handleEmailDigestFrequencyChange(e.target.value)}
-                    className="w-4 h-4 text-white bg-[#111114] border-[#303030] focus:ring-0 focus:ring-offset-0"
+                    className="w-4 h-4 text-gray-900 dark:text-white bg-white dark:bg-[#111114] border-gray-200 dark:border-[#303030] focus:ring-0 focus:ring-offset-0"
                   />
-                  <span className="text-sm text-white">Weekly</span>
+                  <span className="text-sm text-gray-900 dark:text-white">Weekly</span>
                 </label>
               </div>
             </div>
@@ -483,7 +483,7 @@ export default function NotificationSettings() {
         <button
           onClick={handleReset}
           disabled={isResetting || isSaving}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-400 hover:text-white border border-[#303030] rounded-md hover:border-white/40 transition-colors disabled:opacity-50"
+          className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-[#303030] rounded-md hover:border-gray-300 dark:hover:border-white/40 transition-colors disabled:opacity-50"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           {isResetting ? 'Resetting...' : 'Reset to Defaults'}
@@ -495,7 +495,7 @@ export default function NotificationSettings() {
           className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors disabled:opacity-50 flex items-center gap-2 ${
             hasChanges
               ? 'bg-orange-500 text-white hover:bg-orange-600'
-              : 'bg-white text-black hover:bg-gray-200'
+              : 'bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200'
           }`}
         >
           {isSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}

@@ -7,7 +7,6 @@ import { useGetBusinessesQuery } from '../../slices/apiSlice/businessApiSlice';
 import { useGetCallsQuery } from '../../slices/apiSlice/callsApiSlice';
 import { useGetAppointmentsQuery } from '../../slices/apiSlice/appointmentsApiSlice';
 import DataTable from '../../components/ui/DataTable';
-import Card from '../../components/ui/Card';
 
 export default function Overview() {
   const user = useSelector(selectCurrentUser);
@@ -63,7 +62,7 @@ export default function Overview() {
       header: 'Status',
       accessor: 'status',
       render: (row) => (
-        <span className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded capitalize">
+        <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#262626] text-gray-900 dark:text-white text-xs font-medium rounded capitalize">
           {row.status}
         </span>
       ),
@@ -80,25 +79,25 @@ export default function Overview() {
 
   if (businessesLoading) {
     return (
-      <div className="px-8 py-6 flex items-center justify-center min-h-screen">
-        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+      <div className="px-8 py-6 flex items-center justify-center min-h-screen bg-gray-50 dark:bg-transparent">
+        <Loader2 className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin" />
       </div>
     );
   }
 
   if (!business) {
     return (
-      <div className="px-8 py-6">
+      <div className="px-8 py-6 bg-gray-50 dark:bg-transparent min-h-screen">
         <div className="max-w-2xl mx-auto text-center py-12">
-          <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-8">
-            <Phone className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-white mb-2">Welcome to Callnfy!</h2>
-            <p className="text-gray-400 mb-6 text-sm">
+          <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-8">
+            <Phone className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Welcome to Callnfy!</h2>
+            <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm">
               Create your business to start receiving calls and managing appointments.
             </p>
             <Link
               to="/settings?tab=business"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white text-black rounded-md text-sm font-medium hover:bg-gray-200 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-black rounded-md text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
             >
               <Plus className="w-4 h-4" />
               Create Business
@@ -110,19 +109,19 @@ export default function Overview() {
   }
 
   return (
-    <div className="px-8 py-6">
+    <div className="px-8 py-6 bg-gray-50 dark:bg-transparent min-h-screen">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Welcome Section */}
         <div>
-          <p className="text-gray-400 text-sm">Welcome back, {userName}! Here's your {business.name} dashboard.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Welcome back, {userName}! Here's your {business.name} dashboard.</p>
         </div>
 
         {/* Metrics Section */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white">Metrics</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Metrics</h2>
             <div className="flex gap-2">
-              <button className="px-3 py-1.5 text-sm border border-[#303030] rounded-lg text-gray-400 hover:border-[#3a3a3a] hover:text-gray-300 transition-colors">
+              <button className="px-3 py-1.5 text-sm border border-gray-200 dark:border-[#303030] rounded-lg text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-[#3a3a3a] hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
                 Last Month
               </button>
             </div>
@@ -131,30 +130,30 @@ export default function Overview() {
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Card 1: Today's Calls */}
-            <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-4">
+            <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-4">
               <p className="text-xs text-gray-500 mb-2">Today's Calls</p>
-              <p className="text-2xl font-bold text-white mb-1">{todaysCalls}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{todaysCalls}</p>
               <p className="text-xs text-gray-500">Total calls received today</p>
             </div>
 
             {/* Card 2: Minutes Used */}
-            <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-4">
+            <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-4">
               <p className="text-xs text-gray-500 mb-2">Minutes Used</p>
-              <p className="text-2xl font-bold text-white mb-1">{minutesFormatted}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{minutesFormatted}</p>
               <p className="text-xs text-gray-500">Total call duration</p>
             </div>
 
             {/* Card 3: Today's Appointments */}
-            <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-4">
+            <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-4">
               <p className="text-xs text-gray-500 mb-2">Today's Appointments</p>
-              <p className="text-2xl font-bold text-white mb-1">{todaysAppointments}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{todaysAppointments}</p>
               <p className="text-xs text-gray-500">Scheduled for today</p>
             </div>
 
             {/* Card 4: Total Calls */}
-            <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-4">
+            <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-4">
               <p className="text-xs text-gray-500 mb-2">Total Calls</p>
-              <p className="text-2xl font-bold text-white mb-1">{calls.length}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{calls.length}</p>
               <p className="text-xs text-gray-500">All time</p>
             </div>
           </div>
@@ -163,27 +162,27 @@ export default function Overview() {
         {/* Recent Calls Table */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white">Recent Calls</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Calls</h2>
             <Link
               to="/calls"
-              className="text-xs text-gray-400 hover:text-white transition-colors"
+              className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               View All
             </Link>
           </div>
           {callsLoading ? (
-            <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-8 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+            <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-8 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white mx-auto"></div>
             </div>
           ) : calls.length > 0 ? (
             <DataTable columns={callsColumns} data={calls} />
           ) : (
-            <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-8">
+            <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-8">
               <div className="flex flex-col items-center justify-center">
-                <div className="w-12 h-12 rounded-full bg-[#111114] flex items-center justify-center mb-3">
-                  <Phone className="w-6 h-6 text-gray-500" strokeWidth={1.5} />
+                <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-[#111114] flex items-center justify-center mb-3">
+                  <Phone className="w-6 h-6 text-gray-400 dark:text-gray-500" strokeWidth={1.5} />
                 </div>
-                <p className="text-white font-medium text-sm mb-1">No calls yet</p>
+                <p className="text-gray-900 dark:text-white font-medium text-sm mb-1">No calls yet</p>
                 <p className="text-xs text-gray-500">Your recent calls will appear here</p>
               </div>
             </div>
@@ -193,55 +192,55 @@ export default function Overview() {
         {/* Upcoming Appointments */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white">Upcoming Appointments</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Upcoming Appointments</h2>
             <Link
               to="/appointments"
-              className="text-xs text-gray-400 hover:text-white transition-colors"
+              className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               View All
             </Link>
           </div>
           {appointmentsLoading ? (
-            <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-8 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+            <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-8 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white mx-auto"></div>
             </div>
           ) : appointments.length > 0 ? (
             <div className="grid gap-3">
               {appointments.slice(0, 3).map((appointment) => (
-                <Card key={appointment.id}>
+                <div key={appointment.id} className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-sm font-medium text-white">
+                        <h3 className="text-sm font-medium text-gray-900 dark:text-white">
                           {appointment.customerName || 'Unknown'}
                         </h3>
-                        <span className="inline-block px-2 py-0.5 bg-[#111114] text-white text-xs font-medium rounded capitalize">
+                        <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#111114] text-gray-900 dark:text-white text-xs font-medium rounded capitalize">
                           {appointment.status}
                         </span>
                       </div>
-                      <p className="text-white/60 text-xs">{appointment.service}</p>
+                      <p className="text-gray-500 dark:text-white/60 text-xs">{appointment.service}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-white text-sm">
+                      <p className="text-gray-900 dark:text-white text-sm">
                         {new Date(appointment.date).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
                           year: 'numeric'
                         })}
                       </p>
-                      <p className="text-white/60 text-xs">{appointment.time}</p>
+                      <p className="text-gray-500 dark:text-white/60 text-xs">{appointment.time}</p>
                     </div>
                   </div>
-                </Card>
+                </div>
               ))}
             </div>
           ) : (
-            <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-8">
+            <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-8">
               <div className="flex flex-col items-center justify-center">
-                <div className="w-12 h-12 rounded-full bg-[#111114] flex items-center justify-center mb-3">
-                  <TrendingUp className="w-6 h-6 text-gray-500" strokeWidth={1.5} />
+                <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-[#111114] flex items-center justify-center mb-3">
+                  <TrendingUp className="w-6 h-6 text-gray-400 dark:text-gray-500" strokeWidth={1.5} />
                 </div>
-                <p className="text-white font-medium text-sm mb-1">No appointments scheduled</p>
+                <p className="text-gray-900 dark:text-white font-medium text-sm mb-1">No appointments scheduled</p>
                 <p className="text-xs text-gray-500">Upcoming appointments will appear here</p>
               </div>
             </div>

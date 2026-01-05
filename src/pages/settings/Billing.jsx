@@ -71,8 +71,8 @@ export default function Billing() {
   const getStatusBadge = (status) => {
     const isPositive = status === 'active' || status === 'paid' || status === 'trialing';
     const style = isPositive
-      ? 'bg-white/10 text-white border-white/20'
-      : 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20';
+      ? 'bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white border-gray-200 dark:border-white/20'
+      : 'bg-gray-100 dark:bg-zinc-500/10 text-gray-500 dark:text-zinc-400 border-gray-200 dark:border-zinc-500/20';
 
     const labels = {
       active: 'Active',
@@ -96,15 +96,15 @@ export default function Billing() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+        <Loader2 className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin" />
       </div>
     );
   }
 
   if (subscriptionError) {
     return (
-      <div className="bg-zinc-500/10 border border-zinc-500/20 rounded-lg p-3">
-        <div className="flex items-center gap-2 text-zinc-400">
+      <div className="bg-red-50 dark:bg-zinc-500/10 border border-red-200 dark:border-zinc-500/20 rounded-lg p-3">
+        <div className="flex items-center gap-2 text-red-600 dark:text-zinc-400">
           <AlertCircle className="w-4 h-4" />
           <span className="text-sm">Failed to load billing information</span>
         </div>
@@ -133,25 +133,25 @@ export default function Billing() {
 
   return (
     <div>
-      <h1 className="text-lg font-semibold text-white mb-1">Billing</h1>
-      <p className="text-sm text-gray-400 mb-4">Manage your subscription and billing details</p>
+      <h1 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Billing</h1>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Manage your subscription and billing details</p>
 
       {/* Trial Banner - Monochrome */}
       {plan.status === 'trialing' && plan.trialEnd && (
-        <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-3 mb-3">
+        <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-3 mb-3">
           <div className="flex items-center gap-3">
-            <div className="bg-[#111114] p-2 rounded-lg">
-              <Clock className="w-4 h-4 text-white" strokeWidth={1.5} />
+            <div className="bg-gray-100 dark:bg-[#111114] p-2 rounded-lg">
+              <Clock className="w-4 h-4 text-gray-900 dark:text-white" strokeWidth={1.5} />
             </div>
             <div className="flex-1">
-              <p className="text-white text-sm font-medium">
+              <p className="text-gray-900 dark:text-white text-sm font-medium">
                 Free trial · {getDaysRemaining(plan.trialEnd)} days left
               </p>
-              <p className="text-gray-400 text-xs">
+              <p className="text-gray-500 dark:text-gray-400 text-xs">
                 You won't be charged until {formatDate(plan.trialEnd)}
               </p>
             </div>
-            <span className="px-2 py-0.5 text-xs font-medium rounded border bg-white/10 text-white border-white/20">
+            <span className="px-2 py-0.5 text-xs font-medium rounded border bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white border-gray-200 dark:border-white/20">
               Trial
             </span>
           </div>
@@ -159,13 +159,13 @@ export default function Billing() {
       )}
 
       {/* Current Plan */}
-      <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-3 mb-3">
+      <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-3 mb-3">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-white">Current Plan</h2>
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Current Plan</h2>
           <button
             onClick={handleManageBilling}
             disabled={isLoadingPortal}
-            className="bg-white text-black px-3 py-1 text-xs font-medium rounded-md hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+            className="bg-gray-900 dark:bg-white text-white dark:text-black px-3 py-1 text-xs font-medium rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
           >
             {isLoadingPortal && <Loader2 className="w-3 h-3 animate-spin" />}
             Manage Plan
@@ -173,9 +173,9 @@ export default function Billing() {
         </div>
 
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-lg font-bold text-white">{plan.name || 'No Plan'}</span>
+          <span className="text-lg font-bold text-gray-900 dark:text-white">{plan.name || 'No Plan'}</span>
           {plan.price !== undefined && (
-            <span className="text-sm text-gray-400">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
               ${plan.price}/{plan.interval === 'year' ? 'yr' : 'mo'}
             </span>
           )}
@@ -184,8 +184,8 @@ export default function Billing() {
 
         {/* Cancellation Notice */}
         {plan.cancelAtPeriodEnd && (
-          <div className="bg-[#111114] rounded-md p-2 mb-3">
-            <div className="flex items-center gap-2 text-gray-400 text-xs">
+          <div className="bg-gray-50 dark:bg-[#111114] rounded-md p-2 mb-3">
+            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-xs">
               <AlertCircle className="w-3.5 h-3.5" />
               <span>Ends on {formatDate(plan.currentPeriodEnd)}</span>
             </div>
@@ -193,18 +193,18 @@ export default function Billing() {
         )}
 
         {plan.currentPeriodEnd && (
-          <div className="pt-2 border-t border-[#303030]">
+          <div className="pt-2 border-t border-gray-200 dark:border-[#303030]">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <p className="text-xs text-gray-500 mb-0.5">Next Billing</p>
                 <div className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 text-gray-400" strokeWidth={1.5} />
-                  <span className="text-white text-sm">{formatDate(plan.currentPeriodEnd)}</span>
+                  <span className="text-gray-900 dark:text-white text-sm">{formatDate(plan.currentPeriodEnd)}</span>
                 </div>
               </div>
               <div>
                 <p className="text-xs text-gray-500 mb-0.5">Amount Due</p>
-                <span className="text-white text-sm font-medium">
+                <span className="text-gray-900 dark:text-white text-sm font-medium">
                   {plan.price !== undefined ? `$${plan.price}.00` : '—'}
                 </span>
               </div>
@@ -214,10 +214,10 @@ export default function Billing() {
 
         {/* Cancel Subscription */}
         {plan.status && plan.status !== 'canceled' && !plan.cancelAtPeriodEnd && (
-          <div className="pt-2 mt-2 border-t border-[#303030]">
+          <div className="pt-2 mt-2 border-t border-gray-200 dark:border-[#303030]">
             <button
               onClick={() => setShowCancelModal(true)}
-              className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+              className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
             >
               Cancel subscription
             </button>
@@ -226,13 +226,13 @@ export default function Billing() {
       </div>
 
       {/* Payment Method */}
-      <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-3 mb-3">
+      <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-3 mb-3">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-semibold text-white">Payment Method</h2>
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Payment Method</h2>
           <button
             onClick={handleManageBilling}
             disabled={isLoadingPortal}
-            className="text-xs text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+            className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors disabled:opacity-50"
           >
             {card ? 'Update' : 'Add'}
           </button>
@@ -240,11 +240,11 @@ export default function Billing() {
 
         {card && card.last4 ? (
           <div className="flex items-center gap-2.5">
-            <div className="bg-[#111114] p-2 rounded-md">
+            <div className="bg-gray-100 dark:bg-[#111114] p-2 rounded-md">
               <CreditCard className="w-4 h-4 text-gray-400" strokeWidth={1.5} />
             </div>
             <div>
-              <p className="text-white text-sm">
+              <p className="text-gray-900 dark:text-white text-sm">
                 {card.brand} •••• {card.last4}
               </p>
               {card.expMonth && card.expYear && (
@@ -260,13 +260,13 @@ export default function Billing() {
       </div>
 
       {/* Billing History */}
-      <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg overflow-hidden">
-        <h2 className="text-sm font-semibold text-white p-3 pb-2">Billing History</h2>
+      <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg overflow-hidden">
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-white p-3 pb-2">Billing History</h2>
 
         {invoiceList.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-[#111114]">
+              <thead className="bg-gray-50 dark:bg-[#111114]">
                 <tr>
                   <th className="px-3 py-1.5 text-left text-xs text-gray-500 uppercase tracking-wider font-medium">Date</th>
                   <th className="px-3 py-1.5 text-left text-xs text-gray-500 uppercase tracking-wider font-medium">Description</th>
@@ -277,16 +277,16 @@ export default function Billing() {
               </thead>
               <tbody>
                 {invoiceList.map((invoice) => (
-                  <tr key={invoice.id} className="border-t border-[#303030]">
-                    <td className="px-3 py-2 text-white text-xs">{formatDate(invoice.date)}</td>
-                    <td className="px-3 py-2 text-white text-xs">{invoice.description}</td>
-                    <td className="px-3 py-2 text-white text-xs">{formatAmount(invoice.amount)}</td>
+                  <tr key={invoice.id} className="border-t border-gray-200 dark:border-[#303030]">
+                    <td className="px-3 py-2 text-gray-900 dark:text-white text-xs">{formatDate(invoice.date)}</td>
+                    <td className="px-3 py-2 text-gray-900 dark:text-white text-xs">{invoice.description}</td>
+                    <td className="px-3 py-2 text-gray-900 dark:text-white text-xs">{formatAmount(invoice.amount)}</td>
                     <td className="px-3 py-2">{getStatusBadge(invoice.status)}</td>
                     <td className="px-3 py-2 text-right">
                       {invoice.hostedUrl && (
                         <button
                           onClick={() => window.open(invoice.hostedUrl, '_blank')}
-                          className="p-1 text-white/60 hover:text-white transition-colors"
+                          className="p-1 text-gray-500 dark:text-white/60 hover:text-gray-900 dark:hover:text-white transition-colors"
                           title="View invoice"
                         >
                           <Eye className="w-4 h-4" strokeWidth={1.5} />
@@ -308,23 +308,23 @@ export default function Billing() {
       {/* Cancel Subscription Modal */}
       {showCancelModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-4 max-w-sm w-full mx-4">
-            <h3 className="text-base font-semibold text-white mb-2">Cancel Subscription</h3>
-            <p className="text-gray-400 text-sm mb-4">
+          <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-4 max-w-sm w-full mx-4">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">Cancel Subscription</h3>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">
               Are you sure? You'll have access until {formatDate(plan.currentPeriodEnd)}.
             </p>
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowCancelModal(false)}
                 disabled={isCanceling}
-                className="px-3 py-1.5 text-xs text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+                className="px-3 py-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors disabled:opacity-50"
               >
                 Keep Plan
               </button>
               <button
                 onClick={handleCancelSubscription}
                 disabled={isCanceling}
-                className="px-3 py-1.5 text-xs bg-white/10 text-white border border-white/20 rounded-md hover:bg-white/20 transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                className="px-3 py-1.5 text-xs bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white border border-gray-200 dark:border-white/20 rounded-md hover:bg-gray-200 dark:hover:bg-white/20 transition-colors disabled:opacity-50 flex items-center gap-1.5"
               >
                 {isCanceling && <Loader2 className="w-3 h-3 animate-spin" />}
                 Cancel Subscription

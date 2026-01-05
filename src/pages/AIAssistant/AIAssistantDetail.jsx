@@ -88,18 +88,18 @@ export default function AIAssistantDetail() {
 
   if (isLoading) {
     return (
-      <div className="px-8 py-6 flex items-center justify-center min-h-screen">
-        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+      <div className="px-8 py-6 flex items-center justify-center min-h-screen bg-gray-50 dark:bg-transparent">
+        <Loader2 className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin" />
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="px-8 py-6">
+      <div className="px-8 py-6 bg-gray-50 dark:bg-transparent min-h-screen">
         <div className="max-w-5xl mx-auto">
-          <div className="p-4 bg-red-900/20 border border-red-800 rounded-md">
-            <p className="text-sm text-red-400">
+          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+            <p className="text-sm text-red-600 dark:text-red-400">
               {queryError?.data?.error?.message || queryError?.data?.message || 'Failed to load assistant data'}
             </p>
           </div>
@@ -112,32 +112,32 @@ export default function AIAssistantDetail() {
   if (!assistant) {
     return (
       <>
-        <div className="px-8 py-6">
+        <div className="px-8 py-6 bg-gray-50 dark:bg-transparent min-h-screen">
           <div className="max-w-5xl mx-auto">
             {error && (
-              <div className="p-4 bg-red-900/20 border border-red-800 rounded-md mb-6">
-                <p className="text-sm text-red-400">{error}</p>
+              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md mb-6">
+                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
               </div>
             )}
 
             {successMessage && (
-              <div className="p-4 bg-green-900/20 border border-green-800 rounded-md mb-6">
-                <p className="text-sm text-green-400">{successMessage}</p>
+              <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md mb-6">
+                <p className="text-sm text-green-600 dark:text-green-400">{successMessage}</p>
               </div>
             )}
 
-            <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-16">
+            <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-zinc-800 rounded-md p-16">
               <div className="flex flex-col items-center justify-center text-center">
-                <div className="w-16 h-16 bg-[#111114] rounded-full flex items-center justify-center mb-4">
-                  <Sparkles className="w-8 h-8 text-zinc-400" />
+                <div className="w-16 h-16 bg-gray-100 dark:bg-[#111114] rounded-full flex items-center justify-center mb-4">
+                  <Sparkles className="w-8 h-8 text-gray-400 dark:text-zinc-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2">No AI Assistant Yet</h3>
-                <p className="text-sm text-zinc-400 mb-6 max-w-md">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No AI Assistant Yet</h3>
+                <p className="text-sm text-gray-500 dark:text-zinc-400 mb-6 max-w-md">
                   Create an AI assistant to handle your calls intelligently. Configure its voice, behavior, and conversation style.
                 </p>
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="bg-white text-black font-medium px-6 py-2.5 text-sm rounded-md hover:bg-zinc-200 transition-colors"
+                  className="bg-gray-900 dark:bg-white text-white dark:text-black font-medium px-6 py-2.5 text-sm rounded-md hover:bg-gray-800 dark:hover:bg-zinc-200 transition-colors"
                 >
                   Create AI Assistant
                 </button>
@@ -174,41 +174,41 @@ export default function AIAssistantDetail() {
   };
 
   return (
-    <div className="px-8 py-6">
+    <div className="px-8 py-6 bg-gray-50 dark:bg-transparent min-h-screen">
       <div className="max-w-5xl mx-auto space-y-4">
         {/* Vapi Sync Warning */}
         {assistant.vapiError && (
-          <div className="p-3 bg-yellow-900/20 border border-yellow-700 rounded-md flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
+          <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-md flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 text-yellow-500 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-sm text-yellow-400 font-medium">Could not sync with Vapi</p>
-              <p className="text-xs text-yellow-400/70 mt-0.5">{assistant.vapiError}</p>
+              <p className="text-sm text-yellow-600 dark:text-yellow-400 font-medium">Could not sync with Vapi</p>
+              <p className="text-xs text-yellow-500 dark:text-yellow-400/70 mt-0.5">{assistant.vapiError}</p>
             </div>
           </div>
         )}
 
         {/* Vapi Info Card */}
-        <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-4">
+        <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-zinc-800 rounded-md p-4">
           <div className="flex items-center gap-2 mb-3">
-            <Info className="w-4 h-4 text-zinc-500" />
-            <h3 className="text-sm font-medium text-white">Assistant Details (from Vapi)</h3>
+            <Info className="w-4 h-4 text-gray-400 dark:text-zinc-500" />
+            <h3 className="text-sm font-medium text-gray-900 dark:text-white">Assistant Details (from Vapi)</h3>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
-              <p className="text-xs text-zinc-500 mb-1">Name</p>
-              <p className="text-sm text-white">{assistant.vapiName || assistant.name || 'Unnamed'}</p>
+              <p className="text-xs text-gray-500 dark:text-zinc-500 mb-1">Name</p>
+              <p className="text-sm text-gray-900 dark:text-white">{assistant.vapiName || assistant.name || 'Unnamed'}</p>
             </div>
             <div>
-              <p className="text-xs text-zinc-500 mb-1">Voice</p>
-              <p className="text-sm text-white">{formatVoice(assistant.vapiVoice || assistant.voice)}</p>
+              <p className="text-xs text-gray-500 dark:text-zinc-500 mb-1">Voice</p>
+              <p className="text-sm text-gray-900 dark:text-white">{formatVoice(assistant.vapiVoice || assistant.voice)}</p>
             </div>
             <div>
-              <p className="text-xs text-zinc-500 mb-1">AI Model</p>
-              <p className="text-sm text-white">{formatModel(assistant.vapiModel || assistant.model)}</p>
+              <p className="text-xs text-gray-500 dark:text-zinc-500 mb-1">AI Model</p>
+              <p className="text-sm text-gray-900 dark:text-white">{formatModel(assistant.vapiModel || assistant.model)}</p>
             </div>
             <div>
-              <p className="text-xs text-zinc-500 mb-1">Greeting</p>
-              <p className="text-sm text-white truncate" title={assistant.vapiFirstMessage || assistant.firstMessage || 'Not set'}>
+              <p className="text-xs text-gray-500 dark:text-zinc-500 mb-1">Greeting</p>
+              <p className="text-sm text-gray-900 dark:text-white truncate" title={assistant.vapiFirstMessage || assistant.firstMessage || 'Not set'}>
                 {assistant.vapiFirstMessage || assistant.firstMessage || 'Not set'}
               </p>
             </div>
@@ -216,30 +216,30 @@ export default function AIAssistantDetail() {
         </div>
 
         {/* Header */}
-        <div className="bg-[#1a1a1d] border border-zinc-800 rounded-md p-4">
+        <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-zinc-800 rounded-md p-4">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h1 className="text-lg font-semibold text-white">{assistant.vapiName || assistant.name || 'AI Receptionist'}</h1>
-              <p className="text-xs text-zinc-400 mt-0.5">{assistant.vapiId || assistant.id}</p>
+              <h1 className="text-lg font-semibold text-gray-900 dark:text-white">{assistant.vapiName || assistant.name || 'AI Receptionist'}</h1>
+              <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{assistant.vapiId || assistant.id}</p>
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={handleTest}
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-zinc-700 rounded-md hover:bg-zinc-600 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-900 dark:text-white bg-gray-100 dark:bg-zinc-700 rounded-md hover:bg-gray-200 dark:hover:bg-zinc-600 transition-colors"
               >
                 <TestTube className="w-4 h-4" />
                 Test
               </button>
               <button
                 onClick={handleChat}
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-zinc-700 rounded-md hover:bg-zinc-600 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-900 dark:text-white bg-gray-100 dark:bg-zinc-700 rounded-md hover:bg-gray-200 dark:hover:bg-zinc-600 transition-colors"
               >
                 <MessageSquare className="w-4 h-4" />
                 Chat
               </button>
               <button
                 onClick={handleTalk}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-black bg-white rounded-md hover:bg-zinc-200 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white dark:text-black bg-gray-900 dark:bg-white rounded-md hover:bg-gray-800 dark:hover:bg-zinc-200 transition-colors"
               >
                 <Phone className="w-4 h-4" />
                 Talk to Assistant
@@ -248,31 +248,31 @@ export default function AIAssistantDetail() {
           </div>
 
           {/* Tab Navigation */}
-          <div className="flex gap-1 border-b border-zinc-800">
+          <div className="flex gap-1 border-b border-gray-200 dark:border-zinc-800">
             <button
               onClick={() => setActiveTab('model')}
               className={`px-4 py-2 text-sm font-medium transition-colors relative ${
                 activeTab === 'model'
-                  ? 'text-white'
-                  : 'text-zinc-400 hover:text-zinc-300'
+                  ? 'text-gray-900 dark:text-white'
+                  : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300'
               }`}
             >
               Model
               {activeTab === 'model' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 dark:bg-white"></div>
               )}
             </button>
             <button
               onClick={() => setActiveTab('voice')}
               className={`px-4 py-2 text-sm font-medium transition-colors relative ${
                 activeTab === 'voice'
-                  ? 'text-white'
-                  : 'text-zinc-400 hover:text-zinc-300'
+                  ? 'text-gray-900 dark:text-white'
+                  : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300'
               }`}
             >
               Voice
               {activeTab === 'voice' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 dark:bg-white"></div>
               )}
             </button>
           </div>
@@ -290,10 +290,10 @@ export default function AIAssistantDetail() {
 
         {/* Update Indicator */}
         {isUpdating && (
-          <div className="fixed bottom-4 right-4 bg-[#1a1a1d] border border-zinc-700 rounded-md px-4 py-2 shadow-lg">
+          <div className="fixed bottom-4 right-4 bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-zinc-700 rounded-md px-4 py-2 shadow-lg">
             <div className="flex items-center gap-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              <span className="text-sm text-white">Saving changes...</span>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 dark:border-white"></div>
+              <span className="text-sm text-gray-900 dark:text-white">Saving changes...</span>
             </div>
           </div>
         )}

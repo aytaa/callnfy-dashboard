@@ -56,9 +56,9 @@ export default function DataTable({
       return <ChevronsUpDown className="w-4 h-4 text-gray-500" />;
     }
     return sortConfig.direction === 'asc' ? (
-      <ChevronUp className="w-4 h-4 text-white" />
+      <ChevronUp className="w-4 h-4 text-gray-900 dark:text-white" />
     ) : (
-      <ChevronDown className="w-4 h-4 text-white" />
+      <ChevronDown className="w-4 h-4 text-gray-900 dark:text-white" />
     );
   };
 
@@ -67,21 +67,21 @@ export default function DataTable({
       <Card noPadding className={className}>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-[#111114] border-b border-[#303030]">
+            <thead className="bg-gray-50 dark:bg-[#111114] border-b border-gray-200 dark:border-[#303030]">
               <tr>
                 {columns.map((column, idx) => (
                   <th key={idx} className="px-4 py-3 text-left">
-                    <div className="h-4 bg-[#262626] rounded animate-pulse" />
+                    <div className="h-4 bg-gray-200 dark:bg-[#262626] rounded animate-pulse" />
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#303030]">
+            <tbody className="divide-y divide-gray-200 dark:divide-[#303030]">
               {[...Array(5)].map((_, idx) => (
                 <tr key={idx}>
                   {columns.map((_, colIdx) => (
                     <td key={colIdx} className="px-4 py-3">
-                      <div className="h-4 bg-[#262626] rounded animate-pulse" />
+                      <div className="h-4 bg-gray-200 dark:bg-[#262626] rounded animate-pulse" />
                     </td>
                   ))}
                 </tr>
@@ -101,14 +101,14 @@ export default function DataTable({
     <Card noPadding className={className} {...props}>
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-[#111114] border-b border-[#303030]">
+          <thead className="bg-gray-50 dark:bg-[#111114] border-b border-gray-200 dark:border-[#303030]">
             <tr>
               {columns.map((column) => (
                 <th
                   key={column.key}
                   className={clsx(
                     'px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-                    column.sortable && 'cursor-pointer select-none hover:bg-[#1a1a1d] transition-colors'
+                    column.sortable && 'cursor-pointer select-none hover:bg-gray-100 dark:hover:bg-[#1a1a1d] transition-colors'
                   )}
                   onClick={() => column.sortable && handleSort(column.key)}
                 >
@@ -120,16 +120,16 @@ export default function DataTable({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#303030]">
+          <tbody className="divide-y divide-gray-200 dark:divide-[#303030]">
             {paginatedData.map((row, rowIdx) => (
               <tr
                 key={rowIdx}
-                className="hover:bg-white/5 transition-colors"
+                className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
               >
                 {columns.map((column) => (
                   <td
                     key={column.key}
-                    className="px-4 py-3 text-sm text-white"
+                    className="px-4 py-3 text-sm text-gray-900 dark:text-white"
                   >
                     {column.render ? column.render(row[column.key], row) : row[column.key]}
                   </td>
@@ -142,7 +142,7 @@ export default function DataTable({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3 border-t border-[#303030]">
+        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-[#303030]">
           <div className="text-sm text-gray-500">
             Showing {startIndex + 1} to {Math.min(endIndex, data.length)} of {data.length} results
           </div>
@@ -150,17 +150,17 @@ export default function DataTable({
             <button
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="px-3 py-1 text-xs font-medium rounded-md border border-[#303030] text-white hover:border-[#404040] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-3 py-1 text-xs font-medium rounded-md border border-gray-200 dark:border-[#303030] text-gray-900 dark:text-white hover:border-gray-300 dark:hover:border-[#404040] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Previous
             </button>
-            <span className="px-3 py-1 text-xs text-gray-400">
+            <span className="px-3 py-1 text-xs text-gray-500 dark:text-gray-400">
               Page {currentPage} of {totalPages}
             </span>
             <button
               onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 text-xs font-medium rounded-md border border-[#303030] text-white hover:border-[#404040] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-3 py-1 text-xs font-medium rounded-md border border-gray-200 dark:border-[#303030] text-gray-900 dark:text-white hover:border-gray-300 dark:hover:border-[#404040] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Next
             </button>

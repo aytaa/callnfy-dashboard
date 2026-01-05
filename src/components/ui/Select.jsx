@@ -32,9 +32,9 @@ export default function Select({
 
   const baseStyles = 'w-full px-3 py-2 pr-10 rounded-md border appearance-none transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed';
 
-  const normalStyles = 'border-[#303030] bg-[#111114] text-white focus:border-[#404040]';
+  const normalStyles = 'border-gray-200 dark:border-[#303030] bg-white dark:bg-[#111114] text-gray-900 dark:text-white focus:border-gray-300 dark:focus:border-[#404040]';
 
-  const errorStyles = 'border-red-500 bg-[#111114] text-white focus:border-red-500';
+  const errorStyles = 'border-red-500 bg-red-50 dark:bg-[#111114] text-gray-900 dark:text-white focus:border-red-500';
 
   return (
     <div className="w-full">
@@ -44,7 +44,7 @@ export default function Select({
           className="block text-xs text-gray-500 mb-1"
         >
           {label}
-          {required && <span className="text-red-400 ml-1">*</span>}
+          {required && <span className="text-red-500 dark:text-red-400 ml-1">*</span>}
         </label>
       )}
       <div className="relative">

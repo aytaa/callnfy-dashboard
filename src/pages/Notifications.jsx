@@ -61,20 +61,20 @@ export default function Notifications() {
   };
 
   return (
-    <div className="px-8 py-6">
+    <div className="px-8 py-6 bg-gray-50 dark:bg-transparent min-h-screen">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-xl font-semibold text-white">Notifications</h1>
-            <p className="text-sm text-white/60 mt-1">
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">Notifications</h1>
+            <p className="text-sm text-gray-500 dark:text-white/60 mt-1">
               Stay updated with your calls, appointments, and more
             </p>
           </div>
           <button
             onClick={handleMarkAllAsRead}
             disabled={isMarkingAll || notifications.length === 0}
-            className="text-sm text-white/60 hover:text-white transition-colors disabled:opacity-50"
+            className="text-sm text-gray-500 dark:text-white/60 hover:text-gray-900 dark:hover:text-white transition-colors disabled:opacity-50"
           >
             {isMarkingAll ? 'Marking...' : 'Mark all as read'}
           </button>
@@ -89,8 +89,8 @@ export default function Notifications() {
             }}
             className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
               filter === 'all'
-                ? 'bg-white text-black font-medium'
-                : 'bg-white/10 text-white/60 hover:bg-white/20'
+                ? 'bg-gray-900 dark:bg-white text-white dark:text-black font-medium'
+                : 'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-white/60 hover:bg-gray-200 dark:hover:bg-white/20'
             }`}
           >
             All
@@ -102,8 +102,8 @@ export default function Notifications() {
             }}
             className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
               filter === 'unread'
-                ? 'bg-white text-black font-medium'
-                : 'bg-white/10 text-white/60 hover:bg-white/20'
+                ? 'bg-gray-900 dark:bg-white text-white dark:text-black font-medium'
+                : 'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-white/60 hover:bg-gray-200 dark:hover:bg-white/20'
             }`}
           >
             Unread
@@ -111,13 +111,13 @@ export default function Notifications() {
         </div>
 
         {/* Content */}
-        <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg overflow-hidden">
+        <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg overflow-hidden">
           {isLoading ? (
             <div className="py-16 flex items-center justify-center">
-              <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+              <Loader2 className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin" />
             </div>
           ) : notifications.length > 0 ? (
-            <div className="divide-y divide-[#303030]">
+            <div className="divide-y divide-gray-200 dark:divide-[#303030]">
               {notifications.map((notification) => (
                 <NotificationItem
                   key={notification.id}
@@ -129,9 +129,9 @@ export default function Notifications() {
             </div>
           ) : (
             <div className="py-16 flex flex-col items-center justify-center">
-              <Bell className="w-12 h-12 text-white/20 mb-3" />
-              <p className="text-white/60 font-medium">No notifications yet</p>
-              <p className="text-sm text-white/40 mt-1">
+              <Bell className="w-12 h-12 text-gray-300 dark:text-white/20 mb-3" />
+              <p className="text-gray-500 dark:text-white/60 font-medium">No notifications yet</p>
+              <p className="text-sm text-gray-400 dark:text-white/40 mt-1">
                 {filter === 'unread'
                   ? "You're all caught up!"
                   : 'Notifications will appear here when you receive them'}
@@ -143,21 +143,21 @@ export default function Notifications() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-4">
-            <p className="text-sm text-white/40">
+            <p className="text-sm text-gray-400 dark:text-white/40">
               Showing {(page - 1) * limit + 1} - {Math.min(page * limit, total)} of {total}
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1 || isFetching}
-                className="px-3 py-1.5 text-sm bg-white/10 text-white/60 rounded-md hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-white/60 rounded-md hover:bg-gray-200 dark:hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages || isFetching}
-                className="px-3 py-1.5 text-sm bg-white/10 text-white/60 rounded-md hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-white/60 rounded-md hover:bg-gray-200 dark:hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
               </button>

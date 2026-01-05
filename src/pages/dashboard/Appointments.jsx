@@ -70,7 +70,7 @@ export default function Appointments() {
       header: 'Status',
       accessor: 'status',
       render: (row) => (
-        <span className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded capitalize">
+        <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#262626] text-gray-900 dark:text-white text-xs font-medium rounded capitalize">
           {row.status || 'pending'}
         </span>
       ),
@@ -166,17 +166,17 @@ export default function Appointments() {
 
   if (isLoading) {
     return (
-      <div className="px-8 py-6 flex items-center justify-center min-h-screen">
-        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+      <div className="px-8 py-6 flex items-center justify-center min-h-screen bg-gray-50 dark:bg-transparent">
+        <Loader2 className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin" />
       </div>
     );
   }
 
   if (queryError) {
     return (
-      <div className="px-8 py-6">
+      <div className="px-8 py-6 bg-gray-50 dark:bg-transparent min-h-screen">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold text-white mb-4">Appointments</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Appointments</h1>
           <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
             <p className="text-sm text-red-600 dark:text-red-400">
               {queryError?.data?.error?.message || queryError?.data?.message || 'Failed to load appointments'}
@@ -188,7 +188,7 @@ export default function Appointments() {
   }
 
   return (
-    <div className="px-8 py-6">
+    <div className="px-8 py-6 bg-gray-50 dark:bg-transparent min-h-screen">
       <div className="max-w-7xl mx-auto space-y-4">
         {/* Error display */}
         {error && (
@@ -202,13 +202,13 @@ export default function Appointments() {
           <div>
           </div>
           <div className="flex gap-3">
-            <div className="flex bg-[#262626] rounded-lg p-1">
+            <div className="flex bg-gray-100 dark:bg-[#262626] rounded-lg p-1">
               <button
                 onClick={() => setView('calendar')}
                 className={`px-3 py-1.5 rounded-md transition-colors ${
                   view === 'calendar'
-                    ? 'bg-[#2a2a2a] text-white'
-                    : 'text-gray-400 hover:text-white'
+                    ? 'bg-white dark:bg-[#2a2a2a] text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
                 <CalendarIcon className="w-4 h-4" />
@@ -217,8 +217,8 @@ export default function Appointments() {
                 onClick={() => setView('list')}
                 className={`px-3 py-1.5 rounded-md transition-colors ${
                   view === 'list'
-                    ? 'bg-[#2a2a2a] text-white'
-                    : 'text-gray-400 hover:text-white'
+                    ? 'bg-white dark:bg-[#2a2a2a] text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
                 <List className="w-4 h-4" />
@@ -226,7 +226,7 @@ export default function Appointments() {
             </div>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 bg-white text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+              className="flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
             >
               <Plus className="w-4 h-4" />
               Add Appointment
@@ -238,19 +238,19 @@ export default function Appointments() {
         {view === 'calendar' && (
           <Card>
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-white">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
               </h2>
               <div className="flex gap-2">
                 <button
                   onClick={handlePrevMonth}
-                  className="p-2 text-gray-400 hover:text-white hover:bg-[#262626] rounded-lg transition-colors"
+                  className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#262626] rounded-lg transition-colors"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button
                   onClick={handleNextMonth}
-                  className="p-2 text-gray-400 hover:text-white hover:bg-[#262626] rounded-lg transition-colors"
+                  className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#262626] rounded-lg transition-colors"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -259,7 +259,7 @@ export default function Appointments() {
 
             <div className="grid grid-cols-7 gap-2">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                <div key={day} className="text-center text-sm font-semibold text-gray-400 py-2">
+                <div key={day} className="text-center text-sm font-semibold text-gray-500 dark:text-gray-400 py-2">
                   {day}
                 </div>
               ))}
@@ -267,14 +267,14 @@ export default function Appointments() {
                 <div
                   key={index}
                   className={`aspect-square p-2 border rounded-lg ${
-                    day ? 'border-[#303030] bg-[#212121] hover:bg-[#262626] cursor-pointer' : 'border-transparent'
-                  } ${day === 14 ? 'border-white' : ''}`}
+                    day ? 'border-gray-200 dark:border-[#303030] bg-gray-50 dark:bg-[#212121] hover:bg-gray-100 dark:hover:bg-[#262626] cursor-pointer' : 'border-transparent'
+                  } ${day === 14 ? 'border-gray-900 dark:border-white' : ''}`}
                 >
                   {day && (
                     <>
-                      <div className="text-sm text-white mb-1">{day}</div>
+                      <div className="text-sm text-gray-900 dark:text-white mb-1">{day}</div>
                       {hasAppointment(day) && (
-                        <div className="w-2 h-2 bg-white rounded-full mx-auto" />
+                        <div className="w-2 h-2 bg-gray-900 dark:bg-white rounded-full mx-auto" />
                       )}
                     </>
                   )}
@@ -309,14 +309,14 @@ export default function Appointments() {
                   setError('');
                   setFormData({ customer: '', service: '', date: '', time: '', notes: '' });
                 }}
-                className="border border-[#303030] text-white px-3 py-1.5 text-sm rounded-lg hover:border-[#3a3a3a] transition-colors"
+                className="border border-gray-200 dark:border-[#303030] text-gray-900 dark:text-white px-3 py-1.5 text-sm rounded-lg hover:border-gray-300 dark:hover:border-[#3a3a3a] transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={isCreating}
-                className="bg-white text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-gray-900 dark:bg-white text-white dark:text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isCreating ? 'Creating...' : 'Create Appointment'}
               </button>

@@ -103,20 +103,20 @@ export default function Customers() {
 
   if (isLoading && page === 1) {
     return (
-      <div className="px-8 py-6 flex items-center justify-center min-h-screen">
-        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+      <div className="px-8 py-6 flex items-center justify-center min-h-screen bg-gray-50 dark:bg-transparent">
+        <Loader2 className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="px-8 py-6">
+    <div className="px-8 py-6 bg-gray-50 dark:bg-transparent min-h-screen">
       <div className="max-w-7xl mx-auto space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="bg-white text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+            className="bg-gray-900 dark:bg-white text-white dark:text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
           >
             Add Customer
           </button>
@@ -136,8 +136,8 @@ export default function Customers() {
 
         {/* Customers Table */}
         {isLoading ? (
-          <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+          <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white mx-auto"></div>
           </div>
         ) : customers.length > 0 ? (
           <>
@@ -156,7 +156,7 @@ export default function Customers() {
                 >
                   Previous
                 </Button>
-                <span className="flex items-center px-4 text-white">
+                <span className="flex items-center px-4 text-gray-900 dark:text-white">
                   Page {page} of {pagination.totalPages}
                 </span>
                 <Button
@@ -170,18 +170,18 @@ export default function Customers() {
             )}
           </>
         ) : (
-          <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-8">
+          <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-8">
             <div className="flex flex-col items-center justify-center text-center">
-              <div className="w-12 h-12 rounded-full bg-[#111114] flex items-center justify-center mb-3">
-                <Phone className="w-6 h-6 text-gray-500" strokeWidth={1.5} />
+              <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-[#111114] flex items-center justify-center mb-3">
+                <Phone className="w-6 h-6 text-gray-400 dark:text-gray-500" strokeWidth={1.5} />
               </div>
-              <h3 className="text-sm font-medium text-white mb-1">No customers yet</h3>
+              <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-1">No customers yet</h3>
               <p className="text-xs text-gray-500 mb-4">
                 Get started by adding your first customer
               </p>
               <button
                 onClick={() => setIsAddModalOpen(true)}
-                className="bg-white text-black px-3 py-1.5 text-xs font-medium rounded-md hover:bg-gray-200 transition-colors"
+                className="bg-gray-900 dark:bg-white text-white dark:text-black px-3 py-1.5 text-xs font-medium rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
               >
                 Add Customer
               </button>
@@ -200,13 +200,13 @@ export default function Customers() {
               <button
                 onClick={() => handleDeleteCustomer(selectedCustomer?.id)}
                 disabled={isDeleting}
-                className="border border-red-600 text-red-600 px-3 py-1.5 text-sm rounded-lg hover:bg-red-600 hover:text-white transition-colors disabled:opacity-50"
+                className="border border-red-500 dark:border-red-600 text-red-500 dark:text-red-600 px-3 py-1.5 text-sm rounded-lg hover:bg-red-600 hover:text-white hover:border-red-600 transition-colors disabled:opacity-50"
               >
                 {isDeleting ? 'Deleting...' : 'Delete'}
               </button>
               <button
                 onClick={closeModal}
-                className="border border-[#303030] text-white px-3 py-1.5 text-sm rounded-lg hover:border-[#3a3a3a] transition-colors"
+                className="border border-gray-200 dark:border-[#303030] text-gray-900 dark:text-white px-3 py-1.5 text-sm rounded-lg hover:border-gray-300 dark:hover:border-[#3a3a3a] transition-colors"
               >
                 Close
               </button>
@@ -216,15 +216,15 @@ export default function Customers() {
           {selectedCustomer && (
             <div className="space-y-4">
               {/* Customer Info */}
-              <div className="bg-[#111114] border border-[#303030] rounded-md p-3">
+              <div className="bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md p-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Name</p>
-                    <p className="text-white text-sm">{selectedCustomer.name}</p>
+                    <p className="text-gray-900 dark:text-white text-sm">{selectedCustomer.name}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Status</p>
-                    <span className="inline-block px-2 py-0.5 bg-[#1a1a1d] text-white text-xs font-medium rounded">
+                    <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#1a1a1d] text-gray-900 dark:text-white text-xs font-medium rounded">
                       {selectedCustomer.status}
                     </span>
                   </div>
@@ -232,43 +232,43 @@ export default function Customers() {
                     <Phone className="w-4 h-4 text-gray-500" />
                     <div>
                       <p className="text-xs text-gray-500">Phone</p>
-                      <p className="text-white text-sm">{selectedCustomer.phone}</p>
+                      <p className="text-gray-900 dark:text-white text-sm">{selectedCustomer.phone}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Mail className="w-4 h-4 text-gray-500" />
                     <div>
                       <p className="text-xs text-gray-500">Email</p>
-                      <p className="text-white text-sm">{selectedCustomer.email}</p>
+                      <p className="text-gray-900 dark:text-white text-sm">{selectedCustomer.email}</p>
                     </div>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Join Date</p>
-                    <p className="text-white text-sm">{selectedCustomer.joinDate}</p>
+                    <p className="text-gray-900 dark:text-white text-sm">{selectedCustomer.joinDate}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Total Calls</p>
-                    <p className="text-white text-sm font-medium">{selectedCustomer.totalCalls}</p>
+                    <p className="text-gray-900 dark:text-white text-sm font-medium">{selectedCustomer.totalCalls}</p>
                   </div>
                 </div>
               </div>
 
               {/* Call History */}
               <div>
-                <h3 className="text-sm font-medium text-white mb-2 flex items-center gap-2">
+                <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
                   <Phone className="w-4 h-4 text-gray-500" />
                   Call History
                 </h3>
                 <div className="space-y-2">
                   {selectedCustomer.callHistory.length > 0 ? (
                     selectedCustomer.callHistory.map((call, index) => (
-                      <div key={index} className="bg-[#1a1a1d] border border-[#303030] rounded-md p-3">
+                      <div key={index} className="bg-gray-50 dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-md p-3">
                         <div className="flex justify-between items-center">
                           <div>
-                            <p className="text-white text-sm">{call.outcome}</p>
+                            <p className="text-gray-900 dark:text-white text-sm">{call.outcome}</p>
                             <p className="text-xs text-gray-500">{call.date}</p>
                           </div>
-                          <span className="inline-block px-2 py-0.5 bg-[#111114] text-white text-xs font-medium rounded">
+                          <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#111114] text-gray-900 dark:text-white text-xs font-medium rounded">
                             {call.duration}
                           </span>
                         </div>
@@ -282,22 +282,22 @@ export default function Customers() {
 
               {/* Appointment History */}
               <div>
-                <h3 className="text-sm font-medium text-white mb-2 flex items-center gap-2">
+                <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-gray-500" />
                   Appointments
                 </h3>
                 <div className="space-y-2">
                   {selectedCustomer.appointments.length > 0 ? (
                     selectedCustomer.appointments.map((appointment, index) => (
-                      <div key={index} className="bg-[#1a1a1d] border border-[#303030] rounded-md p-3">
+                      <div key={index} className="bg-gray-50 dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-md p-3">
                         <div className="flex justify-between items-center">
                           <div>
-                            <p className="text-white text-sm">{appointment.service}</p>
+                            <p className="text-gray-900 dark:text-white text-sm">{appointment.service}</p>
                             <p className="text-xs text-gray-500">
                               {appointment.date} at {appointment.time}
                             </p>
                           </div>
-                          <span className="inline-block px-2 py-0.5 bg-[#111114] text-white text-xs font-medium rounded">
+                          <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#111114] text-gray-900 dark:text-white text-xs font-medium rounded">
                             {appointment.status}
                           </span>
                         </div>
@@ -330,14 +330,14 @@ export default function Customers() {
                   setFormData({ name: '', phone: '', email: '' });
                   setError('');
                 }}
-                className="border border-[#303030] text-white px-3 py-1.5 text-sm rounded-lg hover:border-[#3a3a3a] transition-colors"
+                className="border border-gray-200 dark:border-[#303030] text-gray-900 dark:text-white px-3 py-1.5 text-sm rounded-lg hover:border-gray-300 dark:hover:border-[#3a3a3a] transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddCustomer}
                 disabled={isCreating}
-                className="bg-white text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                className="bg-gray-900 dark:bg-white text-white dark:text-black px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors disabled:opacity-50"
               >
                 {isCreating ? 'Creating...' : 'Add Customer'}
               </button>
@@ -346,8 +346,8 @@ export default function Customers() {
         >
           <form onSubmit={handleAddCustomer} className="space-y-4">
             {error && (
-              <div className="p-2.5 bg-red-900/20 border border-red-800 rounded-md">
-                <p className="text-xs text-red-400">{error}</p>
+              <div className="p-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+                <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
               </div>
             )}
 
@@ -357,7 +357,7 @@ export default function Customers() {
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full bg-[#111114] border border-[#303030] rounded-md px-2.5 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-[#404040] focus:outline-none"
+                className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-2.5 py-1.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
                 placeholder="Customer name"
                 required
               />
@@ -369,7 +369,7 @@ export default function Customers() {
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full bg-[#111114] border border-[#303030] rounded-md px-2.5 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-[#404040] focus:outline-none"
+                className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-2.5 py-1.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
                 placeholder="+1 (555) 123-4567"
                 required
               />
@@ -381,7 +381,7 @@ export default function Customers() {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full bg-[#111114] border border-[#303030] rounded-md px-2.5 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-[#404040] focus:outline-none"
+                className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-2.5 py-1.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
                 placeholder="customer@email.com"
                 required
               />

@@ -68,7 +68,7 @@ export default function Calls() {
       header: 'Status',
       accessor: 'status',
       render: (row) => (
-        <span className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded capitalize">
+        <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#262626] text-gray-900 dark:text-white text-xs font-medium rounded capitalize">
           {row.status}
         </span>
       ),
@@ -88,7 +88,7 @@ export default function Calls() {
       header: 'Actions',
       render: (row) => (
         <button
-          className="text-gray-400 hover:text-white"
+          className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
           onClick={(e) => {
             e.stopPropagation();
             handleRowClick(row);
@@ -112,14 +112,14 @@ export default function Calls() {
 
   if (callsLoading && page === 1) {
     return (
-      <div className="px-8 py-6 flex items-center justify-center min-h-screen">
-        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+      <div className="px-8 py-6 flex items-center justify-center min-h-screen bg-gray-50 dark:bg-transparent">
+        <Loader2 className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="px-8 py-6">
+    <div className="px-8 py-6 bg-gray-50 dark:bg-transparent min-h-screen">
       <div className="max-w-7xl mx-auto space-y-4">
         {/* Header with Filters */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -145,43 +145,43 @@ export default function Calls() {
         {statsLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-4 animate-pulse">
-                <div className="h-4 bg-[#262626] rounded w-20 mb-2"></div>
-                <div className="h-8 bg-[#262626] rounded w-12"></div>
+              <div key={i} className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-4 animate-pulse">
+                <div className="h-4 bg-gray-200 dark:bg-[#262626] rounded w-20 mb-2"></div>
+                <div className="h-8 bg-gray-200 dark:bg-[#262626] rounded w-12"></div>
               </div>
             ))}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Total Calls */}
-            <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-4">
+            <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-4">
               <p className="text-xs text-gray-500 mb-2">Total Calls</p>
-              <p className="text-2xl font-bold text-white mb-1">{stats?.totalCalls || 0}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{stats?.totalCalls || 0}</p>
               <p className="text-xs text-gray-500">
                 {stats?.percentChange > 0 ? '+' : ''}{stats?.percentChange || 0}%
               </p>
             </div>
 
             {/* Avg Duration */}
-            <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-4">
+            <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-4">
               <p className="text-xs text-gray-500 mb-2">Avg Duration</p>
-              <p className="text-2xl font-bold text-white mb-1">
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
                 {stats?.avgDuration ? `${Math.floor(stats.avgDuration / 60)}:${String(stats.avgDuration % 60).padStart(2, '0')}` : '0:00'}
               </p>
               <p className="text-xs text-gray-500">Average call time</p>
             </div>
 
             {/* Completed */}
-            <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-4">
+            <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-4">
               <p className="text-xs text-gray-500 mb-2">Completed</p>
-              <p className="text-2xl font-bold text-white mb-1">{stats?.completedCalls || 0}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{stats?.completedCalls || 0}</p>
               <p className="text-xs text-gray-500">Successful calls</p>
             </div>
 
             {/* Missed */}
-            <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-4">
+            <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-4">
               <p className="text-xs text-gray-500 mb-2">Missed</p>
-              <p className="text-2xl font-bold text-white mb-1">{stats?.missedCalls || 0}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{stats?.missedCalls || 0}</p>
               <p className="text-xs text-gray-500">Missed calls</p>
             </div>
           </div>
@@ -189,8 +189,8 @@ export default function Calls() {
 
         {/* Calls Table */}
         {callsLoading ? (
-          <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+          <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white mx-auto"></div>
           </div>
         ) : calls.length > 0 ? (
           <>
@@ -208,7 +208,7 @@ export default function Calls() {
                 >
                   Previous
                 </Button>
-                <span className="flex items-center px-4 text-white">
+                <span className="flex items-center px-4 text-gray-900 dark:text-white">
                   Page {page} of {pagination.totalPages}
                 </span>
                 <Button
@@ -222,12 +222,12 @@ export default function Calls() {
             )}
           </>
         ) : (
-          <div className="bg-[#1a1a1d] border border-[#303030] rounded-lg p-8">
+          <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-8">
             <div className="flex flex-col items-center justify-center">
-              <div className="w-12 h-12 rounded-full bg-[#111114] flex items-center justify-center mb-3">
-                <Phone className="w-6 h-6 text-gray-500" strokeWidth={1.5} />
+              <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-[#111114] flex items-center justify-center mb-3">
+                <Phone className="w-6 h-6 text-gray-400 dark:text-gray-500" strokeWidth={1.5} />
               </div>
-              <p className="text-white font-medium text-sm mb-1">No calls found</p>
+              <p className="text-gray-900 dark:text-white font-medium text-sm mb-1">No calls found</p>
               <p className="text-xs text-gray-500">Try adjusting your filters</p>
             </div>
           </div>
@@ -249,22 +249,22 @@ export default function Calls() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-400">Customer</p>
-                  <p className="text-white font-medium">{selectedCall.caller || 'Unknown'}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Customer</p>
+                  <p className="text-gray-900 dark:text-white font-medium">{selectedCall.caller || 'Unknown'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">Phone</p>
-                  <p className="text-white font-medium">{selectedCall.phone}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Phone</p>
+                  <p className="text-gray-900 dark:text-white font-medium">{selectedCall.phone}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">Duration</p>
-                  <p className="text-white font-medium">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Duration</p>
+                  <p className="text-gray-900 dark:text-white font-medium">
                     {Math.floor(selectedCall.duration / 60)}:{String(selectedCall.duration % 60).padStart(2, '0')}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">Status</p>
-                  <span className="inline-block px-2 py-0.5 bg-[#262626] text-white text-xs font-medium rounded capitalize">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
+                  <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#262626] text-gray-900 dark:text-white text-xs font-medium rounded capitalize">
                     {selectedCall.status}
                   </span>
                 </div>
@@ -273,8 +273,8 @@ export default function Calls() {
               {selectedCall.transcript && (
                 <div>
                   <p className="text-xs text-gray-500 mb-1.5">Transcript</p>
-                  <div className="bg-[#111114] border border-[#303030] rounded-md p-3">
-                    <p className="text-white text-sm">{selectedCall.transcript}</p>
+                  <div className="bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md p-3">
+                    <p className="text-gray-900 dark:text-white text-sm">{selectedCall.transcript}</p>
                   </div>
                 </div>
               )}
@@ -282,8 +282,8 @@ export default function Calls() {
               {selectedCall.summary && (
                 <div>
                   <p className="text-xs text-gray-500 mb-1.5">Summary</p>
-                  <div className="bg-[#111114] border border-[#303030] rounded-md p-3">
-                    <p className="text-white text-sm">{selectedCall.summary}</p>
+                  <div className="bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md p-3">
+                    <p className="text-gray-900 dark:text-white text-sm">{selectedCall.summary}</p>
                   </div>
                 </div>
               )}
