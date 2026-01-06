@@ -185,12 +185,6 @@ export default function PhoneNumbers() {
                               )}
                             </div>
 
-                            {/* Label/Name */}
-                            {phoneNumber.name && (
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                                {phoneNumber.name}
-                              </p>
-                            )}
 
                             {/* Assistant Info */}
                             <div className="flex items-center gap-1.5 text-xs text-gray-500">

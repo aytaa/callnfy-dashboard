@@ -172,7 +172,7 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className={`flex-1 flex flex-col bg-gray-50 dark:bg-[#111114] transition-all duration-300 ${isCollapsed ? 'lg:pl-16' : 'lg:pl-60'}`}>
         {/* Mobile Header */}
-        <div className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-white dark:bg-[#111114] border-b border-gray-200 dark:border-[#303030] p-4">
+        <div className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-white dark:bg-[#111114] border-b border-gray-200 dark:border-[#303030] p-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
@@ -196,7 +196,7 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
         </div>
 
         {/* Desktop Header */}
-        <div className="hidden lg:flex items-center justify-between bg-white dark:bg-[#111114] border-b border-gray-200 dark:border-[#303030] px-8 py-4">
+        <div className="hidden lg:flex items-center justify-between bg-white dark:bg-[#111114] border-b border-gray-200 dark:border-[#303030] px-8 py-2">
           <div>
             <h1 className="text-xl font-semibold text-gray-900 dark:text-white">{getPageTitle().title}</h1>
             {getPageTitle().subtitle && (

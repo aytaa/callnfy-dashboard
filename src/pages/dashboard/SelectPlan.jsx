@@ -49,13 +49,13 @@ export default function SelectPlan() {
   };
 
   return (
-    <div className="min-h-screen bg-[#212121] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#212121] flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         {/* Back to Dashboard link if trial is still active */}
         {isTrialActive && (
           <Link
             to="/overview"
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Dashboard
@@ -63,25 +63,25 @@ export default function SelectPlan() {
         )}
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             {isTrialExpired ? 'Your Trial Has Ended' : 'Upgrade Your Plan'}
           </h1>
-          <p className="text-gray-400">
+          <p className="text-gray-500 dark:text-gray-400">
             {isTrialExpired
               ? 'Subscribe now to continue using Callnfy'
               : 'Upgrade to unlock full features'}
           </p>
         </div>
 
-        <div className="bg-[#171717] rounded-lg border border-[#303030] p-8">
+        <div className="bg-white dark:bg-[#171717] rounded-lg border border-gray-200 dark:border-[#303030] p-8">
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-white mb-2">Starter Plan</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Starter Plan</h2>
             <div className="flex items-baseline justify-center gap-2">
-              <span className="text-4xl font-bold text-white">£29</span>
-              <span className="text-gray-400">/month</span>
+              <span className="text-4xl font-bold text-gray-900 dark:text-white">£29</span>
+              <span className="text-gray-500 dark:text-gray-400">/month</span>
             </div>
             {!isTrialExpired && (
-              <p className="text-sm text-gray-500 mt-2">Billed monthly</p>
+              <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">Billed monthly</p>
             )}
           </div>
 
@@ -91,7 +91,7 @@ export default function SelectPlan() {
                 <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">
                   <Check className="w-3 h-3 text-green-500" />
                 </div>
-                <span className="text-gray-300">{feature}</span>
+                <span className="text-gray-600 dark:text-gray-300">{feature}</span>
               </div>
             ))}
           </div>
@@ -104,7 +104,7 @@ export default function SelectPlan() {
             {isLoading ? 'Loading...' : isTrialExpired ? 'Subscribe Now' : 'Upgrade Now'}
           </button>
 
-          <p className="text-xs text-gray-500 text-center mt-4">
+          <p className="text-xs text-gray-500 dark:text-gray-500 text-center mt-4">
             {isTrialExpired
               ? 'Secure payment powered by Stripe'
               : 'Cancel anytime. No long-term commitment.'}

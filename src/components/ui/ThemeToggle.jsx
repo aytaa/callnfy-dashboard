@@ -17,7 +17,7 @@ export default function ThemeToggle({ className, ...props }) {
     <button
       onClick={toggleTheme}
       className={clsx(
-        'p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900',
+        'p-2 hover:opacity-70 transition-opacity focus:outline-none',
         className
       )}
       aria-label="Toggle theme"
