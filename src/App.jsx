@@ -34,6 +34,10 @@ import NotificationSettings from './pages/settings/NotificationSettings';
 // Other pages
 import Notifications from './pages/Notifications';
 
+// Legal pages
+import Privacy from './pages/legal/Privacy';
+import Terms from './pages/legal/Terms';
+
 // Protected Route Component
 function ProtectedRoute({ children }) {
   const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -332,6 +336,10 @@ function App() {
           <Route path="profile" element={<Profile />} />
           <Route path="notifications" element={<NotificationSettings />} />
         </Route>
+
+        {/* Legal Pages (Public) */}
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
 
         {/* 404 Fallback */}
         <Route path="*" element={<Navigate to="/auth/login" replace />} />
