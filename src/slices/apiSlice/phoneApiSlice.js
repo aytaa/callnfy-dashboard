@@ -115,7 +115,7 @@ export const phoneApiSlice = apiSlice.injectEndpoints({
         // Twilio-specific endpoints
         searchTwilioNumbers: builder.mutation({
             query: ({country = 'US', type = 'local', areaCode, contains}) => ({
-                url: '/v1/twilio/numbers/search',
+                url: '/twilio/numbers/search',
                 method: 'POST',
                 body: {
                     country,
@@ -127,7 +127,7 @@ export const phoneApiSlice = apiSlice.injectEndpoints({
         }),
         buyTwilioNumber: builder.mutation({
             query: ({phoneNumber, businessId, friendlyName}) => ({
-                url: '/v1/twilio/numbers/buy',
+                url: '/twilio/numbers/buy',
                 method: 'POST',
                 body: {phoneNumber, businessId, friendlyName},
             }),
@@ -135,13 +135,13 @@ export const phoneApiSlice = apiSlice.injectEndpoints({
         }),
         releaseTwilioNumber: builder.mutation({
             query: (sid) => ({
-                url: `/v1/twilio/numbers/${sid}`,
+                url: `/twilio/numbers/${sid}`,
                 method: 'DELETE',
             }),
             invalidatesTags: [{type: 'PhoneNumber', id: 'LIST'}],
         }),
         getTwilioNumberDetails: builder.query({
-            query: (sid) => `/v1/twilio/numbers/${sid}`,
+            query: (sid) => `/twilio/numbers/${sid}`,
             providesTags: (result, error, sid) => [{type: 'PhoneNumber', id: sid}],
         }),
     }),
