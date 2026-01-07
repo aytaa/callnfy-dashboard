@@ -144,6 +144,15 @@ export default function Privacy() {
                 <p className="text-gray-600 dark:text-gray-400 mt-2">
                   <strong className="text-gray-900 dark:text-white">Email:</strong> hello@callnfy.com
                 </p>
+                <p className="text-gray-600 dark:text-gray-400 mt-2">
+                  <strong className="text-gray-900 dark:text-white">Phone:</strong>
+                </p>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                  🇺🇸 <a href="tel:+12517582527" className="hover:text-gray-900 dark:hover:text-white transition-colors">+1 (251) 758-2527</a>
+                </p>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                  🇬🇧 <a href="tel:+442045721905" className="hover:text-gray-900 dark:hover:text-white transition-colors">+44 (20) 4572 1905</a>
+                </p>
               </section>
             </div>
           </div>
