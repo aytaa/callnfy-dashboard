@@ -6,6 +6,7 @@ import {
   useUpdatePhoneNumberMutation,
   useAssignAssistantMutation,
   useResyncPhoneNumberMutation,
+  useReleaseTwilioNumberMutation,
 } from '../../slices/apiSlice/phoneApiSlice';
 import { useGetAssistantQuery } from '../../slices/apiSlice/assistantApiSlice';
 
@@ -58,6 +59,7 @@ export default function PhoneNumberSettings() {
   const [updatePhoneNumber, { isLoading: isUpdating }] = useUpdatePhoneNumberMutation();
   const [assignAssistant, { isLoading: isAssigning }] = useAssignAssistantMutation();
   const [resyncPhoneNumber, { isLoading: isResyncing }] = useResyncPhoneNumberMutation();
+  const [releaseTwilioNumber, { isLoading: isReleasing }] = useReleaseTwilioNumberMutation();
 
   const phoneNumber = phoneData?.data?.phoneNumber;
 
@@ -164,6 +166,30 @@ export default function PhoneNumberSettings() {
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError(err?.data?.error?.message || err?.data?.message || 'Failed to resync phone number');
+    }
+  };
+
+  const handleReleaseTwilio = async () => {
+    if (!phoneNumber?.twilioSid) {
+      setError('Twilio SID not found for this phone number');
+      return;
+    }
+
+    if (!window.confirm('Are you sure you want to release this Twilio number? This will remove it from your account and you will no longer be charged for it.')) {
+      return;
+    }
+
+    setError('');
+    setSuccess('');
+
+    try {
+      await releaseTwilioNumber(phoneNumber.twilioSid).unwrap();
+      setSuccess('Twilio number released successfully');
+      setTimeout(() => {
+        navigate('/phone-numbers');
+      }, 1500);
+    } catch (err) {
+      setError(err?.data?.error?.message || err?.data?.message || 'Failed to release Twilio number');
     }
   };
 
@@ -400,6 +426,40 @@ export default function PhoneNumberSettings() {
                   readOnly
                   className="w-full bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white font-mono cursor-not-allowed"
                 />
+              </div>
+            )}
+
+            {/* Twilio SID (readonly) */}
+            {phoneNumber.twilioSid && (
+              <div>
+                <label className="block text-sm text-gray-500 dark:text-zinc-400 mb-1">Twilio SID</label>
+                <input
+                  type="text"
+                  value={phoneNumber.twilioSid}
+                  readOnly
+                  className="w-full bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white font-mono cursor-not-allowed"
+                />
+              </div>
+            )}
+
+            {/* Twilio Release Button */}
+            {phoneNumber.provider === 'twilio' && (
+              <div className="pt-4 border-t border-gray-200 dark:border-[#303030]">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">Release Twilio Number</p>
+                    <p className="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">
+                      Remove this number from your Twilio account and stop billing.
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleReleaseTwilio}
+                    disabled={isReleasing}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50"
+                  >
+                    {isReleasing ? 'Releasing...' : 'Release Number'}
+                  </button>
+                </div>
               </div>
             )}
           </div>

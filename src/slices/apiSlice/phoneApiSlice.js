@@ -112,6 +112,38 @@ export const phoneApiSlice = apiSlice.injectEndpoints({
                 {type: 'PhoneNumber', id: 'LIST'},
             ],
         }),
+        // Twilio-specific endpoints
+        searchTwilioNumbers: builder.mutation({
+            query: ({country = 'US', type = 'local', areaCode, contains}) => ({
+                url: '/v1/twilio/numbers/search',
+                method: 'POST',
+                body: {
+                    country,
+                    type,
+                    ...(areaCode && {areaCode}),
+                    ...(contains && {contains}),
+                },
+            }),
+        }),
+        buyTwilioNumber: builder.mutation({
+            query: ({phoneNumber, businessId, friendlyName}) => ({
+                url: '/v1/twilio/numbers/buy',
+                method: 'POST',
+                body: {phoneNumber, businessId, friendlyName},
+            }),
+            invalidatesTags: [{type: 'PhoneNumber', id: 'LIST'}],
+        }),
+        releaseTwilioNumber: builder.mutation({
+            query: (sid) => ({
+                url: `/v1/twilio/numbers/${sid}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: [{type: 'PhoneNumber', id: 'LIST'}],
+        }),
+        getTwilioNumberDetails: builder.query({
+            query: (sid) => `/v1/twilio/numbers/${sid}`,
+            providesTags: (result, error, sid) => [{type: 'PhoneNumber', id: sid}],
+        }),
     }),
 });
 
@@ -128,4 +160,9 @@ export const {
     useDeletePhoneNumberMutation,
     useAssignAssistantMutation,
     useResyncPhoneNumberMutation,
+    // Twilio-specific hooks
+    useSearchTwilioNumbersMutation,
+    useBuyTwilioNumberMutation,
+    useReleaseTwilioNumberMutation,
+    useGetTwilioNumberDetailsQuery,
 } = phoneApiSlice;
