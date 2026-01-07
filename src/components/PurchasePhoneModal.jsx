@@ -98,12 +98,18 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
   };
 
   const handleTwilioSearch = async () => {
+    if (!selectedBusiness) {
+      setError('Please select a business first');
+      return;
+    }
+
     setError('');
     setSelectedTwilioNumber(null);
     setHasSearched(true);
 
     try {
       const result = await searchTwilioNumbers({
+        businessId: selectedBusiness,
         country: twilioCountry,
         type: twilioType,
         areaCode: twilioAreaCode || undefined,

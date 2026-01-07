@@ -114,10 +114,11 @@ export const phoneApiSlice = apiSlice.injectEndpoints({
         }),
         // Twilio-specific endpoints
         searchTwilioNumbers: builder.mutation({
-            query: ({country = 'US', type = 'local', areaCode, contains}) => ({
+            query: ({businessId, country = 'US', type = 'local', areaCode, contains}) => ({
                 url: '/twilio/numbers/search',
                 method: 'POST',
                 body: {
+                    businessId,
                     country,
                     type,
                     ...(areaCode && {areaCode}),
