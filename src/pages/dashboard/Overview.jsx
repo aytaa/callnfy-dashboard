@@ -47,33 +47,45 @@ export default function Overview() {
   }).length;
 
   const callsColumns = [
-    { header: 'Caller', accessor: 'caller' },
-    { header: 'Phone', accessor: 'phone' },
     {
-      header: 'Duration',
-      accessor: 'duration',
-      render: (row) => {
-        const mins = Math.floor(row.duration / 60);
-        const secs = row.duration % 60;
+      key: 'caller',
+      label: 'Caller',
+      render: (_, row) => row?.customer?.name || 'Unknown Caller'
+    },
+    {
+      key: 'callerPhone',
+      label: 'Phone',
+      render: (_, row) => row?.callerPhone || 'Web Call'
+    },
+    {
+      key: 'duration',
+      label: 'Duration',
+      render: (_, row) => {
+        const duration = row?.duration || 0;
+        const mins = Math.floor(duration / 60);
+        const secs = duration % 60;
         return `${mins}:${String(secs).padStart(2, '0')}`;
       }
     },
     {
-      header: 'Status',
-      accessor: 'status',
-      render: (row) => (
+      key: 'status',
+      label: 'Status',
+      render: (_, row) => (
         <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#262626] text-gray-900 dark:text-white text-xs font-medium rounded capitalize">
-          {row.status}
+          {row?.status || 'unknown'}
         </span>
       ),
     },
     {
-      header: 'Time',
-      accessor: 'createdAt',
-      render: (row) => new Date(row.createdAt).toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit'
-      })
+      key: 'createdAt',
+      label: 'Time',
+      render: (_, row) => {
+        const date = row?.startedAt || row?.createdAt;
+        return date ? new Date(date).toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit'
+        }) : '-';
+      }
     },
   ];
 
