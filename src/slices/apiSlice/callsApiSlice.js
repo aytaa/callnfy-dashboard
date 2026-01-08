@@ -13,6 +13,7 @@ export const callsApiSlice = apiSlice.injectEndpoints({
           ...(status && { status }),
         },
       }),
+      transformResponse: (response) => response?.data || { calls: [], pagination: {} },
       providesTags: (result) =>
         result?.calls
           ? [
@@ -23,6 +24,7 @@ export const callsApiSlice = apiSlice.injectEndpoints({
     }),
     getCallDetail: builder.query({
       query: (id) => `/calls/${id}`,
+      transformResponse: (response) => response?.data || null,
       providesTags: (result, error, id) => [{ type: 'Call', id }],
     }),
     getCallStats: builder.query({
@@ -33,6 +35,7 @@ export const callsApiSlice = apiSlice.injectEndpoints({
           ...(dateRange && { dateRange }),
         },
       }),
+      transformResponse: (response) => response?.data || {},
       providesTags: [{ type: 'Call', id: 'STATS' }],
     }),
     testCall: builder.mutation({

@@ -21,6 +21,7 @@ export default function DataTable({
   emptyState,
   itemsPerPage = 10,
   className,
+  onRowClick,
   ...props
 }) {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
@@ -124,7 +125,11 @@ export default function DataTable({
             {paginatedData.map((row, rowIdx) => (
               <tr
                 key={rowIdx}
-                className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                className={clsx(
+                  'hover:bg-gray-50 dark:hover:bg-white/5 transition-colors',
+                  onRowClick && 'cursor-pointer'
+                )}
+                onClick={() => onRowClick?.(row)}
               >
                 {columns.map((column) => (
                   <td

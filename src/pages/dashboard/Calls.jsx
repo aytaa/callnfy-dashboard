@@ -65,41 +65,79 @@ export default function Calls() {
     { value: 'voicemail', label: 'Voicemail' },
   ];
 
+  // Helper to calculate duration from timestamps if duration is 0/null
+  const calculateDuration = (call) => {
+    if (call.duration && call.duration > 0) return call.duration;
+    if (call.startedAt && call.endedAt) {
+      return Math.floor((new Date(call.endedAt) - new Date(call.startedAt)) / 1000);
+    }
+    return 0;
+  };
+
+  // Helper to format duration as mm:ss
+  const formatDuration = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${String(secs).padStart(2, '0')}`;
+  };
+
+  // Status styling map
+  const getStatusStyle = (status) => {
+    const styles = {
+      completed: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+      ended: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+      failed: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+      missed: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+      'no-answer': 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
+      voicemail: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+      'in-progress': 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+    };
+    return styles[status] || 'bg-gray-100 dark:bg-[#262626] text-gray-900 dark:text-white';
+  };
+
   const columns = [
-    { header: 'Customer', accessor: 'caller' },
-    { header: 'Phone', accessor: 'phone' },
     {
-      header: 'Duration',
-      accessor: 'duration',
-      render: (row) => {
-        const mins = Math.floor(row.duration / 60);
-        const secs = row.duration % 60;
-        return `${mins}:${String(secs).padStart(2, '0')}`;
-      }
+      key: 'customer',
+      label: 'Customer',
+      render: (_, row) => row.customer?.name || 'Unknown Caller'
     },
     {
-      header: 'Status',
-      accessor: 'status',
-      render: (row) => (
-        <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#262626] text-gray-900 dark:text-white text-xs font-medium rounded capitalize">
-          {row.status}
+      key: 'callerPhone',
+      label: 'Phone',
+      render: (_, row) => row.callerPhone || 'Web Call'
+    },
+    {
+      key: 'duration',
+      label: 'Duration',
+      render: (_, row) => formatDuration(calculateDuration(row))
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (_, row) => (
+        <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded capitalize ${getStatusStyle(row.status)}`}>
+          {row.status?.replace(/-/g, ' ') || 'Unknown'}
         </span>
       ),
     },
     {
-      header: 'Date',
-      accessor: 'createdAt',
-      render: (row) => new Date(row.createdAt).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
+      key: 'startedAt',
+      label: 'Date',
+      render: (_, row) => {
+        const date = row.startedAt || row.createdAt;
+        return date ? new Date(date).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        }) : '-';
+      }
     },
     {
-      header: 'Actions',
-      render: (row) => (
+      key: 'actions',
+      label: 'Actions',
+      render: (_, row) => (
         <button
           className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
           onClick={(e) => {
@@ -260,7 +298,7 @@ export default function Calls() {
           <Modal
             isOpen={isModalOpen}
             onClose={closeModal}
-            title={`Call Details - ${selectedCall?.caller || 'Unknown'}`}
+            title={`Call Details - ${selectedCall?.customer?.name || 'Unknown Caller'}`}
             size="lg"
             footer={
               <Button variant="secondary" onClick={closeModal}>
@@ -272,31 +310,65 @@ export default function Calls() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Customer</p>
-                  <p className="text-gray-900 dark:text-white font-medium">{selectedCall.caller || 'Unknown'}</p>
+                  <p className="text-gray-900 dark:text-white font-medium">
+                    {selectedCall.customer?.name || 'Unknown Caller'}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Phone</p>
-                  <p className="text-gray-900 dark:text-white font-medium">{selectedCall.phone}</p>
+                  <p className="text-gray-900 dark:text-white font-medium">
+                    {selectedCall.callerPhone || 'Web Call'}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Duration</p>
                   <p className="text-gray-900 dark:text-white font-medium">
-                    {Math.floor(selectedCall.duration / 60)}:{String(selectedCall.duration % 60).padStart(2, '0')}
+                    {formatDuration(calculateDuration(selectedCall))}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
-                  <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#262626] text-gray-900 dark:text-white text-xs font-medium rounded capitalize">
-                    {selectedCall.status}
+                  <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded capitalize ${getStatusStyle(selectedCall.status)}`}>
+                    {selectedCall.status?.replace(/-/g, ' ') || 'Unknown'}
                   </span>
                 </div>
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Date</p>
+                  <p className="text-gray-900 dark:text-white font-medium">
+                    {selectedCall.startedAt ? new Date(selectedCall.startedAt).toLocaleString() : '-'}
+                  </p>
+                </div>
+                {selectedCall.endedReason && (
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Ended Reason</p>
+                    <p className="text-gray-900 dark:text-white font-medium capitalize">
+                      {selectedCall.endedReason.replace(/-/g, ' ')}
+                    </p>
+                  </div>
+                )}
+                {selectedCall.cost !== undefined && selectedCall.cost !== null && (
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Cost</p>
+                    <p className="text-gray-900 dark:text-white font-medium">
+                      ${selectedCall.cost.toFixed(4)}
+                    </p>
+                  </div>
+                )}
+                {selectedCall.business?.name && (
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Business</p>
+                    <p className="text-gray-900 dark:text-white font-medium">
+                      {selectedCall.business.name}
+                    </p>
+                  </div>
+                )}
               </div>
 
-              {selectedCall.transcript && (
+              {selectedCall.transcriptText && (
                 <div>
                   <p className="text-xs text-gray-500 mb-1.5">Transcript</p>
-                  <div className="bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md p-3">
-                    <p className="text-gray-900 dark:text-white text-sm">{selectedCall.transcript}</p>
+                  <div className="bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md p-3 max-h-48 overflow-y-auto">
+                    <p className="text-gray-900 dark:text-white text-sm whitespace-pre-wrap">{selectedCall.transcriptText}</p>
                   </div>
                 </div>
               )}
@@ -307,6 +379,16 @@ export default function Calls() {
                   <div className="bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md p-3">
                     <p className="text-gray-900 dark:text-white text-sm">{selectedCall.summary}</p>
                   </div>
+                </div>
+              )}
+
+              {selectedCall.recordingUrl && (
+                <div>
+                  <p className="text-xs text-gray-500 mb-1.5">Recording</p>
+                  <audio controls className="w-full">
+                    <source src={selectedCall.recordingUrl} type="audio/mpeg" />
+                    Your browser does not support the audio element.
+                  </audio>
                 </div>
               )}
             </div>
