@@ -42,6 +42,14 @@ export const callsApiSlice = apiSlice.injectEndpoints({
         body: { businessId, phoneNumber },
       }),
     }),
+    syncVapiCalls: builder.mutation({
+      query: (businessId) => ({
+        url: '/calls/sync-vapi',
+        method: 'POST',
+        body: { businessId },
+      }),
+      invalidatesTags: [{ type: 'Call', id: 'LIST' }, { type: 'Call', id: 'STATS' }],
+    }),
   }),
 });
 
@@ -50,4 +58,5 @@ export const {
   useGetCallDetailQuery,
   useGetCallStatsQuery,
   useTestCallMutation,
+  useSyncVapiCallsMutation,
 } = callsApiSlice;

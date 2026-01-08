@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Phone, MoreVertical, Loader2 } from 'lucide-react';
-import { useGetCallsQuery, useGetCallStatsQuery } from '../../slices/apiSlice/callsApiSlice';
+import { Phone, MoreVertical, Loader2, RefreshCw } from 'lucide-react';
+import { toast } from 'sonner';
+import { useGetCallsQuery, useGetCallStatsQuery, useSyncVapiCallsMutation } from '../../slices/apiSlice/callsApiSlice';
 import { useGetBusinessesQuery } from '../../slices/apiSlice/businessApiSlice';
 import DataTable from '../../components/ui/DataTable';
 import Select from '../../components/ui/Select';
@@ -33,6 +34,18 @@ export default function Calls() {
     { businessId, dateRange: dateFilter },
     { skip: !businessId, refetchOnMountOrArgChange: true }
   );
+
+  const [syncVapiCalls, { isLoading: isSyncing }] = useSyncVapiCallsMutation();
+
+  const handleSync = async () => {
+    if (!businessId) return;
+    try {
+      const result = await syncVapiCalls(businessId).unwrap();
+      toast.success(`Synced ${result.syncedCount || 0} calls`);
+    } catch (error) {
+      toast.error(error?.data?.message || 'Failed to sync calls');
+    }
+  };
 
   const calls = callsData?.calls || [];
   const pagination = callsData?.pagination || {};
@@ -124,6 +137,15 @@ export default function Calls() {
         {/* Header with Filters */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
+            <Button
+              variant="outline"
+              onClick={handleSync}
+              disabled={isSyncing || !businessId}
+              loading={isSyncing}
+            >
+              {!isSyncing && <RefreshCw className="w-4 h-4 mr-2" />}
+              {isSyncing ? 'Syncing...' : 'Sync Calls'}
+            </Button>
           </div>
           <div className="flex gap-2">
             <Select
