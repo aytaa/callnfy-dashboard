@@ -81,6 +81,20 @@ export default function Calls() {
     return `${mins}:${String(secs).padStart(2, '0')}`;
   };
 
+  // Format ended reason - "customer-ended-call" -> "Customer Ended Call"
+  const formatEndedReason = (reason) => {
+    if (!reason) return '-';
+    return reason.split('-').map(word =>
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
+
+  // Format cost - string "0.0315" -> "$0.03"
+  const formatCost = (cost) => {
+    if (!cost) return '$0.00';
+    return `$${parseFloat(cost).toFixed(2)}`;
+  };
+
   // Status styling map
   const getStatusStyle = (status) => {
     const styles = {
@@ -121,16 +135,27 @@ export default function Calls() {
       ),
     },
     {
+      key: 'endedReason',
+      label: 'Ended Reason',
+      render: (_, row) => formatEndedReason(row.endedReason)
+    },
+    {
+      key: 'cost',
+      label: 'Cost',
+      render: (_, row) => formatCost(row.cost)
+    },
+    {
       key: 'startedAt',
       label: 'Date',
       render: (_, row) => {
         const date = row.startedAt || row.createdAt;
-        return date ? new Date(date).toLocaleDateString('en-US', {
+        return date ? new Date(date).toLocaleString('en-US', {
           month: 'short',
           day: 'numeric',
           year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
         }) : '-';
       }
     },
@@ -346,11 +371,11 @@ export default function Calls() {
                     </p>
                   </div>
                 )}
-                {selectedCall.cost !== undefined && selectedCall.cost !== null && (
+                {selectedCall.cost && (
                   <div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Cost</p>
                     <p className="text-gray-900 dark:text-white font-medium">
-                      ${selectedCall.cost.toFixed(4)}
+                      {formatCost(selectedCall.cost)}
                     </p>
                   </div>
                 )}

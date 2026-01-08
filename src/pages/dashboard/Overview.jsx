@@ -30,6 +30,50 @@ export default function Overview() {
   const calls = callsData?.calls || [];
   const appointments = appointmentsData?.appointments || [];
 
+  // Helper to calculate duration from timestamps if duration is 0/null
+  const calculateDuration = (call) => {
+    if (call?.duration && call.duration > 0) return call.duration;
+    if (call?.startedAt && call?.endedAt) {
+      return Math.round((new Date(call.endedAt) - new Date(call.startedAt)) / 1000);
+    }
+    return 0;
+  };
+
+  // Helper to format duration as mm:ss
+  const formatDuration = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${String(secs).padStart(2, '0')}`;
+  };
+
+  // Format ended reason - "customer-ended-call" -> "Customer Ended Call"
+  const formatEndedReason = (reason) => {
+    if (!reason) return '-';
+    return reason.split('-').map(word =>
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
+
+  // Format cost - string "0.0315" -> "$0.03"
+  const formatCost = (cost) => {
+    if (!cost) return '$0.00';
+    return `$${parseFloat(cost).toFixed(2)}`;
+  };
+
+  // Status styling map
+  const getStatusStyle = (status) => {
+    const styles = {
+      completed: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+      ended: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+      failed: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+      missed: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+      'no-answer': 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
+      voicemail: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+      'in-progress': 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+    };
+    return styles[status] || 'bg-gray-100 dark:bg-[#262626] text-gray-900 dark:text-white';
+  };
+
   // Calculate stats
   const todaysCalls = calls.filter(call => {
     const callDate = new Date(call.createdAt);
@@ -37,8 +81,8 @@ export default function Overview() {
     return callDate.toDateString() === today.toDateString();
   }).length;
 
-  const totalMinutes = calls.reduce((sum, call) => sum + (call.duration || 0), 0);
-  const minutesFormatted = `${Math.floor(totalMinutes / 60)}:${String(totalMinutes % 60).padStart(2, '0')}`;
+  const totalSeconds = calls.reduce((sum, call) => sum + calculateDuration(call), 0);
+  const minutesFormatted = formatDuration(totalSeconds);
 
   const todaysAppointments = appointments.filter(apt => {
     const aptDate = new Date(apt.date);
@@ -48,44 +92,48 @@ export default function Overview() {
 
   const callsColumns = [
     {
-      key: 'caller',
-      label: 'Caller',
-      render: (_, row) => row?.customer?.name || 'Unknown Caller'
+      key: 'startedAt',
+      label: 'Date/Time',
+      render: (_, row) => {
+        const date = row?.startedAt || row?.createdAt;
+        return date ? new Date(date).toLocaleString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        }) : '-';
+      }
     },
     {
       key: 'callerPhone',
-      label: 'Phone',
-      render: (_, row) => row?.callerPhone || 'Web Call'
+      label: 'Caller',
+      render: (_, row) => row?.callerPhone || 'Unknown'
     },
     {
       key: 'duration',
       label: 'Duration',
-      render: (_, row) => {
-        const duration = row?.duration || 0;
-        const mins = Math.floor(duration / 60);
-        const secs = duration % 60;
-        return `${mins}:${String(secs).padStart(2, '0')}`;
-      }
+      render: (_, row) => formatDuration(calculateDuration(row))
     },
     {
       key: 'status',
       label: 'Status',
       render: (_, row) => (
-        <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#262626] text-gray-900 dark:text-white text-xs font-medium rounded capitalize">
-          {row?.status || 'unknown'}
+        <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded capitalize ${getStatusStyle(row?.status)}`}>
+          {row?.status?.replace(/-/g, ' ') || 'Unknown'}
         </span>
       ),
     },
     {
-      key: 'createdAt',
-      label: 'Time',
-      render: (_, row) => {
-        const date = row?.startedAt || row?.createdAt;
-        return date ? new Date(date).toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit'
-        }) : '-';
-      }
+      key: 'endedReason',
+      label: 'Ended Reason',
+      render: (_, row) => formatEndedReason(row?.endedReason)
+    },
+    {
+      key: 'cost',
+      label: 'Cost',
+      render: (_, row) => formatCost(row?.cost)
     },
   ];
 
