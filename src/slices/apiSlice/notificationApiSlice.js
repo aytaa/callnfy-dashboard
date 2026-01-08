@@ -110,6 +110,65 @@ export const notificationApiSlice = apiSlice.injectEndpoints({
         { type: 'Notification', id: 'COUNT' },
       ],
     }),
+
+    // WhatsApp Notification Settings
+    // Get current WhatsApp settings
+    getWhatsAppSettings: builder.query({
+      query: () => '/notifications/whatsapp',
+      transformResponse: (response) => response?.data || response,
+      providesTags: ['WhatsAppSettings'],
+    }),
+
+    // Send verification code to WhatsApp number
+    sendWhatsAppCode: builder.mutation({
+      query: (phoneNumber) => ({
+        url: '/notifications/whatsapp/send-code',
+        method: 'POST',
+        body: { phoneNumber },
+      }),
+      transformResponse: (response) => response?.data || response,
+    }),
+
+    // Verify WhatsApp code
+    verifyWhatsAppCode: builder.mutation({
+      query: (code) => ({
+        url: '/notifications/whatsapp/verify',
+        method: 'POST',
+        body: { code },
+      }),
+      transformResponse: (response) => response?.data || response,
+      invalidatesTags: ['WhatsAppSettings'],
+    }),
+
+    // Enable WhatsApp notifications
+    enableWhatsAppNotifications: builder.mutation({
+      query: () => ({
+        url: '/notifications/whatsapp/enable',
+        method: 'POST',
+      }),
+      transformResponse: (response) => response?.data || response,
+      invalidatesTags: ['WhatsAppSettings'],
+    }),
+
+    // Disable WhatsApp notifications
+    disableWhatsAppNotifications: builder.mutation({
+      query: () => ({
+        url: '/notifications/whatsapp/disable',
+        method: 'POST',
+      }),
+      transformResponse: (response) => response?.data || response,
+      invalidatesTags: ['WhatsAppSettings'],
+    }),
+
+    // Remove WhatsApp number
+    removeWhatsAppNumber: builder.mutation({
+      query: () => ({
+        url: '/notifications/whatsapp',
+        method: 'DELETE',
+      }),
+      transformResponse: (response) => response?.data || response,
+      invalidatesTags: ['WhatsAppSettings'],
+    }),
   }),
 });
 
@@ -124,4 +183,11 @@ export const {
   useMarkAsReadMutation,
   useMarkAllAsReadMutation,
   useDeleteNotificationMutation,
+  // WhatsApp
+  useGetWhatsAppSettingsQuery,
+  useSendWhatsAppCodeMutation,
+  useVerifyWhatsAppCodeMutation,
+  useEnableWhatsAppNotificationsMutation,
+  useDisableWhatsAppNotificationsMutation,
+  useRemoveWhatsAppNumberMutation,
 } = notificationApiSlice;
