@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../slices/authSlice';
 import { useGetBusinessesQuery } from '../../slices/apiSlice/businessApiSlice';
 import { useGetCallsQuery } from '../../slices/apiSlice/callsApiSlice';
-import { useGetAppointmentsQuery } from '../../slices/apiSlice/appointmentsApiSlice';
+import { useGetBookingsQuery } from '../../slices/apiSlice/bookingsApiSlice';
 import DataTable from '../../components/ui/DataTable';
 
 export default function Overview() {
@@ -20,7 +20,7 @@ export default function Overview() {
     { businessId, page: 1, limit: 5 },
     { skip: !businessId, refetchOnMountOrArgChange: true }
   );
-  const { data: appointmentsData, isLoading: appointmentsLoading } = useGetAppointmentsQuery(
+  const { data: bookingsData, isLoading: bookingsLoading } = useGetBookingsQuery(
     { businessId, page: 1, limit: 10 },
     { skip: !businessId, refetchOnMountOrArgChange: true }
   );
@@ -28,7 +28,7 @@ export default function Overview() {
   const userName = user?.name || 'User';
   const userEmail = user?.email || '';
   const calls = callsData?.calls || [];
-  const appointments = appointmentsData?.appointments || [];
+  const appointments = bookingsData?.bookings || [];
 
   // Helper to calculate duration from timestamps if duration is 0/null
   const calculateDuration = (call) => {
@@ -260,7 +260,7 @@ export default function Overview() {
               View All
             </Link>
           </div>
-          {appointmentsLoading ? (
+          {bookingsLoading ? (
             <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-8 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white mx-auto"></div>
             </div>
