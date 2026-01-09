@@ -44,21 +44,21 @@ export default function Customers() {
   const [deleteCustomer, { isLoading: isDeleting }] = useDeleteCustomerMutation();
 
   const customers = customersData?.customers || [];
-  const pagination = customersData?.pagination || {};
+  const pagination = customersData?.pagination || { page: 1, limit: 10, total: 0, totalPages: 0 };
 
   const columns = [
-    { header: 'Name', accessor: 'name' },
-    { header: 'Phone', accessor: 'phone' },
-    { header: 'Email', accessor: 'email' },
+    { key: 'name', label: 'Name' },
+    { key: 'phone', label: 'Phone' },
+    { key: 'email', label: 'Email' },
     {
-      header: 'Total Calls',
-      accessor: 'totalCalls',
-      render: (row) => row.totalCalls || 0
+      key: 'totalCalls',
+      label: 'Total Calls',
+      render: (value) => value || 0
     },
     {
-      header: 'Last Contact',
-      accessor: 'lastContact',
-      render: (row) => row.lastContact ? new Date(row.lastContact).toLocaleDateString('en-US', {
+      key: 'lastContact',
+      label: 'Last Contact',
+      render: (value) => value ? new Date(value).toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
         year: 'numeric',
