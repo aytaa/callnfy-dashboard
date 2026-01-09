@@ -3,7 +3,7 @@ import {logout, setCredentials} from './authSlice';
 import toast from 'react-hot-toast';
 
 const baseQuery = fetchBaseQuery({
-    baseUrl: 'https://api.callnfy.com/v1',
+    baseUrl: import.meta.env.VITE_API_URL || 'https://api.callnfy.com/v1',
     credentials: 'include',
     prepareHeaders: (headers, {getState}) => {
         const token = getState().auth.accessToken;

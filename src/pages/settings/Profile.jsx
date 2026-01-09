@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Loader2, Building2 } from 'lucide-react';
-import { useGetMeQuery } from '../../slices/apiSlice/authApiSlice';
+import { useGetMeQuery, useUpdateProfileMutation } from '../../slices/apiSlice/authApiSlice';
 import toast from 'react-hot-toast';
 
 export default function Profile() {
   const { data: userData, isLoading, error } = useGetMeQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
+  const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
 
   // Normalize user data from API (data.name, data.email, data.businessName)
   const user = userData?.data || userData || {};
@@ -23,9 +24,13 @@ export default function Profile() {
   const businessName = user.businessName || user.business_name || '';
   const initials = name ? name.charAt(0).toUpperCase() : 'U';
 
-  const handleSave = () => {
-    // TODO: Implement update profile API call
-    toast.success('Profile updated');
+  const handleSave = async () => {
+    try {
+      await updateProfile({ name }).unwrap();
+      toast.success('Profile updated successfully');
+    } catch (err) {
+      toast.error(err?.data?.message || 'Failed to update profile');
+    }
   };
 
   if (isLoading) {
@@ -86,9 +91,10 @@ export default function Profile() {
         <div className="flex justify-end mt-3 pt-3 border-t border-gray-200 dark:border-[#303030]">
           <button
             onClick={handleSave}
-            className="bg-gray-900 dark:bg-white text-white dark:text-black px-3 py-1 text-xs font-medium rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+            disabled={isUpdating}
+            className="bg-gray-900 dark:bg-white text-white dark:text-black px-3 py-1 text-xs font-medium rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors disabled:opacity-50"
           >
-            Save Changes
+            {isUpdating ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
       </div>

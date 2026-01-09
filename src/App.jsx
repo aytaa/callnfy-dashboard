@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectIsAuthenticated } from './slices/authSlice';
+import ErrorBoundary from './components/ErrorBoundary';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import ForgotPassword from './pages/auth/ForgotPassword';
@@ -62,8 +63,9 @@ function AuthRoute({ children }) {
 
 function App() {
   return (
-    <Router>
-      <Routes>
+    <ErrorBoundary>
+      <Router>
+        <Routes>
         {/* Default redirect */}
         <Route path="/" element={<Navigate to="/auth/login" replace />} />
 
@@ -343,8 +345,9 @@ function App() {
 
         {/* 404 Fallback */}
         <Route path="*" element={<Navigate to="/auth/login" replace />} />
-      </Routes>
-    </Router>
+        </Routes>
+      </Router>
+    </ErrorBoundary>
   );
 }
 

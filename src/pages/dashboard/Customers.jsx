@@ -260,7 +260,7 @@ export default function Customers() {
                   Call History
                 </h3>
                 <div className="space-y-2">
-                  {selectedCustomer.callHistory.length > 0 ? (
+                  {selectedCustomer?.callHistory?.length > 0 ? (
                     selectedCustomer.callHistory.map((call, index) => (
                       <div key={index} className="bg-gray-50 dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-md p-3">
                         <div className="flex justify-between items-center">
@@ -287,7 +287,7 @@ export default function Customers() {
                   Appointments
                 </h3>
                 <div className="space-y-2">
-                  {selectedCustomer.appointments.length > 0 ? (
+                  {selectedCustomer?.appointments?.length > 0 ? (
                     selectedCustomer.appointments.map((appointment, index) => (
                       <div key={index} className="bg-gray-50 dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-md p-3">
                         <div className="flex justify-between items-center">
