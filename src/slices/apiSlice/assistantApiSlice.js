@@ -20,6 +20,7 @@ export const assistantApiSlice = apiSlice.injectEndpoints({
     }),
     getAssistantDetail: builder.query({
       query: (id) => `/assistants/${id}`,
+      transformResponse: (response) => response.data,
       providesTags: (result, error, id) => [{ type: 'Assistant', id }],
     }),
     createAssistant: builder.mutation({

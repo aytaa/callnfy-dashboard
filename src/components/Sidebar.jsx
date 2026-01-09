@@ -57,7 +57,7 @@ function Sidebar({isOpen, onClose}) {
     };
 
     const localUser = getUserFromStorage();
-    const apiUser = userData?.data;
+    const apiUser = userData;
     const business = businessData?.[0];
 
     // Prefer API data over localStorage
@@ -329,7 +329,7 @@ function Sidebar({isOpen, onClose}) {
                 <div className={clsx('p-3 space-y-2', isCollapsed && 'px-2')}>
                     {/* Plan Badge and Trial Status */}
                     {!isCollapsed && (() => {
-                        const user = userData?.data;
+                        const user = userData;
                         const subscriptionStatus = user?.subscriptionStatus;
                         const trialEndsAt = user?.trialEndsAt;
 
@@ -383,7 +383,7 @@ function Sidebar({isOpen, onClose}) {
 
                     {/* Upgrade Button */}
                     {!isCollapsed && (() => {
-                        const user = userData?.data;
+                        const user = userData;
                         const subscriptionStatus = user?.subscriptionStatus;
 
                         // Only show upgrade button if on trial or no subscription

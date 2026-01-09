@@ -43,7 +43,7 @@ export default function Appointments() {
   const [createBooking, { isLoading: isCreating }] = useCreateBookingMutation();
 
   // Extract appointments from API response
-  const appointments = bookingsData?.data || [];
+  const appointments = bookingsData?.bookings || [];
 
   const serviceOptions = [
     { value: 'consultation', label: 'Consultation' },

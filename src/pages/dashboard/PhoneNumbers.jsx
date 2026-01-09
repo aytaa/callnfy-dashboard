@@ -44,7 +44,7 @@ export default function PhoneNumbers() {
   });
   const [deletePhoneNumber, { isLoading: isDeleting }] = useDeletePhoneNumberMutation();
 
-  const phoneNumbers = phoneNumbersData?.data?.phoneNumbers || [];
+  const phoneNumbers = phoneNumbersData?.phoneNumbers || [];
   const businesses = businessesData || [];
 
   // Create a map of businessId -> phone number

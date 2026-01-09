@@ -14,6 +14,7 @@ export const appointmentsApiSlice = apiSlice.injectEndpoints({
           ...(endDate && { endDate }),
         },
       }),
+      transformResponse: (response) => response?.data || { appointments: [], pagination: {} },
       providesTags: (result) =>
         result?.appointments
           ? [
@@ -24,6 +25,7 @@ export const appointmentsApiSlice = apiSlice.injectEndpoints({
     }),
     getAppointmentDetail: builder.query({
       query: (id) => `/appointments/${id}`,
+      transformResponse: (response) => response?.data || null,
       providesTags: (result, error, id) => [{ type: 'Appointment', id }],
     }),
     createAppointment: builder.mutation({

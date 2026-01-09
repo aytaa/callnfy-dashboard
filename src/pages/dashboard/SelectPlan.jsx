@@ -13,7 +13,7 @@ export default function SelectPlan() {
   });
   const [createCheckout, { isLoading }] = useCreateCheckoutMutation();
 
-  const user = userData?.data;
+  const user = userData;
   const subscriptionStatus = user?.subscriptionStatus;
   const trialEndsAt = user?.trialEndsAt;
 

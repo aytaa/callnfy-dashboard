@@ -10,10 +10,11 @@ export const phoneApiSlice = apiSlice.injectEndpoints({
                     limit: Number(limit),
                 },
             }),
+            transformResponse: (response) => response?.data || {phoneNumbers: [], pagination: {}},
             providesTags: (result) =>
-                result?.data?.phoneNumbers
+                result?.phoneNumbers
                     ? [
-                        ...result.data.phoneNumbers.map(({id}) => ({type: 'PhoneNumber', id})),
+                        ...result.phoneNumbers.map(({id}) => ({type: 'PhoneNumber', id})),
                         {type: 'PhoneNumber', id: 'LIST'},
                     ]
                     : [{type: 'PhoneNumber', id: 'LIST'}],
@@ -28,6 +29,7 @@ export const phoneApiSlice = apiSlice.injectEndpoints({
                     country,
                 },
             }),
+            transformResponse: (response) => response?.data || [],
         }),
         purchasePhoneNumber: builder.mutation({
             query: (phoneNumberData) => ({
@@ -78,6 +80,7 @@ export const phoneApiSlice = apiSlice.injectEndpoints({
         }),
         getPhoneNumber: builder.query({
             query: (id) => `/phone-numbers/${id}`,
+            transformResponse: (response) => response?.data || null,
             providesTags: (result, error, id) => [{type: 'PhoneNumber', id}],
         }),
         updatePhoneNumber: builder.mutation({
@@ -143,6 +146,7 @@ export const phoneApiSlice = apiSlice.injectEndpoints({
         }),
         getTwilioNumberDetails: builder.query({
             query: (sid) => `/twilio/numbers/${sid}`,
+            transformResponse: (response) => response?.data || null,
             providesTags: (result, error, sid) => [{type: 'PhoneNumber', id: sid}],
         }),
     }),

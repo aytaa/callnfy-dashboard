@@ -9,8 +9,8 @@ export default function Profile() {
   });
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
 
-  // Normalize user data from API (data.name, data.email, data.businessName)
-  const user = userData?.data || userData || {};
+  // Normalize user data from API
+  const user = userData || {};
   const [name, setName] = useState('');
 
   // Populate form when user data loads

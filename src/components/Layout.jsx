@@ -56,8 +56,8 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
     const path = location.pathname;
 
     // Handle phone number detail page
-    if (phoneNumberId && phoneNumberData?.data?.phoneNumber) {
-      const phoneNumber = phoneNumberData.data.phoneNumber;
+    if (phoneNumberId && phoneNumberData?.phoneNumber) {
+      const phoneNumber = phoneNumberData.phoneNumber;
       return {
         title: formatPhoneNumber(phoneNumber.phoneNumber || phoneNumber.number),
         subtitle: phoneNumber.name || 'Phone Number',
@@ -112,7 +112,7 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
   useEffect(() => {
     if (skipSubscriptionCheck || isLoadingUser) return;
 
-    const user = userData?.data;
+    const user = userData;
     const subscriptionStatus = user?.subscriptionStatus;
     const trialEndsAt = user?.trialEndsAt;
 

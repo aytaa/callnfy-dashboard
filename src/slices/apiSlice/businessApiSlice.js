@@ -18,6 +18,7 @@ export const businessApiSlice = apiSlice.injectEndpoints({
     }),
     getBusiness: builder.query({
       query: (id) => `/businesses/${id}`,
+      transformResponse: (response) => response?.data || null,
       providesTags: (result, error, id) => [{ type: 'Business', id }],
     }),
     createBusiness: builder.mutation({

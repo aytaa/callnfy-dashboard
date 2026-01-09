@@ -61,7 +61,7 @@ export default function PhoneNumberSettings() {
   const [resyncPhoneNumber, { isLoading: isResyncing }] = useResyncPhoneNumberMutation();
   const [releaseTwilioNumber, { isLoading: isReleasing }] = useReleaseTwilioNumberMutation();
 
-  const phoneNumber = phoneData?.data?.phoneNumber;
+  const phoneNumber = phoneData?.phoneNumber;
 
   // Initialize form values when data loads
   useEffect(() => {

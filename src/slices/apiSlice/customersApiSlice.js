@@ -23,6 +23,7 @@ export const customersApiSlice = apiSlice.injectEndpoints({
     }),
     getCustomerDetail: builder.query({
       query: (id) => `/customers/${id}`,
+      transformResponse: (response) => response.data,
       providesTags: (result, error, id) => [{ type: 'Customer', id }],
     }),
     createCustomer: builder.mutation({

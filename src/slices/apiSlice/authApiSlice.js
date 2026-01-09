@@ -34,6 +34,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
     }),
     getMe: builder.query({
       query: () => '/auth/me',
+      transformResponse: (response) => response?.data || null,
       keepUnusedDataFor: 0,  // Don't cache
       refetchOnMountOrArgChange: true,  // Refetch every time component mounts
       providesTags: ['User'],

@@ -39,8 +39,8 @@ export default function SubscriptionGuard({ children }) {
     // Skip if already checked or still loading
     if (hasCheckedOnboarding.current || isLoadingUser || !userData) return;
 
-    // Extract user from various possible response structures
-    const user = userData?.data?.user || userData?.data || userData?.user || userData;
+    // Extract user from API response (transformResponse unwraps response.data)
+    const user = userData?.user || userData;
     const onboardingCompleted = user?.onboardingCompleted === true;
 
     // Debug logging
@@ -96,7 +96,7 @@ export default function SubscriptionGuard({ children }) {
 
   // Show onboarding modal if not completed
   if (showOnboarding) {
-    const user = userData?.data?.user || userData?.data || userData?.user || userData;
+    const user = userData?.user || userData;
     console.log('[SubscriptionGuard] Rendering modal with user:', user);
     return (
       <>

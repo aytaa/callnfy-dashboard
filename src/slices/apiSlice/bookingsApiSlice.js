@@ -14,6 +14,7 @@ export const bookingsApiSlice = apiSlice.injectEndpoints({
           ...(endDate && { endDate }),
         },
       }),
+      transformResponse: (response) => response?.data || { bookings: [], pagination: {} },
       providesTags: (result) =>
         result?.bookings
           ? [
@@ -24,6 +25,7 @@ export const bookingsApiSlice = apiSlice.injectEndpoints({
     }),
     getBooking: builder.query({
       query: (id) => `/bookings/${id}`,
+      transformResponse: (response) => response?.data || null,
       providesTags: (result, error, id) => [{ type: 'Booking', id }],
     }),
     getAvailability: builder.query({
@@ -34,6 +36,7 @@ export const bookingsApiSlice = apiSlice.injectEndpoints({
           ...(serviceId && { serviceId }),
         },
       }),
+      transformResponse: (response) => response?.data || {},
     }),
     createBooking: builder.mutation({
       query: (booking) => ({

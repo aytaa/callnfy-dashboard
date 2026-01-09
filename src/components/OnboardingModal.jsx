@@ -141,8 +141,8 @@ export default function OnboardingModal({ onComplete, initialUserData }) {
       setAssistantName(assistant.name || 'Sophie');
     }
 
-    if (phoneNumbers?.data?.phoneNumbers?.length > 0) {
-      const phone = phoneNumbers.data.phoneNumbers[0];
+    if (phoneNumbers?.phoneNumbers?.length > 0) {
+      const phone = phoneNumbers.phoneNumbers[0];
       setSavedPhoneNumber(phone.phoneNumber || phone.number);
     }
 
