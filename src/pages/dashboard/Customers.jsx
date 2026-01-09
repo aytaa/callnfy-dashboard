@@ -80,8 +80,24 @@ export default function Customers() {
     e.preventDefault();
     setError('');
 
+    // Validate phone is not empty
+    if (!formData.phone?.trim()) {
+      setError('Phone number is required');
+      return;
+    }
+
+    // Validate businessId is available
+    if (!businessId) {
+      setError('Business not loaded. Please refresh and try again.');
+      return;
+    }
+
     try {
-      await createCustomer(formData).unwrap();
+      await createCustomer({
+        ...formData,
+        phone: formData.phone.trim(),
+        businessId,
+      }).unwrap();
       setIsAddModalOpen(false);
       setFormData({ name: '', phone: '', email: '' });
     } catch (err) {
