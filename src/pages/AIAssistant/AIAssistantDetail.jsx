@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Phone, MessageSquare, TestTube, Sparkles, AlertTriangle, Info, Loader2, Clock, Mic, Brain, Settings, Hash } from 'lucide-react';
+import { Sparkles, AlertTriangle, Info, Loader2, Clock, Mic, Brain, Hash } from 'lucide-react';
 import {
   useGetAssistantQuery,
   useUpdateAssistantMutation,
@@ -123,18 +123,6 @@ export default function AIAssistantDetail() {
     }
   };
 
-  const handleTest = () => {
-    console.log('Test assistant');
-  };
-
-  const handleChat = () => {
-    console.log('Open chat');
-  };
-
-  const handleTalk = () => {
-    console.log('Talk to assistant');
-  };
-
   if (isLoading) {
     return (
       <div className="px-8 py-6 flex items-center justify-center min-h-screen bg-gray-50 dark:bg-transparent">
@@ -244,34 +232,9 @@ export default function AIAssistantDetail() {
 
         {/* Header */}
         <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-zinc-800 rounded-md p-4">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h1 className="text-lg font-semibold text-gray-900 dark:text-white">{assistant.name || 'AI Receptionist'}</h1>
-              <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{assistant.businessName || businessName}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleTest}
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-900 dark:text-white bg-gray-100 dark:bg-zinc-700 rounded-md hover:bg-gray-200 dark:hover:bg-zinc-600 transition-colors"
-              >
-                <TestTube className="w-4 h-4" />
-                Test
-              </button>
-              <button
-                onClick={handleChat}
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-900 dark:text-white bg-gray-100 dark:bg-zinc-700 rounded-md hover:bg-gray-200 dark:hover:bg-zinc-600 transition-colors"
-              >
-                <MessageSquare className="w-4 h-4" />
-                Chat
-              </button>
-              <button
-                onClick={handleTalk}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white dark:text-black bg-gray-900 dark:bg-white rounded-md hover:bg-gray-800 dark:hover:bg-zinc-200 transition-colors"
-              >
-                <Phone className="w-4 h-4" />
-                Talk to Assistant
-              </button>
-            </div>
+          <div className="mb-4">
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">{assistant.name || 'AI Receptionist'}</h1>
+            <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{assistant.businessName || businessName}</p>
           </div>
 
           {/* Tab Navigation */}
