@@ -1,14 +1,12 @@
 import { useState } from 'react';
 
 export default function VoiceTab({ assistant, onUpdate }) {
-  // Use Vapi data as source of truth, fallback to local data
-  const vapiVoice = assistant?.vapiVoice || assistant?.voice;
-
+  // Use direct API fields (voiceProvider and voiceId are flat)
   const [formData, setFormData] = useState({
-    provider: vapiVoice?.provider || 'elevenlabs',
-    voiceId: vapiVoice?.voiceId || vapiVoice?.voice || '',
-    speed: vapiVoice?.speed || 1.0,
-    pitch: vapiVoice?.pitch || 1.0,
+    voiceProvider: assistant?.voiceProvider || 'azure',
+    voiceId: assistant?.voiceId || '',
+    speed: 1.0,
+    pitch: 1.0,
   });
 
   const handleChange = (field, value) => {
@@ -18,19 +16,15 @@ export default function VoiceTab({ assistant, onUpdate }) {
   const handleBlur = () => {
     if (onUpdate) {
       onUpdate({
-        voice: {
-          provider: formData.provider,
-          voiceId: formData.voiceId,
-          speed: formData.speed,
-          pitch: formData.pitch,
-        },
+        voiceProvider: formData.voiceProvider,
+        voiceId: formData.voiceId,
       });
     }
   };
 
   // Voice options based on provider
   const getVoiceOptions = () => {
-    switch (formData.provider) {
+    switch (formData.voiceProvider) {
       case 'elevenlabs':
         return [
           { value: 'rachel', label: 'Rachel' },
@@ -81,25 +75,47 @@ export default function VoiceTab({ assistant, onUpdate }) {
     }
   };
 
+  // Check if current voiceId is in the options list
+  const voiceOptions = getVoiceOptions();
+  const isCustomVoice = formData.voiceId && !voiceOptions.find(v => v.value === formData.voiceId);
+
   return (
     <div className="space-y-4">
+      {/* Current Voice Display */}
+      <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-md p-3">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Current Provider</p>
+            <p className="text-sm text-gray-900 dark:text-white font-medium capitalize">
+              {assistant?.voiceProvider || 'Not set'}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Current Voice</p>
+            <p className="text-sm text-gray-900 dark:text-white font-medium">
+              {assistant?.voiceId || 'Not set'}
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Voice Provider */}
       <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-md p-3">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Voice Provider</h3>
         <div>
           <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Provider</label>
           <select
-            value={formData.provider}
+            value={formData.voiceProvider}
             onChange={(e) => {
-              handleChange('provider', e.target.value);
+              handleChange('voiceProvider', e.target.value);
               handleChange('voiceId', ''); // Reset voice when provider changes
             }}
             onBlur={handleBlur}
             className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
           >
+            <option value="azure">Azure</option>
             <option value="elevenlabs">ElevenLabs</option>
             <option value="playht">PlayHT</option>
-            <option value="azure">Azure</option>
             <option value="openai">OpenAI</option>
             <option value="deepgram">Deepgram</option>
             <option value="cartesia">Cartesia</option>
@@ -114,20 +130,27 @@ export default function VoiceTab({ assistant, onUpdate }) {
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Voice Selection</h3>
         <div>
           <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Voice</label>
-          {getVoiceOptions().length > 0 ? (
-            <select
-              value={formData.voiceId}
-              onChange={(e) => handleChange('voiceId', e.target.value)}
-              onBlur={handleBlur}
-              className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
-            >
-              <option value="">Select a voice</option>
-              {getVoiceOptions().map((voice) => (
-                <option key={voice.value} value={voice.value}>
-                  {voice.label}
-                </option>
-              ))}
-            </select>
+          {voiceOptions.length > 0 ? (
+            <>
+              <select
+                value={isCustomVoice ? '' : formData.voiceId}
+                onChange={(e) => handleChange('voiceId', e.target.value)}
+                onBlur={handleBlur}
+                className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
+              >
+                <option value="">Select a voice</option>
+                {voiceOptions.map((voice) => (
+                  <option key={voice.value} value={voice.value}>
+                    {voice.label}
+                  </option>
+                ))}
+              </select>
+              {isCustomVoice && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  Current custom voice: <span className="font-mono">{formData.voiceId}</span>
+                </p>
+              )}
+            </>
           ) : (
             <input
               type="text"

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Phone, MessageSquare, TestTube, Sparkles, AlertTriangle, Info, Loader2 } from 'lucide-react';
+import { Phone, MessageSquare, TestTube, Sparkles, AlertTriangle, Info, Loader2, Clock, Mic, Brain, Settings, Hash } from 'lucide-react';
 import {
   useGetAssistantQuery,
   useUpdateAssistantMutation,
@@ -10,8 +10,60 @@ import ModelTab from './tabs/ModelTab';
 import VoiceTab from './tabs/VoiceTab';
 import CreateAssistantModal from '../../components/CreateAssistantModal';
 
+// Helper functions
+const formatDate = (dateString) => {
+  if (!dateString) return '-';
+  return new Date(dateString).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+};
+
+const formatDuration = (seconds) => {
+  if (!seconds) return '-';
+  const mins = Math.floor(seconds / 60);
+  return `${mins} min`;
+};
+
+const formatFirstMessageMode = (mode) => {
+  if (!mode) return '-';
+  return mode
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
+const capitalize = (str) => {
+  if (!str) return '-';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+// Info field component
+const InfoField = ({ label, value, mono = false }) => (
+  <div>
+    <p className="text-xs text-gray-500 dark:text-zinc-500 mb-1">{label}</p>
+    <p className={`text-sm text-gray-900 dark:text-white ${mono ? 'font-mono text-xs break-all' : ''}`}>
+      {value || '-'}
+    </p>
+  </div>
+);
+
+// Section component
+const Section = ({ title, icon: Icon, children }) => (
+  <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-zinc-800 rounded-md p-4">
+    <div className="flex items-center gap-2 mb-4">
+      {Icon && <Icon className="w-4 h-4 text-gray-400 dark:text-zinc-500" />}
+      <h3 className="text-sm font-medium text-gray-900 dark:text-white">{title}</h3>
+    </div>
+    {children}
+  </div>
+);
+
 export default function AIAssistantDetail() {
-  const [activeTab, setActiveTab] = useState('model');
+  const [activeTab, setActiveTab] = useState('overview');
   const [updateData, setUpdateData] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState('');
@@ -72,17 +124,14 @@ export default function AIAssistantDetail() {
   };
 
   const handleTest = () => {
-    // TODO: Implement test functionality
     console.log('Test assistant');
   };
 
   const handleChat = () => {
-    // TODO: Implement chat functionality
     console.log('Open chat');
   };
 
   const handleTalk = () => {
-    // TODO: Implement talk functionality
     console.log('Talk to assistant');
   };
 
@@ -157,20 +206,26 @@ export default function AIAssistantDetail() {
     );
   }
 
-  // Helper to format voice display
-  const formatVoice = (voice) => {
-    if (!voice) return 'Not configured';
-    const provider = voice.provider || 'Unknown';
-    const voiceId = voice.voiceId || voice.voice || 'Unknown';
-    return `${provider.charAt(0).toUpperCase() + provider.slice(1)} - ${voiceId}`;
+  // Format helper for voice display
+  const formatVoice = () => {
+    const provider = assistant.voiceProvider;
+    const voiceId = assistant.voiceId;
+    if (!provider && !voiceId) return 'Not configured';
+    return `${capitalize(provider)} - ${voiceId || 'Unknown'}`;
   };
 
-  // Helper to format model display
-  const formatModel = (model) => {
+  // Format helper for model display
+  const formatModel = () => {
+    const model = assistant.model;
     if (!model) return 'Not configured';
-    const provider = model.provider || 'Unknown';
-    const modelName = model.model || 'Unknown';
-    return `${provider.charAt(0).toUpperCase() + provider.slice(1)} ${modelName}`;
+    return `${capitalize(model.provider)} - ${model.model || 'Unknown'}`;
+  };
+
+  // Format helper for transcriber display
+  const formatTranscriber = () => {
+    const transcriber = assistant.transcriber;
+    if (!transcriber) return 'Not configured';
+    return `${capitalize(transcriber.provider)} - ${transcriber.model || 'Unknown'}`;
   };
 
   return (
@@ -187,40 +242,12 @@ export default function AIAssistantDetail() {
           </div>
         )}
 
-        {/* Vapi Info Card */}
-        <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-zinc-800 rounded-md p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Info className="w-4 h-4 text-gray-400 dark:text-zinc-500" />
-            <h3 className="text-sm font-medium text-gray-900 dark:text-white">Assistant Details (from Vapi)</h3>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>
-              <p className="text-xs text-gray-500 dark:text-zinc-500 mb-1">Name</p>
-              <p className="text-sm text-gray-900 dark:text-white">{assistant.vapiName || assistant.name || 'Unnamed'}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 dark:text-zinc-500 mb-1">Voice</p>
-              <p className="text-sm text-gray-900 dark:text-white">{formatVoice(assistant.vapiVoice || assistant.voice)}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 dark:text-zinc-500 mb-1">AI Model</p>
-              <p className="text-sm text-gray-900 dark:text-white">{formatModel(assistant.vapiModel || assistant.model)}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 dark:text-zinc-500 mb-1">Greeting</p>
-              <p className="text-sm text-gray-900 dark:text-white truncate" title={assistant.vapiFirstMessage || assistant.firstMessage || 'Not set'}>
-                {assistant.vapiFirstMessage || assistant.firstMessage || 'Not set'}
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Header */}
         <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-zinc-800 rounded-md p-4">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h1 className="text-lg font-semibold text-gray-900 dark:text-white">{assistant.vapiName || assistant.name || 'AI Receptionist'}</h1>
-              <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{assistant.vapiId || assistant.id}</p>
+              <h1 className="text-lg font-semibold text-gray-900 dark:text-white">{assistant.name || 'AI Receptionist'}</h1>
+              <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{assistant.businessName || businessName}</p>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -249,37 +276,146 @@ export default function AIAssistantDetail() {
 
           {/* Tab Navigation */}
           <div className="flex gap-1 border-b border-gray-200 dark:border-zinc-800">
-            <button
-              onClick={() => setActiveTab('model')}
-              className={`px-4 py-2 text-sm font-medium transition-colors relative ${
-                activeTab === 'model'
-                  ? 'text-gray-900 dark:text-white'
-                  : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300'
-              }`}
-            >
-              Model
-              {activeTab === 'model' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 dark:bg-white"></div>
-              )}
-            </button>
-            <button
-              onClick={() => setActiveTab('voice')}
-              className={`px-4 py-2 text-sm font-medium transition-colors relative ${
-                activeTab === 'voice'
-                  ? 'text-gray-900 dark:text-white'
-                  : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300'
-              }`}
-            >
-              Voice
-              {activeTab === 'voice' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 dark:bg-white"></div>
-              )}
-            </button>
+            {['overview', 'model', 'voice'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 py-2 text-sm font-medium transition-colors relative capitalize ${
+                  activeTab === tab
+                    ? 'text-gray-900 dark:text-white'
+                    : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300'
+                }`}
+              >
+                {tab}
+                {activeTab === tab && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 dark:bg-white"></div>
+                )}
+              </button>
+            ))}
           </div>
         </div>
 
         {/* Tab Content */}
         <div>
+          {activeTab === 'overview' && (
+            <div className="space-y-4">
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-zinc-800 rounded-md p-4">
+                  <p className="text-xs text-gray-500 dark:text-zinc-500 mb-1">Voice</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate" title={formatVoice()}>
+                    {formatVoice()}
+                  </p>
+                </div>
+                <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-zinc-800 rounded-md p-4">
+                  <p className="text-xs text-gray-500 dark:text-zinc-500 mb-1">Model</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate" title={formatModel()}>
+                    {formatModel()}
+                  </p>
+                </div>
+                <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-zinc-800 rounded-md p-4">
+                  <p className="text-xs text-gray-500 dark:text-zinc-500 mb-1">Transcriber</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate" title={formatTranscriber()}>
+                    {formatTranscriber()}
+                  </p>
+                </div>
+                <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-zinc-800 rounded-md p-4">
+                  <p className="text-xs text-gray-500 dark:text-zinc-500 mb-1">Max Duration</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    {formatDuration(assistant.maxDurationSeconds)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Basic Info Section */}
+              <Section title="Basic Info" icon={Info}>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <InfoField label="Name" value={assistant.name} />
+                  <InfoField label="Business Name" value={assistant.businessName} />
+                  <InfoField label="Created" value={formatDate(assistant.createdAt)} />
+                  <InfoField label="Updated" value={formatDate(assistant.updatedAt)} />
+                </div>
+              </Section>
+
+              {/* Voice Settings Section */}
+              <Section title="Voice Settings" icon={Mic}>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                  <InfoField label="Voice Provider" value={capitalize(assistant.voiceProvider)} />
+                  <InfoField label="Voice ID" value={assistant.voiceId} />
+                  <InfoField label="First Message Mode" value={formatFirstMessageMode(assistant.firstMessageMode)} />
+                  <InfoField label="Greeting" value={assistant.greeting || 'Not set'} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <InfoField label="End Call Message" value={assistant.endCallMessage || 'Not set'} />
+                  <InfoField label="Voicemail Message" value={assistant.voicemailMessage || 'Not set'} />
+                </div>
+              </Section>
+
+              {/* AI Model Section */}
+              <Section title="AI Model" icon={Brain}>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                  <InfoField label="Provider" value={capitalize(assistant.model?.provider)} />
+                  <InfoField label="Model" value={assistant.model?.model} />
+                  <InfoField label="Max Tokens" value={assistant.model?.maxTokens?.toString()} />
+                  <InfoField label="Temperature" value={assistant.model?.temperature?.toString()} />
+                </div>
+                {assistant.systemPrompt && (
+                  <div>
+                    <p className="text-xs text-gray-500 dark:text-zinc-500 mb-2">System Prompt</p>
+                    <div className="bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-zinc-800 rounded-md p-3">
+                      <pre className="text-xs text-gray-700 dark:text-zinc-300 whitespace-pre-wrap font-mono">
+                        {assistant.systemPrompt}
+                      </pre>
+                    </div>
+                  </div>
+                )}
+              </Section>
+
+              {/* Transcriber Section */}
+              <Section title="Transcriber" icon={Mic}>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <InfoField label="Provider" value={capitalize(assistant.transcriber?.provider)} />
+                  <InfoField label="Model" value={assistant.transcriber?.model} />
+                  <InfoField label="Language" value={assistant.transcriber?.language?.toUpperCase()} />
+                </div>
+              </Section>
+
+              {/* Call Settings Section */}
+              <Section title="Call Settings" icon={Clock}>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                  <InfoField label="Max Duration" value={formatDuration(assistant.maxDurationSeconds)} />
+                  <InfoField label="First Message Mode" value={formatFirstMessageMode(assistant.firstMessageMode)} />
+                  <div>
+                    <p className="text-xs text-gray-500 dark:text-zinc-500 mb-1">End Call Phrases</p>
+                    {assistant.endCallPhrases && assistant.endCallPhrases.length > 0 ? (
+                      <div className="flex flex-wrap gap-1">
+                        {assistant.endCallPhrases.map((phrase, index) => (
+                          <span
+                            key={index}
+                            className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-xs rounded"
+                          >
+                            {phrase}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-900 dark:text-white">-</p>
+                    )}
+                  </div>
+                </div>
+              </Section>
+
+              {/* Technical Info Section */}
+              <Section title="Technical Info" icon={Hash}>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <InfoField label="Assistant ID" value={assistant.id} mono />
+                  <InfoField label="Vapi Assistant ID" value={assistant.vapiAssistantId} mono />
+                  <InfoField label="Business ID" value={assistant.businessId} mono />
+                </div>
+              </Section>
+            </div>
+          )}
+
           {activeTab === 'model' && (
             <ModelTab assistant={assistant} onUpdate={handleUpdate} />
           )}

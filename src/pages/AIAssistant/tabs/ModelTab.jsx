@@ -2,19 +2,17 @@ import { useState } from 'react';
 import { Sparkles } from 'lucide-react';
 
 export default function ModelTab({ assistant, onUpdate }) {
-  // Use Vapi data as source of truth, fallback to local data
-  const vapiModel = assistant?.vapiModel || assistant?.model;
-  const vapiFirstMessage = assistant?.vapiFirstMessage || assistant?.firstMessage;
-  const vapiSystemPrompt = assistant?.vapiSystemPrompt || assistant?.systemPrompt;
+  // Use direct API fields
+  const model = assistant?.model;
 
   const [formData, setFormData] = useState({
-    provider: vapiModel?.provider || 'openai',
-    model: vapiModel?.model || 'gpt-4',
+    provider: model?.provider || 'openai',
+    model: model?.model || 'gpt-4o-mini',
     firstMessageMode: assistant?.firstMessageMode || 'assistant-speaks-first',
-    firstMessage: vapiFirstMessage || '',
-    systemPrompt: vapiSystemPrompt || '',
-    maxTokens: vapiModel?.maxTokens || 1000,
-    temperature: vapiModel?.temperature || 0.7,
+    greeting: assistant?.greeting || '',
+    systemPrompt: assistant?.systemPrompt || '',
+    maxTokens: model?.maxTokens || 1000,
+    temperature: model?.temperature || 0.7,
   });
 
   const handleChange = (field, value) => {
@@ -24,7 +22,7 @@ export default function ModelTab({ assistant, onUpdate }) {
   const handleBlur = () => {
     if (onUpdate) {
       onUpdate({
-        firstMessage: formData.firstMessage,
+        greeting: formData.greeting,
         firstMessageMode: formData.firstMessageMode,
         systemPrompt: formData.systemPrompt,
         model: {
@@ -87,9 +85,10 @@ export default function ModelTab({ assistant, onUpdate }) {
             >
               {formData.provider === 'openai' && (
                 <>
+                  <option value="gpt-4o-mini">GPT-4o Mini</option>
+                  <option value="gpt-4o">GPT-4o</option>
                   <option value="gpt-4">GPT-4</option>
                   <option value="gpt-4-turbo">GPT-4 Turbo</option>
-                  <option value="gpt-4o">GPT-4o</option>
                   <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
                 </>
               )}
@@ -144,10 +143,10 @@ export default function ModelTab({ assistant, onUpdate }) {
             </select>
           </div>
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Message</label>
+            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Greeting Message</label>
             <textarea
-              value={formData.firstMessage}
-              onChange={(e) => handleChange('firstMessage', e.target.value)}
+              value={formData.greeting}
+              onChange={(e) => handleChange('greeting', e.target.value)}
               onBlur={handleBlur}
               rows={2}
               placeholder="Hello! Thanks for calling. How can I help you today?"
