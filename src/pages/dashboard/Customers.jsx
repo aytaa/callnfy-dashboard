@@ -80,7 +80,12 @@ export default function Customers() {
     e.preventDefault();
     setError('');
 
-    // Validate phone is not empty
+    // Validate required fields
+    if (!formData.name?.trim()) {
+      setError('Name is required');
+      return;
+    }
+
     if (!formData.phone?.trim()) {
       setError('Phone number is required');
       return;
@@ -368,7 +373,9 @@ export default function Customers() {
             )}
 
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Name</label>
+              <label className="block text-xs text-gray-500 mb-1">
+                Name <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
                 value={formData.name}
@@ -380,7 +387,9 @@ export default function Customers() {
             </div>
 
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Phone</label>
+              <label className="block text-xs text-gray-500 mb-1">
+                Phone <span className="text-red-500">*</span>
+              </label>
               <input
                 type="tel"
                 value={formData.phone}
@@ -392,14 +401,15 @@ export default function Customers() {
             </div>
 
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Email</label>
+              <label className="block text-xs text-gray-500 mb-1">
+                Email <span className="text-gray-400 text-xs">(optional)</span>
+              </label>
               <input
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-2.5 py-1.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
                 placeholder="customer@email.com"
-                required
               />
             </div>
           </form>

@@ -12,6 +12,7 @@ export const customersApiSlice = apiSlice.injectEndpoints({
           ...(search && { search }),
         },
       }),
+      transformResponse: (response) => response.data,
       providesTags: (result) =>
         result?.customers
           ? [
