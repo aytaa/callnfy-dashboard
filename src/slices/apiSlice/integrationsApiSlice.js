@@ -18,8 +18,8 @@ export const integrationsApiSlice = apiSlice.injectEndpoints({
 
     // Google Calendar Integration
     connectGoogleCalendar: builder.mutation({
-      query: (businessId) => ({
-        url: `/integrations/${businessId}/google/connect`,
+      query: ({ businessId, source }) => ({
+        url: `/integrations/${businessId}/google/connect${source ? `?source=${source}` : ''}`,
         method: 'POST',
       }),
       transformResponse: (response) => response,
