@@ -17,6 +17,8 @@ export default function SubscriptionGuard({ children }) {
   const {
     data: subscription,
     isLoading: isLoadingSubscription,
+    isError: isSubscriptionError,
+    error: subscriptionError,
   } = useGetSubscriptionQuery(undefined, {
     refetchOnMountOrArgChange: false,
     refetchOnFocus: false,
@@ -27,6 +29,8 @@ export default function SubscriptionGuard({ children }) {
   const {
     data: userData,
     isLoading: isLoadingUser,
+    isError: isUserError,
+    error: userError,
     refetch: refetchUser,
   } = useGetMeQuery(undefined, {
     refetchOnMountOrArgChange: false,
@@ -83,6 +87,44 @@ export default function SubscriptionGuard({ children }) {
         <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
       </div>
     );
+  }
+
+  // Handle API errors - if /me fails, user session may be invalid
+  // 401 errors are handled by customBaseQuery (auto logout)
+  // For other errors, we show an error state or redirect to login
+  if (isUserError) {
+    console.error('[SubscriptionGuard] User API error:', userError);
+    // If it's not a 401 (which is handled by customBaseQuery), show error or redirect
+    const errorStatus = userError?.status || userError?.originalStatus;
+    if (errorStatus === 401 || errorStatus === 403) {
+      // Auth errors should redirect to login (customBaseQuery may have already done this)
+      return <Navigate to="/auth/login" state={{ from: location }} replace />;
+    }
+    // For other errors (500, network, etc), show a simple error state
+    return (
+      <div className="min-h-screen bg-[#111114] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-400 mb-4">Unable to load your account data.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle subscription API errors similarly
+  if (isSubscriptionError) {
+    console.error('[SubscriptionGuard] Subscription API error:', subscriptionError);
+    const errorStatus = subscriptionError?.status || subscriptionError?.originalStatus;
+    if (errorStatus === 401 || errorStatus === 403) {
+      return <Navigate to="/auth/login" state={{ from: location }} replace />;
+    }
+    // For subscription errors, redirect to plan page (they may not have a subscription)
+    return <Navigate to="/plan" state={{ from: location }} replace />;
   }
 
   // Check if subscription exists and is valid
