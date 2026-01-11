@@ -19,6 +19,12 @@ export function SocketProvider({ children }) {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const token = useSelector(selectCurrentToken);
 
+  // DEBUG: Log on every render to see state
+  console.log('=== SocketContext Debug ===');
+  console.log('SocketContext - wsUrl:', import.meta.env.VITE_NOTIFICATION_WS_URL);
+  console.log('SocketContext - isAuthenticated:', isAuthenticated);
+  console.log('SocketContext - token:', token ? 'exists (' + token.substring(0, 20) + '...)' : 'MISSING');
+
   const wsRef = useRef(null);
   const reconnectAttemptsRef = useRef(0);
   const reconnectTimeoutRef = useRef(null);
@@ -86,38 +92,48 @@ export function SocketProvider({ children }) {
 
   // Connect to WebSocket
   const connect = useCallback(() => {
+    console.log('=== WebSocket connect() called ===');
+    console.log('connect() - wsUrl:', wsUrl);
+    console.log('connect() - token:', token ? 'exists' : 'MISSING');
+    console.log('connect() - current readyState:', wsRef.current?.readyState);
+
     if (!wsUrl) {
-      console.warn('WebSocket URL not configured (VITE_NOTIFICATION_WS_URL)');
+      console.error('❌ WebSocket URL not configured (VITE_NOTIFICATION_WS_URL)');
       return;
     }
 
     if (!token) {
-      console.warn('No auth token available for WebSocket');
+      console.error('❌ No auth token available for WebSocket');
       return;
     }
 
     // Don't create new connection if one exists and is connecting/open
     if (wsRef.current?.readyState === CONNECTING || wsRef.current?.readyState === OPEN) {
+      console.log('⏳ WebSocket already connecting or open, skipping');
       return;
     }
 
     try {
+      console.log('🔌 Creating new WebSocket connection to:', wsUrl);
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log('WebSocket connected');
+        console.log('✅ WebSocket connected successfully!');
         reconnectAttemptsRef.current = 0;
         setConnectionError(null);
 
         // Authenticate immediately after connection
+        console.log('🔐 Sending auth message with token');
         send('auth', { token });
       };
 
       ws.onmessage = (event) => {
         try {
+          console.log('📨 WebSocket message received:', event.data);
           const message = JSON.parse(event.data);
           const { type, ...data } = message;
+          console.log('📨 Parsed message - type:', type, 'data:', data);
 
           // Handle specific message types
           switch (type) {
@@ -156,13 +172,21 @@ export function SocketProvider({ children }) {
       };
 
       ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
+        console.error('❌ WebSocket error:', error);
+        console.error('❌ Error details:', {
+          type: error.type,
+          target: error.target?.url,
+          readyState: error.target?.readyState
+        });
         setConnectionError('Connection error');
         emitToListeners('error', { message: 'Connection error' });
       };
 
       ws.onclose = (event) => {
-        console.log('WebSocket closed:', event.code, event.reason);
+        console.log('🔴 WebSocket closed');
+        console.log('Close code:', event.code);
+        console.log('Close reason:', event.reason || '(no reason)');
+        console.log('Was clean:', event.wasClean);
         setIsConnected(false);
         stopHeartbeat();
         emitToListeners('disconnected', { code: event.code, reason: event.reason });
@@ -204,9 +228,17 @@ export function SocketProvider({ children }) {
 
   // Connect when authenticated, disconnect when not
   useEffect(() => {
+    console.log('=== SocketContext useEffect triggered ===');
+    console.log('useEffect - isAuthenticated:', isAuthenticated);
+    console.log('useEffect - token:', token ? 'exists' : 'MISSING');
+
     if (isAuthenticated && token) {
+      console.log('✅ Conditions met, calling connect()');
       connect();
     } else {
+      console.log('❌ Conditions not met, calling disconnect()');
+      console.log('  - isAuthenticated:', isAuthenticated);
+      console.log('  - token:', token ? 'exists' : 'MISSING');
       disconnect();
     }
 
