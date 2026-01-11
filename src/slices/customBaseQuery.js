@@ -93,8 +93,8 @@ export const customBaseQuery = async (args, api, extraOptions) => {
         resetRateLimitCounter();
     }
 
-    // Handle 401 Unauthorized - attempt token refresh
-    if (result?.error?.status === 401) {
+    // Handle 401 Unauthorized or 403 Forbidden - attempt token refresh
+    if (result?.error?.status === 401 || result?.error?.status === 403) {
         const refreshToken = api.getState().auth.refreshToken;
 
         if (refreshToken) {
@@ -125,6 +125,13 @@ export const customBaseQuery = async (args, api, extraOptions) => {
                 };
             }
 
+            // Check if refresh itself failed with 401/403
+            if (refreshResult?.error?.status === 401 || refreshResult?.error?.status === 403) {
+                api.dispatch(logout());
+                window.location.href = '/auth/login';
+                return result;
+            }
+
             if (refreshResult?.data?.data) {
                 api.dispatch(
                     setCredentials({
@@ -141,21 +148,32 @@ export const customBaseQuery = async (args, api, extraOptions) => {
                     handleRateLimitError(api);
                     return result;
                 }
+
+                // If retry still returns 401 or 403, logout and redirect to login
+                if (result?.error?.status === 401 || result?.error?.status === 403) {
+                    api.dispatch(logout());
+                    window.location.href = '/auth/login';
+                    return result;
+                }
             } else {
+                // Refresh failed - logout and redirect
                 api.dispatch(logout());
+                window.location.href = '/auth/login';
             }
         } else {
+            // No refresh token - logout and redirect
             api.dispatch(logout());
+            window.location.href = '/auth/login';
         }
     }
 
     return result;
 };
 
-// Custom retry condition for RTK Query - don't retry on 429
+// Custom retry condition for RTK Query - don't retry on auth/rate limit errors
 export const shouldRetry = (error) => {
-    // Never retry on 429 (rate limit) or 401 (auth errors)
-    if (error?.status === 429 || error?.status === 401) {
+    // Never retry on 429 (rate limit), 401 (unauthorized), or 403 (forbidden)
+    if (error?.status === 429 || error?.status === 401 || error?.status === 403) {
         return false;
     }
     // Retry on network errors or 5xx server errors
