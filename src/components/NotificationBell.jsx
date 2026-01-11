@@ -1,11 +1,15 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Bell, Phone, Calendar, AlertTriangle, CreditCard } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import {
   useGetNotificationsQuery,
   useGetUnreadCountQuery,
   useMarkAsReadMutation,
+  notificationApiSlice,
 } from '../slices/apiSlice/notificationApiSlice';
+import { useNotificationSocket } from '../hooks/useSocket';
+import { useDispatch } from 'react-redux';
 
 const getNotificationIcon = (type) => {
   switch (type) {
@@ -47,18 +51,50 @@ const formatTimeAgo = (dateString) => {
 export default function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const dispatch = useDispatch();
 
-  // Get unread count for badge (no polling - will use WebSocket later)
+  // Get unread count for badge
   const { data: unreadCount = 0 } = useGetUnreadCountQuery();
 
   // Get recent notifications for dropdown (limit to 5)
-  const { data: notificationsData } = useGetNotificationsQuery(
+  const { data: notificationsData, refetch: refetchNotifications } = useGetNotificationsQuery(
     { limit: 5, offset: 0 },
     { skip: !isOpen }
   );
   const notifications = notificationsData?.notifications || [];
 
   const [markAsRead] = useMarkAsReadMutation();
+
+  // Handle new notification from WebSocket
+  const handleNewNotification = useCallback((notification) => {
+    // Show toast for new notification
+    toast(notification.message || notification.title || 'New notification', {
+      icon: '🔔',
+      duration: 4000,
+    });
+
+    // Invalidate RTK Query cache to refresh notification list and count
+    dispatch(notificationApiSlice.util.invalidateTags([
+      { type: 'Notification', id: 'LIST' },
+      { type: 'Notification', id: 'COUNT' },
+    ]));
+
+    // Refetch notifications if dropdown is open
+    if (isOpen) {
+      refetchNotifications();
+    }
+  }, [dispatch, isOpen, refetchNotifications]);
+
+  // Handle unread count update from WebSocket
+  const handleUnreadCountUpdate = useCallback(() => {
+    // Invalidate the count cache to trigger a refetch
+    dispatch(notificationApiSlice.util.invalidateTags([
+      { type: 'Notification', id: 'COUNT' },
+    ]));
+  }, [dispatch]);
+
+  // Subscribe to WebSocket notification events
+  useNotificationSocket(handleNewNotification, handleUnreadCountUpdate);
 
   // Click outside to close
   useEffect(() => {

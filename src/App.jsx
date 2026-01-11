@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
 import { selectIsAuthenticated } from './slices/authSlice';
 import ErrorBoundary from './components/ErrorBoundary';
+import { SocketProvider } from './contexts/SocketContext';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import ForgotPassword from './pages/auth/ForgotPassword';
@@ -66,30 +67,31 @@ function AuthRoute({ children }) {
 function App() {
   return (
     <ErrorBoundary>
-      <Toaster
-        position="bottom-center"
-        toastOptions={{
-          duration: 3000,
-          style: {
-            background: '#1a1a1d',
-            color: '#fff',
-            border: '1px solid #303030',
-          },
-          success: {
-            iconTheme: {
-              primary: '#10b981',
-              secondary: '#fff',
+      <SocketProvider>
+        <Toaster
+          position="bottom-center"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: '#1a1a1d',
+              color: '#fff',
+              border: '1px solid #303030',
             },
-          },
-          error: {
-            iconTheme: {
-              primary: '#ef4444',
-              secondary: '#fff',
+            success: {
+              iconTheme: {
+                primary: '#10b981',
+                secondary: '#fff',
+              },
             },
-          },
-        }}
-      />
-      <Router>
+            error: {
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#fff',
+              },
+            },
+          }}
+        />
+        <Router>
         <Routes>
         {/* Default redirect */}
         <Route path="/" element={<Navigate to="/auth/login" replace />} />
@@ -372,7 +374,8 @@ function App() {
         {/* 404 Fallback */}
         <Route path="*" element={<Navigate to="/auth/login" replace />} />
         </Routes>
-      </Router>
+        </Router>
+      </SocketProvider>
     </ErrorBoundary>
   );
 }
