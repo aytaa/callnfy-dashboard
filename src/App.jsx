@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { Toaster } from 'react-hot-toast';
 import { selectIsAuthenticated } from './slices/authSlice';
 import ErrorBoundary from './components/ErrorBoundary';
 import Login from './pages/auth/Login';
@@ -64,6 +65,29 @@ function AuthRoute({ children }) {
 function App() {
   return (
     <ErrorBoundary>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#1a1a1d',
+            color: '#fff',
+            border: '1px solid #303030',
+          },
+          success: {
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
       <Router>
         <Routes>
         {/* Default redirect */}
