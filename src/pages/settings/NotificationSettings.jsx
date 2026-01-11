@@ -6,7 +6,7 @@ import {
   useUpdateNotificationSettingsMutation,
   useResetNotificationSettingsMutation,
 } from '../../slices/apiSlice/notificationApiSlice';
-import WhatsAppNotificationSettings from '../../components/WhatsAppNotificationSettings';
+import PhoneNotificationSettings from '../../components/PhoneNotificationSettings';
 
 // Toggle Switch Component
 function Toggle({ checked, onChange, disabled = false }) {
@@ -479,9 +479,9 @@ export default function NotificationSettings() {
         </div>
       </div>
 
-      {/* WhatsApp Notifications */}
+      {/* SMS Notifications */}
       <div className="mb-3">
-        <WhatsAppNotificationSettings />
+        <PhoneNotificationSettings />
       </div>
 
       {/* Action Buttons */}

@@ -111,63 +111,63 @@ export const notificationApiSlice = apiSlice.injectEndpoints({
       ],
     }),
 
-    // WhatsApp Notification Settings
-    // Get current WhatsApp settings
-    getWhatsAppSettings: builder.query({
-      query: () => '/notifications/whatsapp',
+    // Phone/SMS Notification Settings
+    // Get current phone settings
+    getPhoneSettings: builder.query({
+      query: () => '/notifications/phone',
       transformResponse: (response) => response?.data || response,
-      providesTags: ['WhatsAppSettings'],
+      providesTags: ['PhoneSettings'],
     }),
 
-    // Send verification code to WhatsApp number
-    sendWhatsAppCode: builder.mutation({
+    // Send SMS verification code to phone number
+    sendPhoneCode: builder.mutation({
       query: (phoneNumber) => ({
-        url: '/notifications/whatsapp/send-code',
+        url: '/notifications/phone/send-code',
         method: 'POST',
         body: { phoneNumber },
       }),
       transformResponse: (response) => response?.data || response,
     }),
 
-    // Verify WhatsApp code
-    verifyWhatsAppCode: builder.mutation({
+    // Verify phone code
+    verifyPhoneCode: builder.mutation({
       query: (code) => ({
-        url: '/notifications/whatsapp/verify',
+        url: '/notifications/phone/verify',
         method: 'POST',
         body: { code },
       }),
       transformResponse: (response) => response?.data || response,
-      invalidatesTags: ['WhatsAppSettings'],
+      invalidatesTags: ['PhoneSettings'],
     }),
 
-    // Enable WhatsApp notifications
-    enableWhatsAppNotifications: builder.mutation({
+    // Enable phone notifications
+    enablePhoneNotifications: builder.mutation({
       query: () => ({
-        url: '/notifications/whatsapp/enable',
+        url: '/notifications/phone/enable',
         method: 'POST',
       }),
       transformResponse: (response) => response?.data || response,
-      invalidatesTags: ['WhatsAppSettings'],
+      invalidatesTags: ['PhoneSettings'],
     }),
 
-    // Disable WhatsApp notifications
-    disableWhatsAppNotifications: builder.mutation({
+    // Disable phone notifications
+    disablePhoneNotifications: builder.mutation({
       query: () => ({
-        url: '/notifications/whatsapp/disable',
+        url: '/notifications/phone/disable',
         method: 'POST',
       }),
       transformResponse: (response) => response?.data || response,
-      invalidatesTags: ['WhatsAppSettings'],
+      invalidatesTags: ['PhoneSettings'],
     }),
 
-    // Remove WhatsApp number
-    removeWhatsAppNumber: builder.mutation({
+    // Remove phone number
+    removePhoneNumber: builder.mutation({
       query: () => ({
-        url: '/notifications/whatsapp',
+        url: '/notifications/phone',
         method: 'DELETE',
       }),
       transformResponse: (response) => response?.data || response,
-      invalidatesTags: ['WhatsAppSettings'],
+      invalidatesTags: ['PhoneSettings'],
     }),
   }),
 });
@@ -183,11 +183,11 @@ export const {
   useMarkAsReadMutation,
   useMarkAllAsReadMutation,
   useDeleteNotificationMutation,
-  // WhatsApp
-  useGetWhatsAppSettingsQuery,
-  useSendWhatsAppCodeMutation,
-  useVerifyWhatsAppCodeMutation,
-  useEnableWhatsAppNotificationsMutation,
-  useDisableWhatsAppNotificationsMutation,
-  useRemoveWhatsAppNumberMutation,
+  // Phone/SMS
+  useGetPhoneSettingsQuery,
+  useSendPhoneCodeMutation,
+  useVerifyPhoneCodeMutation,
+  useEnablePhoneNotificationsMutation,
+  useDisablePhoneNotificationsMutation,
+  useRemovePhoneNumberMutation,
 } = notificationApiSlice;

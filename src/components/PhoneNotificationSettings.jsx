@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
-import { Loader2, MessageCircle, Check, Trash2 } from 'lucide-react';
+import { Loader2, Phone, Check, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
-  useGetWhatsAppSettingsQuery,
-  useSendWhatsAppCodeMutation,
-  useVerifyWhatsAppCodeMutation,
-  useEnableWhatsAppNotificationsMutation,
-  useDisableWhatsAppNotificationsMutation,
-  useRemoveWhatsAppNumberMutation,
+  useGetPhoneSettingsQuery,
+  useSendPhoneCodeMutation,
+  useVerifyPhoneCodeMutation,
+  useEnablePhoneNotificationsMutation,
+  useDisablePhoneNotificationsMutation,
+  useRemovePhoneNumberMutation,
 } from '../slices/apiSlice/notificationApiSlice';
 
 // Toggle Switch Component (same as in NotificationSettings)
@@ -45,13 +45,13 @@ function maskPhoneNumber(phone) {
   return `${countryCode}${formatted}${lastTwo}`;
 }
 
-export default function WhatsAppNotificationSettings() {
-  const { data: settings, isLoading, refetch } = useGetWhatsAppSettingsQuery();
-  const [sendCode, { isLoading: isSendingCode }] = useSendWhatsAppCodeMutation();
-  const [verifyCode, { isLoading: isVerifying }] = useVerifyWhatsAppCodeMutation();
-  const [enableNotifications, { isLoading: isEnabling }] = useEnableWhatsAppNotificationsMutation();
-  const [disableNotifications, { isLoading: isDisabling }] = useDisableWhatsAppNotificationsMutation();
-  const [removeNumber, { isLoading: isRemoving }] = useRemoveWhatsAppNumberMutation();
+export default function PhoneNotificationSettings() {
+  const { data: settings, isLoading, refetch } = useGetPhoneSettingsQuery();
+  const [sendCode, { isLoading: isSendingCode }] = useSendPhoneCodeMutation();
+  const [verifyCode, { isLoading: isVerifying }] = useVerifyPhoneCodeMutation();
+  const [enableNotifications, { isLoading: isEnabling }] = useEnablePhoneNotificationsMutation();
+  const [disableNotifications, { isLoading: isDisabling }] = useDisablePhoneNotificationsMutation();
+  const [removeNumber, { isLoading: isRemoving }] = useRemovePhoneNumberMutation();
 
   // Local state
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -97,7 +97,7 @@ export default function WhatsAppNotificationSettings() {
       setPendingPhone(cleanPhone);
       setShowVerification(true);
       setResendCountdown(60);
-      toast.success('Verification code sent to your WhatsApp');
+      toast.success('Verification code sent via SMS');
     } catch (err) {
       setError(err?.data?.error?.message || 'Failed to send verification code');
     }
@@ -117,7 +117,7 @@ export default function WhatsAppNotificationSettings() {
       setShowVerification(false);
       setVerificationCode('');
       setPendingPhone('');
-      toast.success('WhatsApp number verified successfully');
+      toast.success('Phone number verified successfully');
       refetch();
     } catch (err) {
       setError(err?.data?.error?.message || 'Invalid verification code');
@@ -152,10 +152,10 @@ export default function WhatsAppNotificationSettings() {
     try {
       if (enabled) {
         await enableNotifications().unwrap();
-        toast.success('WhatsApp notifications enabled');
+        toast.success('SMS notifications enabled');
       } else {
         await disableNotifications().unwrap();
-        toast.success('WhatsApp notifications disabled');
+        toast.success('SMS notifications disabled');
       }
       refetch();
     } catch (err) {
@@ -169,7 +169,7 @@ export default function WhatsAppNotificationSettings() {
       await removeNumber().unwrap();
       setShowRemoveConfirm(false);
       setPhoneNumber('');
-      toast.success('WhatsApp number removed');
+      toast.success('Phone number removed');
       refetch();
     } catch (err) {
       toast.error(err?.data?.error?.message || 'Failed to remove number');
@@ -189,8 +189,8 @@ export default function WhatsAppNotificationSettings() {
   return (
     <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-3">
       <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-200 dark:border-[#303030]">
-        <MessageCircle className="w-4 h-4 text-gray-400 dark:text-white/60" />
-        <h2 className="text-sm font-medium text-gray-900 dark:text-white">WhatsApp Notifications</h2>
+        <Phone className="w-4 h-4 text-gray-400 dark:text-white/60" />
+        <h2 className="text-sm font-medium text-gray-900 dark:text-white">SMS Notifications</h2>
       </div>
 
       {/* State 3: Verified */}
@@ -208,8 +208,8 @@ export default function WhatsAppNotificationSettings() {
           {/* Toggle Notifications */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-900 dark:text-white">Receive WhatsApp notifications</p>
-              <p className="text-xs text-gray-500">Get important updates via WhatsApp</p>
+              <p className="text-sm text-gray-900 dark:text-white">Receive SMS notifications</p>
+              <p className="text-xs text-gray-500">Get important updates via SMS</p>
             </div>
             <Toggle
               checked={isEnabled}
@@ -233,10 +233,10 @@ export default function WhatsAppNotificationSettings() {
       {showRemoveConfirm && (
         <div className="space-y-3">
           <p className="text-sm text-gray-900 dark:text-white">
-            Are you sure you want to remove your WhatsApp number?
+            Are you sure you want to remove your phone number?
           </p>
           <p className="text-xs text-gray-500">
-            You will stop receiving WhatsApp notifications and will need to verify again.
+            You will stop receiving SMS notifications and will need to verify again.
           </p>
           <div className="flex items-center gap-3">
             <button
@@ -328,12 +328,12 @@ export default function WhatsAppNotificationSettings() {
       {!isVerified && !hasPhoneNumber && !showVerification && (
         <div className="space-y-4">
           <p className="text-sm text-gray-500">
-            Add your WhatsApp number to receive important notifications via WhatsApp.
+            Add your phone number to receive important notifications via SMS.
           </p>
 
           {/* Phone Input */}
           <div>
-            <label className="block text-xs text-gray-500 mb-1">WhatsApp Number</label>
+            <label className="block text-xs text-gray-500 mb-1">Phone Number</label>
             <input
               type="tel"
               value={phoneNumber}
