@@ -329,13 +329,16 @@ function Sidebar({isOpen, onClose}) {
                 <div className={clsx('p-3 space-y-2', isCollapsed && 'px-2')}>
                     {/* Plan Badge and Trial Status */}
                     {!isCollapsed && (() => {
-                        const user = userData;
-                        const subscriptionStatus = user?.subscriptionStatus;
-                        const trialEndsAt = user?.trialEndsAt;
+                        const subscription = business?.subscription;
+                        const subscriptionStatus = subscription?.status;
+                        const trialEndsAt = subscription?.trialEndsAt;
+                        const minutesLimit = subscription?.minutesLimit || 0;
+                        const minutesUsed = subscription?.minutesUsed || 0;
+                        const minutesRemaining = minutesLimit - minutesUsed;
 
                         // Calculate days remaining if on trial
                         let daysRemaining = null;
-                        if (subscriptionStatus === 'trialing' && trialEndsAt) {
+                        if (subscriptionStatus === 'trial' && trialEndsAt) {
                             const now = new Date();
                             const endDate = new Date(trialEndsAt);
                             const diffTime = endDate - now;
@@ -343,48 +346,60 @@ function Sidebar({isOpen, onClose}) {
                         }
 
                         return (
-                            <div className="px-3 py-2">
-                                <div className="flex items-center justify-between mb-2">
-                                    {subscriptionStatus === 'trialing' && daysRemaining !== null ? (
-                                        <>
-                                            <span
-                                                className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#262626] text-gray-900 dark:text-white text-xs font-medium rounded border border-gray-200 dark:border-[#303030]">
-                                                TRIAL
+                            <div className="px-3 py-2 bg-gray-50 dark:bg-[#1a1a1d] rounded-lg border border-gray-200 dark:border-[#303030]">
+                                {subscriptionStatus === 'trial' && daysRemaining !== null ? (
+                                    <div className="space-y-1.5">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs font-medium text-gray-900 dark:text-white">
+                                                Trial
                                             </span>
                                             <span className="text-xs text-gray-600 dark:text-gray-400">
                                                 {daysRemaining > 0 ? `${daysRemaining} days left` : 'Expires today'}
                                             </span>
-                                        </>
-                                    ) : subscriptionStatus === 'active' ? (
-                                        <>
-                                            <span
-                                                className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#262626] text-gray-900 dark:text-white text-xs font-medium rounded">
-                                                {user?.planName?.toUpperCase() || 'STARTER'}
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                                                Minutes
                                             </span>
-                                            {user?.usageMinutes !== undefined && user?.planMinutes !== undefined && (
-                                                <span className="text-xs text-gray-500 dark:text-zinc-400">
-                                                    {user.usageMinutes} / {user.planMinutes} min
-                                                </span>
-                                            )}
-                                        </>
-                                    ) : (
-                                        <>
-                                            <span
-                                                className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs font-medium rounded">
-                                                FREE
+                                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                                                {minutesRemaining}/{minutesLimit}
                                             </span>
-                                            <span className="text-xs text-gray-500 dark:text-gray-400">Start trial</span>
-                                        </>
-                                    )}
-                                </div>
+                                        </div>
+                                    </div>
+                                ) : subscriptionStatus === 'active' ? (
+                                    <div className="space-y-1.5">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs font-medium text-gray-900 dark:text-white">
+                                                {subscription?.plan?.toUpperCase() || 'STARTER'}
+                                            </span>
+                                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                                                Active
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                                                Minutes
+                                            </span>
+                                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                                                {minutesRemaining}/{minutesLimit}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                                            No subscription
+                                        </span>
+                                    </div>
+                                )}
                             </div>
                         );
                     })()}
 
                     {/* Upgrade Button */}
                     {!isCollapsed && (() => {
-                        const user = userData;
-                        const subscriptionStatus = user?.subscriptionStatus;
+                        const subscription = business?.subscription;
+                        const subscriptionStatus = subscription?.status;
 
                         // Only show upgrade button if on trial or no subscription
                         const showUpgrade = subscriptionStatus !== 'active';
