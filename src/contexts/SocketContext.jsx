@@ -49,28 +49,36 @@ export function SocketProvider({ children }) {
 
   // Add event listener
   const addEventListener = useCallback((type, callback) => {
+    console.log(`📡 addEventListener: Registering listener for "${type}"`);
     if (!listenersRef.current.has(type)) {
       listenersRef.current.set(type, new Set());
     }
     listenersRef.current.get(type).add(callback);
+    console.log(`📡 addEventListener: Total listeners for "${type}":`, listenersRef.current.get(type).size);
 
     // Return cleanup function
     return () => {
+      console.log(`📡 addEventListener: Removing listener for "${type}"`);
       listenersRef.current.get(type)?.delete(callback);
     };
   }, []);
 
   // Emit event to listeners
   const emitToListeners = useCallback((type, data) => {
+    console.log(`📡 emitToListeners: Emitting "${type}" to listeners`, data);
     const callbacks = listenersRef.current.get(type);
+    console.log(`📡 emitToListeners: Found ${callbacks?.size || 0} listeners for "${type}"`);
     if (callbacks) {
       callbacks.forEach((callback) => {
         try {
+          console.log(`📡 emitToListeners: Calling callback for "${type}"`);
           callback(data);
         } catch (error) {
           console.error(`Error in WebSocket listener for "${type}":`, error);
         }
       });
+    } else {
+      console.warn(`📡 emitToListeners: No listeners registered for "${type}"`);
     }
   }, []);
 

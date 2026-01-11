@@ -67,13 +67,27 @@ export default function NotificationBell() {
 
   // Handle new notification from WebSocket
   const handleNewNotification = useCallback((notification) => {
+    console.log('🔔 NotificationBell: handleNewNotification called', notification);
+
     // Show toast for new notification
-    toast(notification.message || notification.title || 'New notification', {
+    const message = notification.message || notification.title || 'New notification';
+    console.log('🔔 Showing toast:', message);
+    toast(message, {
       icon: '🔔',
       duration: 4000,
     });
 
-    // Invalidate RTK Query cache to refresh notification list and count
+    // Optimistically update the unread count immediately
+    console.log('🔔 Optimistically updating unread count');
+    dispatch(
+      notificationApiSlice.util.updateQueryData('getUnreadCount', undefined, (draft) => {
+        console.log('🔔 Previous count:', draft);
+        return (draft || 0) + 1;
+      })
+    );
+
+    // Also invalidate to trigger refetch for accurate data
+    console.log('🔔 Invalidating cache tags');
     dispatch(notificationApiSlice.util.invalidateTags([
       { type: 'Notification', id: 'LIST' },
       { type: 'Notification', id: 'COUNT' },
@@ -81,6 +95,7 @@ export default function NotificationBell() {
 
     // Refetch notifications if dropdown is open
     if (isOpen) {
+      console.log('🔔 Dropdown open, refetching notifications');
       refetchNotifications();
     }
   }, [dispatch, isOpen, refetchNotifications]);

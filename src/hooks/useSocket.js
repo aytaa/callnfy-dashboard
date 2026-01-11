@@ -36,21 +36,44 @@ export function useNotificationSocket(onNotification, onUnreadCount) {
 
   // Subscribe to notification events
   useEffect(() => {
-    if (!onNotification) return;
-    const cleanup = addEventListener('notification', onNotification);
-    return cleanup;
+    console.log('🔔 useNotificationSocket: Setting up notification listener');
+    if (!onNotification) {
+      console.log('🔔 useNotificationSocket: No onNotification callback provided');
+      return;
+    }
+
+    // Wrap callback with debug logging
+    const wrappedCallback = (data) => {
+      console.log('🔔 useNotificationSocket: notification event received!', data);
+      onNotification(data);
+    };
+
+    const cleanup = addEventListener('notification', wrappedCallback);
+    console.log('🔔 useNotificationSocket: Listener registered');
+    return () => {
+      console.log('🔔 useNotificationSocket: Cleaning up notification listener');
+      cleanup();
+    };
   }, [addEventListener, onNotification]);
 
   // Subscribe to unread count events
   useEffect(() => {
+    console.log('🔔 useNotificationSocket: Setting up unreadCount listener');
     if (!onUnreadCount) return;
-    const cleanup = addEventListener('unreadCount', onUnreadCount);
+
+    const wrappedCallback = (data) => {
+      console.log('🔔 useNotificationSocket: unreadCount event received!', data);
+      onUnreadCount(data);
+    };
+
+    const cleanup = addEventListener('unreadCount', wrappedCallback);
     return cleanup;
   }, [addEventListener, onUnreadCount]);
 
   // Request unread count when connected
   useEffect(() => {
     if (isConnected) {
+      console.log('🔔 useNotificationSocket: Connected, requesting unread count');
       send('getUnreadCount');
     }
   }, [isConnected, send]);
