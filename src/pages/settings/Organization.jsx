@@ -39,15 +39,16 @@ export default function Organization() {
   const handleSave = async () => {
     if (!business?.id) return;
 
+    // Only send non-empty values to avoid validation issues
+    const updates = { id: business.id };
+    if (name.trim()) updates.name = name.trim();
+    if (email.trim()) updates.email = email.trim();
+    if (phone.trim()) updates.phone = phone.trim();
+    if (website.trim()) updates.website = website.trim();
+    if (industry.trim()) updates.industry = industry.trim();
+
     try {
-      await updateBusiness({
-        id: business.id,
-        name,
-        email,
-        phone,
-        website,
-        industry,
-      }).unwrap();
+      await updateBusiness(updates).unwrap();
       toast.success('Organization updated');
     } catch (err) {
       toast.error(err?.data?.message || 'Failed to update organization');
