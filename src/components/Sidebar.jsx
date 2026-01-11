@@ -348,10 +348,10 @@ function Sidebar({isOpen, onClose}) {
                                     {subscriptionStatus === 'trialing' && daysRemaining !== null ? (
                                         <>
                                             <span
-                                                className="inline-block px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium rounded border border-blue-200 dark:border-blue-800">
+                                                className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#262626] text-gray-900 dark:text-white text-xs font-medium rounded border border-gray-200 dark:border-[#303030]">
                                                 TRIAL
                                             </span>
-                                            <span className="text-xs text-gray-900 dark:text-white">
+                                            <span className="text-xs text-gray-600 dark:text-gray-400">
                                                 {daysRemaining > 0 ? `${daysRemaining} days left` : 'Expires today'}
                                             </span>
                                         </>

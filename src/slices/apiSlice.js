@@ -4,6 +4,7 @@ import {customBaseQuery} from './customBaseQuery';
 export const apiSlice = createApi({
     reducerPath: 'api',
     baseQuery: customBaseQuery,
+    refetchOnMountOrArgChange: true,
     tagTypes: [
         'User',
         'Business',

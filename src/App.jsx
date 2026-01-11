@@ -27,6 +27,7 @@ import CheckoutSuccess from './pages/onboarding/CheckoutSuccess';
 
 // Settings pages
 import Organization from './pages/settings/Organization';
+import WorkingHours from './pages/settings/WorkingHours';
 import Billing from './pages/settings/Billing';
 import Members from './pages/settings/Members';
 import Profile from './pages/settings/Profile';
@@ -66,7 +67,7 @@ function App() {
   return (
     <ErrorBoundary>
       <Toaster
-        position="top-right"
+        position="bottom-center"
         toastOptions={{
           duration: 3000,
           style: {
@@ -356,6 +357,7 @@ function App() {
         >
           <Route index element={<Navigate to="/settings/organization" replace />} />
           <Route path="organization" element={<Organization />} />
+          <Route path="working-hours" element={<WorkingHours />} />
           <Route path="billing" element={<Billing />} />
           <Route path="members" element={<Members />} />
           <Route path="integrations" element={<Integrations />} />
