@@ -204,9 +204,11 @@ export default function PhoneNotificationSettings() {
   }, [resendCountdown]);
 
   // Determine current state from API response
-  const isVerified = settings?.phoneVerified === true;
-  const hasPhoneNumber = !!settings?.phoneNumber;
-  const isEnabled = settings?.phoneEnabled === true;
+  // API returns: { phone: { phoneNumber, phoneVerified, phoneEnabled } }
+  const phone = settings?.phone;
+  const isVerified = phone?.phoneVerified === true;
+  const hasPhoneNumber = !!phone?.phoneNumber;
+  const isEnabled = phone?.phoneEnabled === true;
 
   // Get full phone number
   const getFullPhoneNumber = () => {
@@ -336,7 +338,7 @@ export default function PhoneNotificationSettings() {
             <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md">
               <Check className="w-4 h-4 text-green-500" />
               <span className="text-sm text-gray-900 dark:text-white font-medium">
-                {formatPhoneNumber(settings.phoneNumber)}
+                {formatPhoneNumber(phone?.phoneNumber)}
               </span>
             </div>
             <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800">

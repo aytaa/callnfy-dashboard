@@ -301,6 +301,11 @@ export default function NotificationSettings() {
         Manage how and when you receive notifications
       </p>
 
+      {/* SMS Notifications */}
+      <div className="mb-3">
+        <PhoneNotificationSettings />
+      </div>
+
       {/* Notification Types */}
       <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-3 mb-3">
         <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-200 dark:border-[#303030]">
@@ -477,11 +482,6 @@ export default function NotificationSettings() {
             </div>
           )}
         </div>
-      </div>
-
-      {/* SMS Notifications */}
-      <div className="mb-3">
-        <PhoneNotificationSettings />
       </div>
 
       {/* Action Buttons */}
