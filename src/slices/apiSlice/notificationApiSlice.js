@@ -52,7 +52,7 @@ export const notificationApiSlice = apiSlice.injectEndpoints({
     // Get unread count for badge
     getUnreadCount: builder.query({
       query: () => '/notifications/unread-count',
-      transformResponse: (response) => response?.data?.count || response?.count || 0,
+      transformResponse: (response) => response?.data?.unreadCount ?? response?.unreadCount ?? 0,
       providesTags: [{ type: 'Notification', id: 'COUNT' }],
     }),
 
@@ -67,7 +67,7 @@ export const notificationApiSlice = apiSlice.injectEndpoints({
     updateNotificationPreferences: builder.mutation({
       query: (preferences) => ({
         url: '/notifications/preferences',
-        method: 'PUT',
+        method: 'PATCH',
         body: preferences,
       }),
       invalidatesTags: ['NotificationPreferences'],
@@ -77,7 +77,7 @@ export const notificationApiSlice = apiSlice.injectEndpoints({
     markAsRead: builder.mutation({
       query: (notificationId) => ({
         url: `/notifications/${notificationId}/read`,
-        method: 'POST',
+        method: 'PATCH',
       }),
       invalidatesTags: (result, error, notificationId) => [
         { type: 'Notification', id: notificationId },
@@ -90,7 +90,7 @@ export const notificationApiSlice = apiSlice.injectEndpoints({
     markAllAsRead: builder.mutation({
       query: () => ({
         url: '/notifications/read-all',
-        method: 'POST',
+        method: 'PATCH',
       }),
       invalidatesTags: [
         { type: 'Notification', id: 'LIST' },

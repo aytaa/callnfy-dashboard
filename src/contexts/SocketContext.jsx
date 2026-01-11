@@ -154,11 +154,13 @@ export function SocketProvider({ children }) {
               break;
 
             case 'notification':
-              emitToListeners('notification', data.data || data);
+              // Server sends { type: 'notification', payload: {...} }
+              emitToListeners('notification', data.payload || data);
               break;
 
             case 'unreadCount':
-              emitToListeners('unreadCount', data.count);
+              // Server sends { type: 'unreadCount', payload: { count } }
+              emitToListeners('unreadCount', data.payload?.count ?? data.count);
               break;
 
             case 'auth_error':
