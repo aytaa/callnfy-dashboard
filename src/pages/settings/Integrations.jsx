@@ -49,7 +49,7 @@ export default function Integrations() {
     }
 
     try {
-      const result = await connectGoogle(businessId).unwrap();
+      const result = await connectGoogle({ businessId }).unwrap();
       if (result?.data?.authUrl) {
         // Redirect to Google OAuth
         window.location.href = result.data.authUrl;
