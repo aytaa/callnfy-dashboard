@@ -137,11 +137,12 @@ export function SocketProvider({ children }) {
 
           // Handle specific message types
           switch (type) {
+            case 'auth_success':
             case 'connected':
-              console.log('WebSocket authenticated:', data.userId);
+              console.log('WebSocket authenticated:', data.payload?.userId || data.userId);
               setIsConnected(true);
               startHeartbeat();
-              emitToListeners('connected', data);
+              emitToListeners('connected', data.payload || data);
               break;
 
             case 'notification':
@@ -152,10 +153,16 @@ export function SocketProvider({ children }) {
               emitToListeners('unreadCount', data.count);
               break;
 
+            case 'auth_error':
+              console.error('WebSocket auth failed:', data.payload?.message || data.message);
+              setConnectionError(data.payload?.message || data.message || 'Authentication failed');
+              emitToListeners('auth_error', data.payload || data);
+              break;
+
             case 'error':
-              console.error('WebSocket error from server:', data.message);
-              setConnectionError(data.message);
-              emitToListeners('error', data);
+              console.error('WebSocket error from server:', data.payload?.message || data.message);
+              setConnectionError(data.payload?.message || data.message);
+              emitToListeners('error', data.payload || data);
               break;
 
             case 'pong':
