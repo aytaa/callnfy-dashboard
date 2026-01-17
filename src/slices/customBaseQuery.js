@@ -19,6 +19,12 @@ const baseQuery = fetchBaseQuery({
 
 let refreshPromise = null;
 
+// Global flag to indicate refresh is in progress - exported for other components to check
+export let isRefreshing = false;
+
+// Small delay to ensure browser processes Set-Cookie header before retry
+const waitForCookies = () => new Promise(resolve => setTimeout(resolve, 100));
+
 // Rate limit tracking
 let consecutive429Count = 0;
 const RATE_LIMIT_THRESHOLD = 3;
@@ -96,6 +102,9 @@ export const customBaseQuery = async (args, api, extraOptions) => {
 
         if (isAuthenticated) {
             if (!refreshPromise) {
+                // Set global flag so other components know refresh is in progress
+                isRefreshing = true;
+
                 // Refresh token is in httpOnly cookie - sent automatically
                 refreshPromise = baseQuery(
                     {
@@ -113,6 +122,7 @@ export const customBaseQuery = async (args, api, extraOptions) => {
 
             // Check if refresh itself got rate limited
             if (refreshResult?.error?.status === 429) {
+                isRefreshing = false;
                 handleRateLimitError(api);
                 return {
                     error: {
@@ -124,20 +134,28 @@ export const customBaseQuery = async (args, api, extraOptions) => {
 
             // Check if refresh itself failed with 401/403
             if (refreshResult?.error?.status === 401 || refreshResult?.error?.status === 403) {
+                isRefreshing = false;
                 api.dispatch(logout());
                 window.location.href = '/auth/login';
                 return result;
             }
 
             // Refresh succeeded - new tokens are set as cookies automatically
-            if (refreshResult?.data) {
+            // Check success by absence of error (not by presence of data)
+            if (!refreshResult?.error) {
                 // Update user info if returned
-                if (refreshResult.data?.data?.user) {
+                if (refreshResult?.data?.data?.user) {
                     api.dispatch(setCredentials({ user: refreshResult.data.data.user }));
                 }
 
-                // Retry the original request
+                // Wait for browser to process the new Set-Cookie header
+                await waitForCookies();
+
+                // Retry the original request with new cookie
                 result = await baseQuery(args, api, extraOptions);
+
+                // Clear refreshing flag after retry completes
+                isRefreshing = false;
 
                 // Check if retry got rate limited
                 if (result?.error?.status === 429) {
@@ -153,6 +171,7 @@ export const customBaseQuery = async (args, api, extraOptions) => {
                 }
             } else {
                 // Refresh failed - logout and redirect
+                isRefreshing = false;
                 api.dispatch(logout());
                 window.location.href = '/auth/login';
             }

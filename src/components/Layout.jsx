@@ -4,6 +4,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useGetMeQuery, useLogoutMutation } from '../slices/apiSlice/authApiSlice';
 import { useGetBusinessesQuery } from '../slices/apiSlice/businessApiSlice';
 import { useGetPhoneNumberQuery } from '../slices/apiSlice/phoneApiSlice';
+import { isRefreshing } from '../slices/customBaseQuery';
 import Sidebar from './Sidebar';
 import CreateBusinessModal from './CreateBusinessModal';
 import NotificationBell from './NotificationBell';
@@ -99,10 +100,14 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
     if (meError) {
       // Check if it's a 401 Unauthorized error
       if (meError.status === 401 || meError.status === 'FETCH_ERROR') {
-        // Logout and redirect to login
-        // Backend clears httpOnly cookies on logout API call
-        logout();
-        navigate('/login', { replace: true });
+        // Don't logout if a token refresh is in progress
+        // The refresh will handle authentication
+        if (!isRefreshing) {
+          // Logout and redirect to login
+          // Backend clears httpOnly cookies on logout API call
+          logout();
+          navigate('/login', { replace: true });
+        }
       }
     }
   }, [meError, logout, navigate]);

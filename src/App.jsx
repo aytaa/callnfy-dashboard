@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
 import { selectIsAuthenticated, selectIsAuthChecked, setCredentials, setAuthChecked, logout } from './slices/authSlice';
 import { useGetMeQuery } from './slices/apiSlice/authApiSlice';
+import { isRefreshing } from './slices/customBaseQuery';
 import ErrorBoundary from './components/ErrorBoundary';
 import { SocketProvider } from './contexts/SocketContext';
 import Login from './pages/auth/Login';
@@ -63,8 +64,12 @@ function AuthInitializer({ children }) {
       // User is authenticated - cookie is valid
       dispatch(setCredentials({ user: userData }));
     } else if (isError) {
-      // Cookie is invalid or expired - clear any stale user data
-      dispatch(logout());
+      // Don't logout if a token refresh is in progress
+      // The refresh will handle authentication
+      if (!isRefreshing) {
+        // Cookie is invalid or expired - clear any stale user data
+        dispatch(logout());
+      }
     }
 
     dispatch(setAuthChecked(true));
