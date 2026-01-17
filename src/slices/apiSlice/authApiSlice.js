@@ -26,10 +26,10 @@ export const authApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: ['User'],
     }),
     refreshToken: builder.mutation({
-      query: (refreshToken) => ({
+      // Refresh token is in httpOnly cookie - sent automatically
+      query: () => ({
         url: '/auth/refresh',
         method: 'POST',
-        body: { refreshToken },
       }),
     }),
     getMe: builder.query({

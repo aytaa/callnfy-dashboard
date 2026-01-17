@@ -1,7 +1,10 @@
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
-import { selectIsAuthenticated } from './slices/authSlice';
+import { Loader2 } from 'lucide-react';
+import { selectIsAuthenticated, selectIsAuthChecked, setCredentials, setAuthChecked, logout } from './slices/authSlice';
+import { useGetMeQuery } from './slices/apiSlice/authApiSlice';
 import ErrorBoundary from './components/ErrorBoundary';
 import { SocketProvider } from './contexts/SocketContext';
 import Login from './pages/auth/Login';
@@ -42,9 +45,56 @@ import Notifications from './pages/Notifications';
 import Privacy from './pages/legal/Privacy';
 import Terms from './pages/legal/Terms';
 
+// Auth Initializer - checks auth status on app load using httpOnly cookie
+function AuthInitializer({ children }) {
+  const dispatch = useDispatch();
+  const isAuthChecked = useSelector(selectIsAuthChecked);
+
+  // Try to get current user - cookie will be sent automatically
+  const { data: userData, isLoading, isError } = useGetMeQuery(undefined, {
+    // Skip if we've already checked auth
+    skip: isAuthChecked,
+  });
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (userData) {
+      // User is authenticated - cookie is valid
+      dispatch(setCredentials({ user: userData }));
+    } else if (isError) {
+      // Cookie is invalid or expired - clear any stale user data
+      dispatch(logout());
+    }
+
+    dispatch(setAuthChecked(true));
+  }, [userData, isLoading, isError, dispatch]);
+
+  // Show loading while checking auth status
+  if (!isAuthChecked) {
+    return (
+      <div className="flex h-screen bg-gray-50 dark:bg-[#111114] items-center justify-center">
+        <Loader2 className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin" />
+      </div>
+    );
+  }
+
+  return children;
+}
+
 // Protected Route Component
 function ProtectedRoute({ children }) {
   const isAuthenticated = useSelector(selectIsAuthenticated);
+  const isAuthChecked = useSelector(selectIsAuthChecked);
+
+  // Wait for auth check to complete
+  if (!isAuthChecked) {
+    return (
+      <div className="flex h-screen bg-gray-50 dark:bg-[#111114] items-center justify-center">
+        <Loader2 className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin" />
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/auth/login" replace />;
@@ -56,6 +106,16 @@ function ProtectedRoute({ children }) {
 // Auth Route Component (redirect if already logged in)
 function AuthRoute({ children }) {
   const isAuthenticated = useSelector(selectIsAuthenticated);
+  const isAuthChecked = useSelector(selectIsAuthChecked);
+
+  // Wait for auth check to complete
+  if (!isAuthChecked) {
+    return (
+      <div className="flex h-screen bg-gray-50 dark:bg-[#111114] items-center justify-center">
+        <Loader2 className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin" />
+      </div>
+    );
+  }
 
   if (isAuthenticated) {
     return <Navigate to="/overview" replace />;
@@ -67,32 +127,33 @@ function AuthRoute({ children }) {
 function App() {
   return (
     <ErrorBoundary>
-      <SocketProvider>
-        <Toaster
-          position="bottom-center"
-          toastOptions={{
-            duration: 3000,
-            style: {
-              background: '#1a1a1d',
-              color: '#fff',
-              border: '1px solid #303030',
+      <Toaster
+        position="bottom-center"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#1a1a1d',
+            color: '#fff',
+            border: '1px solid #303030',
+          },
+          success: {
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
             },
-            success: {
-              iconTheme: {
-                primary: '#10b981',
-                secondary: '#fff',
-              },
+          },
+          error: {
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
             },
-            error: {
-              iconTheme: {
-                primary: '#ef4444',
-                secondary: '#fff',
-              },
-            },
-          }}
-        />
-        <Router>
-        <Routes>
+          },
+        }}
+      />
+      <Router>
+        <AuthInitializer>
+          <SocketProvider>
+            <Routes>
         {/* Default redirect */}
         <Route path="/" element={<Navigate to="/auth/login" replace />} />
 
@@ -373,9 +434,10 @@ function App() {
 
         {/* 404 Fallback */}
         <Route path="*" element={<Navigate to="/auth/login" replace />} />
-        </Routes>
-        </Router>
-      </SocketProvider>
+            </Routes>
+          </SocketProvider>
+        </AuthInitializer>
+      </Router>
     </ErrorBoundary>
   );
 }

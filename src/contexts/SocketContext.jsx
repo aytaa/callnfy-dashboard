@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { selectIsAuthenticated, selectCurrentToken } from '../slices/authSlice';
+import { selectIsAuthenticated } from '../slices/authSlice';
 
 const SocketContext = createContext(null);
 
@@ -17,13 +17,11 @@ const HEARTBEAT_INTERVAL = 30000; // 30 seconds
 
 export function SocketProvider({ children }) {
   const isAuthenticated = useSelector(selectIsAuthenticated);
-  const token = useSelector(selectCurrentToken);
 
   // DEBUG: Log on every render to see state
   console.log('=== SocketContext Debug ===');
   console.log('SocketContext - wsUrl:', import.meta.env.VITE_NOTIFICATION_WS_URL);
   console.log('SocketContext - isAuthenticated:', isAuthenticated);
-  console.log('SocketContext - token:', token ? 'exists (' + token.substring(0, 20) + '...)' : 'MISSING');
 
   const wsRef = useRef(null);
   const reconnectAttemptsRef = useRef(0);
@@ -102,16 +100,10 @@ export function SocketProvider({ children }) {
   const connect = useCallback(() => {
     console.log('=== WebSocket connect() called ===');
     console.log('connect() - wsUrl:', wsUrl);
-    console.log('connect() - token:', token ? 'exists' : 'MISSING');
     console.log('connect() - current readyState:', wsRef.current?.readyState);
 
     if (!wsUrl) {
       console.error('❌ WebSocket URL not configured (VITE_NOTIFICATION_WS_URL)');
-      return;
-    }
-
-    if (!token) {
-      console.error('❌ No auth token available for WebSocket');
       return;
     }
 
@@ -131,9 +123,10 @@ export function SocketProvider({ children }) {
         reconnectAttemptsRef.current = 0;
         setConnectionError(null);
 
-        // Authenticate immediately after connection
-        console.log('🔐 Sending auth message with token');
-        send('auth', { token });
+        // Auth is handled via httpOnly cookies sent with the WebSocket handshake
+        // Send auth message to trigger server-side cookie validation
+        console.log('🔐 Sending auth message (cookies sent automatically)');
+        send('auth', {});
       };
 
       ws.onmessage = (event) => {
@@ -222,7 +215,7 @@ export function SocketProvider({ children }) {
       console.error('Failed to create WebSocket:', error);
       setConnectionError('Failed to connect');
     }
-  }, [wsUrl, token, send, startHeartbeat, stopHeartbeat, emitToListeners]);
+  }, [wsUrl, send, startHeartbeat, stopHeartbeat, emitToListeners]);
 
   // Disconnect from WebSocket
   const disconnect = useCallback(() => {
@@ -247,22 +240,19 @@ export function SocketProvider({ children }) {
   useEffect(() => {
     console.log('=== SocketContext useEffect triggered ===');
     console.log('useEffect - isAuthenticated:', isAuthenticated);
-    console.log('useEffect - token:', token ? 'exists' : 'MISSING');
 
-    if (isAuthenticated && token) {
-      console.log('✅ Conditions met, calling connect()');
+    if (isAuthenticated) {
+      console.log('✅ User authenticated, calling connect()');
       connect();
     } else {
-      console.log('❌ Conditions not met, calling disconnect()');
-      console.log('  - isAuthenticated:', isAuthenticated);
-      console.log('  - token:', token ? 'exists' : 'MISSING');
+      console.log('❌ User not authenticated, calling disconnect()');
       disconnect();
     }
 
     return () => {
       disconnect();
     };
-  }, [isAuthenticated, token, connect, disconnect]);
+  }, [isAuthenticated, connect, disconnect]);
 
   // Cleanup on unmount
   useEffect(() => {

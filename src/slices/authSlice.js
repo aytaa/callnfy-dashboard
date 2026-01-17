@@ -13,9 +13,11 @@ const getStoredUser = () => {
 
 const initialState = {
   user: getStoredUser(),
-  accessToken: localStorage.getItem('accessToken') || null,
-  refreshToken: localStorage.getItem('refreshToken') || null,
-  isAuthenticated: !!localStorage.getItem('accessToken'),
+  // With httpOnly cookies, we can't check tokens directly
+  // isAuthenticated is set based on user presence or successful /auth/me call
+  isAuthenticated: !!getStoredUser(),
+  // Track if we've checked auth status on app load
+  isAuthChecked: false,
 };
 
 const authSlice = createSlice({
@@ -23,53 +25,31 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setCredentials: (state, action) => {
-      const { user, accessToken, refreshToken } = action.payload;
-
-      // CRITICAL: Only update values that are provided (not undefined)
-      // This prevents overwriting existing values with undefined
+      const { user } = action.payload;
 
       if (user !== undefined) {
         state.user = user;
-        localStorage.setItem('user', JSON.stringify(user));
-      }
-
-      if (accessToken !== undefined) {
-        state.accessToken = accessToken;
-        localStorage.setItem('accessToken', accessToken);
-      }
-
-      if (refreshToken !== undefined) {
-        state.refreshToken = refreshToken;
-        localStorage.setItem('refreshToken', refreshToken);
-      }
-
-      // Set authenticated if we have an access token
-      if (accessToken) {
-        state.isAuthenticated = true;
+        if (user) {
+          localStorage.setItem('user', JSON.stringify(user));
+          state.isAuthenticated = true;
+        }
       }
     },
-    token: (state, action) => {
-      state.accessToken = action.payload.accessToken;
-      state.refreshToken = action.payload.refreshToken;
-      localStorage.setItem('accessToken', action.payload.accessToken);
-      localStorage.setItem('refreshToken', action.payload.refreshToken);
+    setAuthChecked: (state, action) => {
+      state.isAuthChecked = action.payload;
     },
     logout: (state) => {
       state.user = null;
-      state.accessToken = null;
-      state.refreshToken = null;
       state.isAuthenticated = false;
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
     },
   },
 });
 
-export const { setCredentials, token, logout } = authSlice.actions;
+export const { setCredentials, setAuthChecked, logout } = authSlice.actions;
 
 export default authSlice.reducer;
 
 export const selectCurrentUser = (state) => state.auth.user;
-export const selectCurrentToken = (state) => state.auth.accessToken;
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
+export const selectIsAuthChecked = (state) => state.auth.isAuthChecked;

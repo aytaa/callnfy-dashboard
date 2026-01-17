@@ -100,9 +100,8 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
       // Check if it's a 401 Unauthorized error
       if (meError.status === 401 || meError.status === 'FETCH_ERROR') {
         // Logout and redirect to login
+        // Backend clears httpOnly cookies on logout API call
         logout();
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
         navigate('/login', { replace: true });
       }
     }

@@ -29,15 +29,22 @@ function Login() {
     try {
       const result = await login({ email, password }).unwrap();
 
+      // Tokens are now set as httpOnly cookies by the backend
+      // We only store the user info in Redux
       dispatch(setCredentials({
         user: result.data.user,
-        accessToken: result.data.accessToken,
-        refreshToken: result.data.refreshToken,
       }));
 
       navigate('/overview');
     } catch (err) {
-      setError(err?.data?.error?.message || err?.data?.message || 'Failed to login. Please try again.');
+      // Provide user-friendly error messages for common auth errors
+      if (err?.status === 401 || err?.data?.error?.code === 'INVALID_CREDENTIALS') {
+        setError('Invalid email or password. Please try again.');
+      } else if (err?.status === 429) {
+        setError('Too many login attempts. Please wait a moment and try again.');
+      } else {
+        setError(err?.data?.error?.message || err?.data?.message || 'Failed to login. Please try again.');
+      }
     }
   };
 

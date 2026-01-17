@@ -4,15 +4,7 @@ import toast from 'react-hot-toast';
 
 const baseQuery = fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_URL || 'https://api.callnfy.com/v1',
-    credentials: 'include',
-    prepareHeaders: (headers, {getState}) => {
-        const token = getState().auth.accessToken;
-
-        if (token) {
-            headers.set('authorization', `Bearer ${token}`);
-        }
-        return headers;
-    },
+    credentials: 'include', // Send httpOnly cookies with every request
     paramsSerializer: (params) => {
         const serializedParams = {...params};
         if (serializedParams.page !== undefined) {
@@ -94,16 +86,21 @@ export const customBaseQuery = async (args, api, extraOptions) => {
     }
 
     // Handle 401 Unauthorized or 403 Forbidden - attempt token refresh
-    if (result?.error?.status === 401 || result?.error?.status === 403) {
-        const refreshToken = api.getState().auth.refreshToken;
+    // Skip for auth endpoints (login, register, etc.) - these should return errors to the caller
+    const requestUrl = typeof args === 'string' ? args : args?.url;
+    const isAuthEndpoint = requestUrl?.startsWith('/auth/') && !requestUrl?.includes('/auth/refresh');
 
-        if (refreshToken) {
+    if ((result?.error?.status === 401 || result?.error?.status === 403) && !isAuthEndpoint) {
+        // Only attempt refresh if user is authenticated (has user in state)
+        const isAuthenticated = api.getState().auth.isAuthenticated;
+
+        if (isAuthenticated) {
             if (!refreshPromise) {
+                // Refresh token is in httpOnly cookie - sent automatically
                 refreshPromise = baseQuery(
                     {
                         url: '/auth/refresh',
                         method: 'POST',
-                        body: {refreshToken},
                     },
                     api,
                     extraOptions
@@ -132,15 +129,14 @@ export const customBaseQuery = async (args, api, extraOptions) => {
                 return result;
             }
 
-            if (refreshResult?.data?.data) {
-                api.dispatch(
-                    setCredentials({
-                        user: refreshResult.data.data.user,
-                        accessToken: refreshResult.data.data.accessToken,
-                        refreshToken: refreshResult.data.data.refreshToken || refreshToken,
-                    })
-                );
+            // Refresh succeeded - new tokens are set as cookies automatically
+            if (refreshResult?.data) {
+                // Update user info if returned
+                if (refreshResult.data?.data?.user) {
+                    api.dispatch(setCredentials({ user: refreshResult.data.data.user }));
+                }
 
+                // Retry the original request
                 result = await baseQuery(args, api, extraOptions);
 
                 // Check if retry got rate limited
@@ -161,8 +157,7 @@ export const customBaseQuery = async (args, api, extraOptions) => {
                 window.location.href = '/auth/login';
             }
         } else {
-            // No refresh token - logout and redirect
-            api.dispatch(logout());
+            // Not authenticated - redirect to login
             window.location.href = '/auth/login';
         }
     }
