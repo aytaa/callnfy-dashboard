@@ -5,9 +5,10 @@ import { Toaster } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
 import { selectIsAuthenticated, selectIsAuthChecked, setCredentials, setAuthChecked, logout } from './slices/authSlice';
 import { useGetMeQuery } from './slices/apiSlice/authApiSlice';
-import { isRefreshing } from './slices/customBaseQuery';
+import { getIsRefreshing } from './slices/customBaseQuery';
 import ErrorBoundary from './components/ErrorBoundary';
 import { SocketProvider } from './contexts/SocketContext';
+import RefreshOverlay from './components/RefreshOverlay';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import ForgotPassword from './pages/auth/ForgotPassword';
@@ -66,7 +67,7 @@ function AuthInitializer({ children }) {
     } else if (isError) {
       // Don't logout if a token refresh is in progress
       // The refresh will handle authentication
-      if (!isRefreshing) {
+      if (!getIsRefreshing()) {
         // Cookie is invalid or expired - clear any stale user data
         dispatch(logout());
       }
@@ -155,6 +156,7 @@ function App() {
           },
         }}
       />
+      <RefreshOverlay />
       <Router>
         <AuthInitializer>
           <SocketProvider>
