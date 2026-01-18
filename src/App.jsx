@@ -8,7 +8,6 @@ import { useGetMeQuery } from './slices/apiSlice/authApiSlice';
 import { getIsRefreshing } from './slices/customBaseQuery';
 import ErrorBoundary from './components/ErrorBoundary';
 import { SocketProvider } from './contexts/SocketContext';
-import RefreshOverlay from './components/RefreshOverlay';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import ForgotPassword from './pages/auth/ForgotPassword';
@@ -156,7 +155,6 @@ function App() {
           },
         }}
       />
-      <RefreshOverlay />
       <Router>
         <AuthInitializer>
           <SocketProvider>

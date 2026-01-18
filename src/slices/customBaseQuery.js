@@ -19,28 +19,11 @@ const baseQuery = fetchBaseQuery({
 
 let refreshPromise = null;
 
-// Reactive isRefreshing state with event emitter pattern
+// Track if a token refresh is in progress (used to prevent duplicate logouts)
 let _isRefreshing = false;
-const refreshListeners = new Set();
 
-// Subscribe to isRefreshing changes
-export const subscribeToRefreshing = (callback) => {
-    refreshListeners.add(callback);
-    // Return unsubscribe function
-    return () => refreshListeners.delete(callback);
-};
-
-// Get current isRefreshing value (for non-reactive checks)
+// Get current isRefreshing value
 export const getIsRefreshing = () => _isRefreshing;
-
-// For backwards compatibility
-export { _isRefreshing as isRefreshing };
-
-// Set isRefreshing and notify all subscribers
-const setIsRefreshing = (value) => {
-    _isRefreshing = value;
-    refreshListeners.forEach(callback => callback(value));
-};
 
 // Small delay to ensure browser processes Set-Cookie header before retry
 const waitForCookies = () => new Promise(resolve => setTimeout(resolve, 100));
@@ -123,7 +106,7 @@ export const customBaseQuery = async (args, api, extraOptions) => {
         if (isAuthenticated) {
             if (!refreshPromise) {
                 // Set global flag so other components know refresh is in progress
-                setIsRefreshing(true);
+                _isRefreshing = true;
 
                 // Refresh token is in httpOnly cookie - sent automatically
                 refreshPromise = baseQuery(
@@ -142,7 +125,7 @@ export const customBaseQuery = async (args, api, extraOptions) => {
 
             // Check if refresh itself got rate limited
             if (refreshResult?.error?.status === 429) {
-                setIsRefreshing(false);
+                _isRefreshing = false;
                 handleRateLimitError(api);
                 return {
                     error: {
@@ -154,7 +137,7 @@ export const customBaseQuery = async (args, api, extraOptions) => {
 
             // Check if refresh itself failed with 401/403
             if (refreshResult?.error?.status === 401 || refreshResult?.error?.status === 403) {
-                setIsRefreshing(false);
+                _isRefreshing = false;
                 api.dispatch(logout());
                 window.location.href = '/auth/login';
                 return result;
@@ -175,7 +158,7 @@ export const customBaseQuery = async (args, api, extraOptions) => {
                 result = await baseQuery(args, api, extraOptions);
 
                 // Clear refreshing flag after retry completes
-                setIsRefreshing(false);
+                _isRefreshing = false;
 
                 // Check if retry got rate limited
                 if (result?.error?.status === 429) {
@@ -191,7 +174,7 @@ export const customBaseQuery = async (args, api, extraOptions) => {
                 }
             } else {
                 // Refresh failed - logout and redirect
-                setIsRefreshing(false);
+                _isRefreshing = false;
                 api.dispatch(logout());
                 window.location.href = '/auth/login';
             }
