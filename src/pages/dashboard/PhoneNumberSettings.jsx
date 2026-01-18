@@ -195,7 +195,7 @@ export default function PhoneNumberSettings() {
 
   if (isLoadingPhone || isLoadingAssistants) {
     return (
-      <div className="px-8 py-6 flex items-center justify-center min-h-screen">
+      <div className="px-8 py-6 flex items-center justify-center h-full bg-gray-50 dark:bg-transparent">
         <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
       </div>
     );

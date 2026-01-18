@@ -20,7 +20,7 @@ import {
 import clsx from 'clsx';
 import SearchModal from './SearchModal';
 import {logout} from '../slices/authSlice';
-import {useGetMeQuery} from '../slices/apiSlice/authApiSlice';
+import {useGetMeQuery, useLogoutMutation} from '../slices/apiSlice/authApiSlice';
 import {useGetBusinessesQuery} from '../slices/apiSlice/businessApiSlice';
 
 
@@ -41,6 +41,7 @@ function Sidebar({isOpen, onClose}) {
         refetchOnReconnect: false,
     });
     const {data: businessData, isLoading: isLoadingBusiness} = useGetBusinessesQuery();
+    const [logoutApi] = useLogoutMutation();
 
     // Get user email and name from API data, with localStorage fallback
     const getUserFromStorage = () => {
@@ -109,7 +110,15 @@ function Sidebar({isOpen, onClose}) {
         },
     ];
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
+        try {
+            // Call backend to invalidate tokens
+            await logoutApi().unwrap();
+        } catch (error) {
+            // Log error but continue with local logout
+            console.error('Logout API error:', error);
+        }
+        // Clear local state regardless of API result
         dispatch(logout());
         navigate('/login');
         setEmailDropdownOpen(false);

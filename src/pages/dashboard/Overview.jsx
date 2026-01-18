@@ -139,7 +139,7 @@ export default function Overview() {
 
   if (businessesLoading) {
     return (
-      <div className="px-8 py-6 flex items-center justify-center min-h-screen bg-gray-50 dark:bg-transparent">
+      <div className="px-8 py-6 flex items-center justify-center h-full bg-gray-50 dark:bg-transparent">
         <Loader2 className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin" />
       </div>
     );
@@ -147,7 +147,7 @@ export default function Overview() {
 
   if (!business) {
     return (
-      <div className="px-8 py-6 bg-gray-50 dark:bg-transparent min-h-screen">
+      <div className="px-8 py-6 bg-gray-50 dark:bg-transparent">
         <div className="max-w-2xl mx-auto text-center py-12">
           <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-8">
             <Phone className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
@@ -169,7 +169,7 @@ export default function Overview() {
   }
 
   return (
-    <div className="px-8 py-6 bg-gray-50 dark:bg-transparent min-h-screen">
+    <div className="px-8 py-6 bg-gray-50 dark:bg-transparent">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Welcome Section */}
         <div>

@@ -166,7 +166,7 @@ export default function Appointments() {
 
   if (isLoading) {
     return (
-      <div className="px-8 py-6 flex items-center justify-center min-h-screen bg-gray-50 dark:bg-transparent">
+      <div className="px-8 py-6 flex items-center justify-center h-full bg-gray-50 dark:bg-transparent">
         <Loader2 className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin" />
       </div>
     );
@@ -174,7 +174,7 @@ export default function Appointments() {
 
   if (queryError) {
     return (
-      <div className="px-8 py-6 bg-gray-50 dark:bg-transparent min-h-screen">
+      <div className="px-8 py-6 bg-gray-50 dark:bg-transparent">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Appointments</h1>
           <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
@@ -188,7 +188,7 @@ export default function Appointments() {
   }
 
   return (
-    <div className="px-8 py-6 bg-gray-50 dark:bg-transparent min-h-screen">
+    <div className="px-8 py-6 bg-gray-50 dark:bg-transparent">
       <div className="max-w-7xl mx-auto space-y-4">
         {/* Error display */}
         {error && (

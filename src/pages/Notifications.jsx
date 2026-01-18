@@ -61,7 +61,7 @@ export default function Notifications() {
   };
 
   return (
-    <div className="px-8 py-6 bg-gray-50 dark:bg-transparent min-h-screen">
+    <div className="px-8 py-6 bg-gray-50 dark:bg-transparent">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">

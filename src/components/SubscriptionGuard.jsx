@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
 import { useGetSubscriptionQuery } from '../slices/apiSlice/billingApiSlice';
 import { useGetMeQuery } from '../slices/apiSlice/authApiSlice';
 import OnboardingModal from './OnboardingModal';
@@ -80,13 +79,9 @@ export default function SubscriptionGuard({ children }) {
     hasCheckedOnboarding.current = false;
   };
 
-  // Show loading state
+  // During loading, render children - each page handles its own loading state
   if (isLoadingSubscription || isLoadingUser) {
-    return (
-      <div className="min-h-screen bg-[#111114] flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
-      </div>
-    );
+    return children;
   }
 
   // Handle API errors - if /me fails, user session may be invalid
@@ -102,12 +97,12 @@ export default function SubscriptionGuard({ children }) {
     }
     // For other errors (500, network, etc), show a simple error state
     return (
-      <div className="min-h-screen bg-[#111114] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-[#111114] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-400 mb-4">Unable to load your account data.</p>
+          <p className="text-gray-500 dark:text-gray-400 mb-4">Unable to load your account data.</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+            className="px-4 py-2 bg-gray-900 dark:bg-gray-800 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-700"
           >
             Retry
           </button>

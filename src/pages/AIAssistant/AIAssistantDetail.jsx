@@ -125,7 +125,7 @@ export default function AIAssistantDetail() {
 
   if (isLoading) {
     return (
-      <div className="px-8 py-6 flex items-center justify-center min-h-screen bg-gray-50 dark:bg-transparent">
+      <div className="px-8 py-6 flex items-center justify-center h-full bg-gray-50 dark:bg-transparent">
         <Loader2 className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin" />
       </div>
     );
@@ -133,7 +133,7 @@ export default function AIAssistantDetail() {
 
   if (isError) {
     return (
-      <div className="px-8 py-6 bg-gray-50 dark:bg-transparent min-h-screen">
+      <div className="px-8 py-6 bg-gray-50 dark:bg-transparent">
         <div className="max-w-5xl mx-auto">
           <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
             <p className="text-sm text-red-600 dark:text-red-400">
@@ -149,7 +149,7 @@ export default function AIAssistantDetail() {
   if (!assistant) {
     return (
       <>
-        <div className="px-8 py-6 bg-gray-50 dark:bg-transparent min-h-screen">
+        <div className="px-8 py-6 bg-gray-50 dark:bg-transparent">
           <div className="max-w-5xl mx-auto">
             {error && (
               <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md mb-6">
@@ -217,7 +217,7 @@ export default function AIAssistantDetail() {
   };
 
   return (
-    <div className="px-8 py-6 bg-gray-50 dark:bg-transparent min-h-screen">
+    <div className="px-8 py-6 bg-gray-50 dark:bg-transparent">
       <div className="max-w-5xl mx-auto space-y-4">
         {/* Vapi Sync Warning */}
         {assistant.vapiError && (
