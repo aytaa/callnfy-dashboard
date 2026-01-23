@@ -7,21 +7,19 @@ const SocketContext = createContext(null);
 // WebSocket ready states
 const CONNECTING = 0;
 const OPEN = 1;
-const CLOSING = 2;
-const CLOSED = 3;
 
 // Configuration
 const RECONNECT_INTERVAL = 3000; // 3 seconds
 const MAX_RECONNECT_ATTEMPTS = 10;
 const HEARTBEAT_INTERVAL = 30000; // 30 seconds
 
+// Debug logging - only in development
+const DEBUG = import.meta.env.DEV && import.meta.env.VITE_WS_DEBUG === 'true';
+const log = (...args) => DEBUG && console.log('[WebSocket]', ...args);
+const logError = (...args) => console.error('[WebSocket]', ...args);
+
 export function SocketProvider({ children }) {
   const isAuthenticated = useSelector(selectIsAuthenticated);
-
-  // DEBUG: Log on every render to see state
-  console.log('=== SocketContext Debug ===');
-  console.log('SocketContext - wsUrl:', import.meta.env.VITE_NOTIFICATION_WS_URL);
-  console.log('SocketContext - isAuthenticated:', isAuthenticated);
 
   const wsRef = useRef(null);
   const reconnectAttemptsRef = useRef(0);
@@ -47,36 +45,28 @@ export function SocketProvider({ children }) {
 
   // Add event listener
   const addEventListener = useCallback((type, callback) => {
-    console.log(`📡 addEventListener: Registering listener for "${type}"`);
     if (!listenersRef.current.has(type)) {
       listenersRef.current.set(type, new Set());
     }
     listenersRef.current.get(type).add(callback);
-    console.log(`📡 addEventListener: Total listeners for "${type}":`, listenersRef.current.get(type).size);
 
     // Return cleanup function
     return () => {
-      console.log(`📡 addEventListener: Removing listener for "${type}"`);
       listenersRef.current.get(type)?.delete(callback);
     };
   }, []);
 
   // Emit event to listeners
   const emitToListeners = useCallback((type, data) => {
-    console.log(`📡 emitToListeners: Emitting "${type}" to listeners`, data);
     const callbacks = listenersRef.current.get(type);
-    console.log(`📡 emitToListeners: Found ${callbacks?.size || 0} listeners for "${type}"`);
     if (callbacks) {
       callbacks.forEach((callback) => {
         try {
-          console.log(`📡 emitToListeners: Calling callback for "${type}"`);
           callback(data);
         } catch (error) {
-          console.error(`Error in WebSocket listener for "${type}":`, error);
+          logError(`Error in listener for "${type}":`, error);
         }
       });
-    } else {
-      console.warn(`📡 emitToListeners: No listeners registered for "${type}"`);
     }
   }, []);
 
@@ -98,72 +88,61 @@ export function SocketProvider({ children }) {
 
   // Connect to WebSocket
   const connect = useCallback(() => {
-    console.log('=== WebSocket connect() called ===');
-    console.log('connect() - wsUrl:', wsUrl);
-    console.log('connect() - current readyState:', wsRef.current?.readyState);
-
     if (!wsUrl) {
-      console.error('❌ WebSocket URL not configured (VITE_NOTIFICATION_WS_URL)');
+      logError('WebSocket URL not configured (VITE_NOTIFICATION_WS_URL)');
       return;
     }
 
     // Don't create new connection if one exists and is connecting/open
     if (wsRef.current?.readyState === CONNECTING || wsRef.current?.readyState === OPEN) {
-      console.log('⏳ WebSocket already connecting or open, skipping');
       return;
     }
 
     try {
-      console.log('🔌 Creating new WebSocket connection to:', wsUrl);
+      log('Connecting to:', wsUrl);
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log('✅ WebSocket connected successfully!');
+        log('Connected');
         reconnectAttemptsRef.current = 0;
         setConnectionError(null);
 
         // Auth is handled via httpOnly cookies sent with the WebSocket handshake
-        // Send auth message to trigger server-side cookie validation
-        console.log('🔐 Sending auth message (cookies sent automatically)');
         send('auth', {});
       };
 
       ws.onmessage = (event) => {
         try {
-          console.log('📨 WebSocket message received:', event.data);
           const message = JSON.parse(event.data);
           const { type, ...data } = message;
-          console.log('📨 Parsed message - type:', type, 'data:', data);
 
           // Handle specific message types
           switch (type) {
             case 'auth_success':
             case 'connected':
-              console.log('WebSocket authenticated:', data.payload?.userId || data.userId);
+              log('Authenticated');
               setIsConnected(true);
               startHeartbeat();
               emitToListeners('connected', data.payload || data);
               break;
 
             case 'notification':
-              // Server sends { type: 'notification', payload: {...} }
               emitToListeners('notification', data.payload || data);
               break;
 
             case 'unreadCount':
-              // Server sends { type: 'unreadCount', payload: { count } }
               emitToListeners('unreadCount', data.payload?.count ?? data.count);
               break;
 
             case 'auth_error':
-              console.error('WebSocket auth failed:', data.payload?.message || data.message);
+              logError('Auth failed:', data.payload?.message || data.message);
               setConnectionError(data.payload?.message || data.message || 'Authentication failed');
               emitToListeners('auth_error', data.payload || data);
               break;
 
             case 'error':
-              console.error('WebSocket error from server:', data.payload?.message || data.message);
+              logError('Server error:', data.payload?.message || data.message);
               setConnectionError(data.payload?.message || data.message);
               emitToListeners('error', data.payload || data);
               break;
@@ -177,26 +156,17 @@ export function SocketProvider({ children }) {
               emitToListeners(type, data);
           }
         } catch (error) {
-          console.error('Failed to parse WebSocket message:', error);
+          logError('Failed to parse message:', error);
         }
       };
 
-      ws.onerror = (error) => {
-        console.error('❌ WebSocket error:', error);
-        console.error('❌ Error details:', {
-          type: error.type,
-          target: error.target?.url,
-          readyState: error.target?.readyState
-        });
+      ws.onerror = () => {
         setConnectionError('Connection error');
         emitToListeners('error', { message: 'Connection error' });
       };
 
       ws.onclose = (event) => {
-        console.log('🔴 WebSocket closed');
-        console.log('Close code:', event.code);
-        console.log('Close reason:', event.reason || '(no reason)');
-        console.log('Was clean:', event.wasClean);
+        log('Closed - code:', event.code);
         setIsConnected(false);
         stopHeartbeat();
         emitToListeners('disconnected', { code: event.code, reason: event.reason });
@@ -204,7 +174,7 @@ export function SocketProvider({ children }) {
         // Attempt reconnection if not intentionally closed
         if (event.code !== 1000 && reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
           reconnectAttemptsRef.current++;
-          console.log(`Reconnecting... (attempt ${reconnectAttemptsRef.current}/${MAX_RECONNECT_ATTEMPTS})`);
+          log(`Reconnecting (${reconnectAttemptsRef.current}/${MAX_RECONNECT_ATTEMPTS})`);
 
           reconnectTimeoutRef.current = setTimeout(() => {
             connect();
@@ -212,7 +182,7 @@ export function SocketProvider({ children }) {
         }
       };
     } catch (error) {
-      console.error('Failed to create WebSocket:', error);
+      logError('Failed to create WebSocket:', error);
       setConnectionError('Failed to connect');
     }
   }, [wsUrl, send, startHeartbeat, stopHeartbeat, emitToListeners]);
@@ -238,14 +208,9 @@ export function SocketProvider({ children }) {
 
   // Connect when authenticated, disconnect when not
   useEffect(() => {
-    console.log('=== SocketContext useEffect triggered ===');
-    console.log('useEffect - isAuthenticated:', isAuthenticated);
-
     if (isAuthenticated) {
-      console.log('✅ User authenticated, calling connect()');
       connect();
     } else {
-      console.log('❌ User not authenticated, calling disconnect()');
       disconnect();
     }
 
