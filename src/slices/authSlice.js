@@ -18,6 +18,9 @@ const initialState = {
   isAuthenticated: !!getStoredUser(),
   // Track if we've checked auth status on app load
   isAuthChecked: false,
+  // Track if a forced logout was triggered (auth error, rate limit, etc.)
+  // This prevents re-authentication race conditions
+  forceLogout: false,
 };
 
 const authSlice = createSlice({
@@ -26,6 +29,11 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (state, action) => {
       const { user } = action.payload;
+
+      // Don't set credentials if forceLogout is true (prevents race conditions)
+      if (state.forceLogout) {
+        return;
+      }
 
       if (user !== undefined) {
         state.user = user;
@@ -38,6 +46,12 @@ const authSlice = createSlice({
     setAuthChecked: (state, action) => {
       state.isAuthChecked = action.payload;
     },
+    setForceLogout: (state, action) => {
+      state.forceLogout = action.payload;
+    },
+    clearForceLogout: (state) => {
+      state.forceLogout = false;
+    },
     logout: (state) => {
       state.user = null;
       state.isAuthenticated = false;
@@ -46,10 +60,11 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, setAuthChecked, logout } = authSlice.actions;
+export const { setCredentials, setAuthChecked, setForceLogout, clearForceLogout, logout } = authSlice.actions;
 
 export default authSlice.reducer;
 
 export const selectCurrentUser = (state) => state.auth.user;
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 export const selectIsAuthChecked = (state) => state.auth.isAuthChecked;
+export const selectForceLogout = (state) => state.auth.forceLogout;

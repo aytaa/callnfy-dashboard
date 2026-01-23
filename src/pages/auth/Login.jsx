@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Phone } from 'lucide-react';
 import { useLoginMutation } from '../../slices/apiSlice/authApiSlice';
-import { setCredentials } from '../../slices/authSlice';
+import { setCredentials, clearForceLogout } from '../../slices/authSlice';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -28,6 +28,10 @@ function Login() {
 
     try {
       const result = await login({ email, password }).unwrap();
+
+      // Clear forceLogout flag before setting credentials
+      // This allows the user to log back in after being forcefully logged out
+      dispatch(clearForceLogout());
 
       // Tokens are now set as httpOnly cookies by the backend
       // We only store the user info in Redux

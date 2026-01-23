@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Modal from './ui/Modal';
-import { Phone, Globe, AlertCircle, Loader2, Info, Search, Check, DollarSign, ExternalLink } from 'lucide-react';
+import { Phone, Globe, AlertCircle, Loader2, Info, Search, Check, DollarSign } from 'lucide-react';
 import { usePurchasePhoneNumberMutation, useSearchTwilioNumbersMutation, useCreatePhoneNumberCheckoutMutation } from '../slices/apiSlice/phoneApiSlice';
 import { useGetBusinessesQuery } from '../slices/apiSlice/businessApiSlice';
 
@@ -235,9 +235,18 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
   };
 
   const isLoading = isCreating || isCreatingCheckout;
+  const isRedirectingToCheckout = isCreatingCheckout;
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Phone Number" size="lg">
+    <Modal isOpen={isOpen} onClose={isRedirectingToCheckout ? undefined : handleClose} title="Phone Number" size="lg">
+      {/* Full modal loading overlay during checkout redirect */}
+      {isRedirectingToCheckout && (
+        <div className="absolute inset-0 bg-white/80 dark:bg-[#111114]/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-lg">
+          <Loader2 className="w-8 h-8 text-gray-900 dark:text-white animate-spin mb-3" />
+          <p className="text-sm font-medium text-gray-900 dark:text-white">Redirecting to secure checkout...</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Please wait</p>
+        </div>
+      )}
       <div className="flex min-h-[400px]">
         {/* Left Sidebar - Phone Number Options */}
         <div className="w-56 border-r border-gray-200 dark:border-[#303030] pr-4">
@@ -535,27 +544,20 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
           <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-gray-200 dark:border-[#303030]">
             <button
               onClick={handleClose}
-              className="px-4 py-2 text-sm border border-gray-200 dark:border-[#303030] text-gray-700 dark:text-white rounded-md hover:border-gray-300 dark:hover:border-[#404040] transition-colors"
+              disabled={isRedirectingToCheckout}
+              className="px-4 py-2 text-sm border border-gray-200 dark:border-[#303030] text-gray-700 dark:text-white rounded-md hover:border-gray-300 dark:hover:border-[#404040] transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               onClick={handleCreate}
               disabled={isLoading || !selectedBusiness || (selectedOption === 'twilio-number' && !selectedTwilioNumber)}
-              className="px-4 py-2 text-sm bg-gray-900 dark:bg-white text-white dark:text-black font-medium rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors disabled:opacity-50 flex items-center gap-2"
+              className="px-4 py-2 text-sm bg-gray-900 dark:bg-white text-white dark:text-black font-medium rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors disabled:opacity-50"
             >
               {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  {selectedOption === 'twilio-number' ? 'Redirecting to checkout...' : 'Creating...'}
-                </>
+                selectedOption === 'twilio-number' ? 'Processing...' : 'Creating...'
               ) : (
-                selectedOption === 'twilio-number' ? (
-                  <>
-                    <ExternalLink className="w-4 h-4" />
-                    Continue to Checkout
-                  </>
-                ) : 'Create'
+                selectedOption === 'twilio-number' ? 'Continue to Checkout' : 'Create'
               )}
             </button>
           </div>

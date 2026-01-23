@@ -1,5 +1,5 @@
 import {fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import {logout, setCredentials} from './authSlice';
+import {logout, setCredentials, setForceLogout} from './authSlice';
 import toast from 'react-hot-toast';
 
 const baseQuery = fetchBaseQuery({
@@ -24,6 +24,14 @@ let _isRefreshing = false;
 
 // Get current isRefreshing value
 export const getIsRefreshing = () => _isRefreshing;
+
+// Helper to perform logout and let React Router handle redirect
+// We don't use window.location.href because it causes a full page reload
+// which can lead to race conditions where the user is re-authenticated
+const performLogout = (api) => {
+    api.dispatch(setForceLogout(true));
+    api.dispatch(logout());
+};
 
 // Small delay to ensure browser processes Set-Cookie header before retry
 const waitForCookies = () => new Promise(resolve => setTimeout(resolve, 100));
@@ -53,9 +61,7 @@ const handleRateLimitError = (api) => {
             duration: 5000,
             id: 'rate-limit-logout',
         });
-        api.dispatch(logout());
-        // Redirect to login
-        window.location.href = '/auth/login';
+        performLogout(api);
         return true; // Signal that we've logged out
     } else {
         // Show rate limit warning
@@ -138,8 +144,7 @@ export const customBaseQuery = async (args, api, extraOptions) => {
             // Check if refresh itself failed with 401/403
             if (refreshResult?.error?.status === 401 || refreshResult?.error?.status === 403) {
                 _isRefreshing = false;
-                api.dispatch(logout());
-                window.location.href = '/auth/login';
+                performLogout(api);
                 return result;
             }
 
@@ -166,21 +171,19 @@ export const customBaseQuery = async (args, api, extraOptions) => {
                     return result;
                 }
 
-                // If retry still returns 401 or 403, logout and redirect to login
+                // If retry still returns 401 or 403, logout and let React Router redirect
                 if (result?.error?.status === 401 || result?.error?.status === 403) {
-                    api.dispatch(logout());
-                    window.location.href = '/auth/login';
+                    performLogout(api);
                     return result;
                 }
             } else {
-                // Refresh failed - logout and redirect
+                // Refresh failed - logout and let React Router redirect
                 _isRefreshing = false;
-                api.dispatch(logout());
-                window.location.href = '/auth/login';
+                performLogout(api);
             }
         } else {
-            // Not authenticated - redirect to login
-            window.location.href = '/auth/login';
+            // Not authenticated - let React Router redirect
+            performLogout(api);
         }
     }
 

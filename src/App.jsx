@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
-import { selectIsAuthenticated, selectIsAuthChecked, setCredentials, setAuthChecked } from './slices/authSlice';
+import { selectIsAuthenticated, selectIsAuthChecked, selectForceLogout, setCredentials, setAuthChecked } from './slices/authSlice';
 import { useGetMeQuery } from './slices/apiSlice/authApiSlice';
 import ErrorBoundary from './components/ErrorBoundary';
 import { SocketProvider } from './contexts/SocketContext';
@@ -80,6 +80,13 @@ function AuthInitializer({ children }) {
 function ProtectedRoute({ children }) {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const isAuthChecked = useSelector(selectIsAuthChecked);
+  const forceLogout = useSelector(selectForceLogout);
+
+  // If forceLogout is true, always redirect to login
+  // This handles the case where a forced logout was triggered
+  if (forceLogout) {
+    return <Navigate to="/auth/login" replace />;
+  }
 
   // While auth is being checked, render children (pages handle their own loading)
   // Only redirect after auth check confirms user is not authenticated
@@ -94,6 +101,12 @@ function ProtectedRoute({ children }) {
 function AuthRoute({ children }) {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const isAuthChecked = useSelector(selectIsAuthChecked);
+  const forceLogout = useSelector(selectForceLogout);
+
+  // Don't redirect if forceLogout is true - user needs to log in again
+  if (forceLogout) {
+    return children;
+  }
 
   // While auth is being checked, render children (pages handle their own loading)
   // Only redirect after auth check confirms user is authenticated
