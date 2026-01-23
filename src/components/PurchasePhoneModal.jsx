@@ -8,21 +8,21 @@ const PHONE_OPTIONS = [
   {
     id: 'vapi-number',
     type: 'vapi',
-    label: 'Free Vapi Number',
+    label: 'Standard Number',
     description: 'Free US phone number',
     icon: Phone,
   },
   {
     id: 'vapi-sip',
     type: 'vapi-sip',
-    label: 'Free Vapi SIP',
+    label: 'Standard SIP',
     description: 'SIP URI for VoIP',
     icon: Globe,
   },
   {
     id: 'twilio-number',
     type: 'twilio',
-    label: 'Twilio Number',
+    label: 'Premium Number',
     description: 'Paid phone number',
     icon: DollarSign,
   },
@@ -468,8 +468,8 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
                 <div className="flex items-start gap-2">
                   <Info className="w-4 h-4 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
                   <div className="space-y-1">
-                    <p className="text-xs text-gray-600 dark:text-gray-400">Twilio phone numbers</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">Monthly fees apply. Charges will appear on your Twilio bill.</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Premium phone numbers</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">Monthly fees apply.</p>
                   </div>
                 </div>
               </div>

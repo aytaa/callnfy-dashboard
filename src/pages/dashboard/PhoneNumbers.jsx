@@ -177,12 +177,10 @@ export default function PhoneNumbers() {
                               }`}>
                                 {phoneNumber.status === 'assigned' ? 'Assigned' : phoneNumber.status || 'Active'}
                               </span>
-                              {/* Provider Badge */}
-                              {phoneNumber.provider && (
-                                <span className="px-2 py-0.5 text-xs font-medium rounded bg-gray-100 dark:bg-[#262626] text-gray-900 dark:text-white border border-gray-200 dark:border-[#303030]">
-                                  {phoneNumber.provider.toUpperCase()}
-                                </span>
-                              )}
+                              {/* Type Badge */}
+                              <span className="px-2 py-0.5 text-xs font-medium rounded bg-gray-100 dark:bg-[#262626] text-gray-900 dark:text-white border border-gray-200 dark:border-[#303030]">
+                                {phoneNumber.provider === 'twilio' ? 'Premium' : 'Standard'}
+                              </span>
                             </div>
 
 

@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
-import { Loader2 } from 'lucide-react';
 import { selectIsAuthenticated, selectIsAuthChecked, setCredentials, setAuthChecked, logout } from './slices/authSlice';
 import { useGetMeQuery } from './slices/apiSlice/authApiSlice';
 import { getIsRefreshing } from './slices/customBaseQuery';
@@ -75,15 +74,7 @@ function AuthInitializer({ children }) {
     dispatch(setAuthChecked(true));
   }, [userData, isLoading, isError, dispatch]);
 
-  // Show loading while checking auth status
-  if (!isAuthChecked) {
-    return (
-      <div className="flex h-screen bg-gray-50 dark:bg-[#111114] items-center justify-center">
-        <Loader2 className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin" />
-      </div>
-    );
-  }
-
+  // Let pages render while auth check happens - no global blocking overlay
   return children;
 }
 
@@ -92,16 +83,9 @@ function ProtectedRoute({ children }) {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const isAuthChecked = useSelector(selectIsAuthChecked);
 
-  // Wait for auth check to complete
-  if (!isAuthChecked) {
-    return (
-      <div className="flex h-screen bg-gray-50 dark:bg-[#111114] items-center justify-center">
-        <Loader2 className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
+  // While auth is being checked, render children (pages handle their own loading)
+  // Only redirect after auth check confirms user is not authenticated
+  if (isAuthChecked && !isAuthenticated) {
     return <Navigate to="/auth/login" replace />;
   }
 
@@ -113,16 +97,9 @@ function AuthRoute({ children }) {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const isAuthChecked = useSelector(selectIsAuthChecked);
 
-  // Wait for auth check to complete
-  if (!isAuthChecked) {
-    return (
-      <div className="flex h-screen bg-gray-50 dark:bg-[#111114] items-center justify-center">
-        <Loader2 className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin" />
-      </div>
-    );
-  }
-
-  if (isAuthenticated) {
+  // While auth is being checked, render children (pages handle their own loading)
+  // Only redirect after auth check confirms user is authenticated
+  if (isAuthChecked && isAuthenticated) {
     return <Navigate to="/overview" replace />;
   }
 

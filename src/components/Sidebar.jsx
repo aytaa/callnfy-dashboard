@@ -354,15 +354,29 @@ function Sidebar({isOpen, onClose}) {
                             daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                         }
 
+                        const isTrialUrgent = daysRemaining !== null && daysRemaining <= 2;
+
                         return (
-                            <div className="px-3 py-2 bg-gray-50 dark:bg-[#1a1a1d] rounded-lg border border-gray-200 dark:border-[#303030]">
+                            <div className={`px-3 py-2 rounded-lg border ${
+                                isTrialUrgent
+                                    ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                                    : 'bg-gray-50 dark:bg-[#1a1a1d] border-gray-200 dark:border-[#303030]'
+                            }`}>
                                 {subscriptionStatus === 'trial' && daysRemaining !== null ? (
                                     <div className="space-y-1.5">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-xs font-medium text-gray-900 dark:text-white">
+                                            <span className={`text-xs font-medium ${
+                                                isTrialUrgent
+                                                    ? 'text-red-600 dark:text-red-400'
+                                                    : 'text-gray-900 dark:text-white'
+                                            }`}>
                                                 Trial
                                             </span>
-                                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                                            <span className={`text-xs font-medium ${
+                                                isTrialUrgent
+                                                    ? 'text-red-600 dark:text-red-400'
+                                                    : 'text-gray-600 dark:text-gray-400'
+                                            }`}>
                                                 {daysRemaining > 0 ? `${daysRemaining} days left` : 'Expires today'}
                                             </span>
                                         </div>

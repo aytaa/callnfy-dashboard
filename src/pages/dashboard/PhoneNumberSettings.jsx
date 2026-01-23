@@ -171,11 +171,11 @@ export default function PhoneNumberSettings() {
 
   const handleReleaseTwilio = async () => {
     if (!phoneNumber?.twilioSid) {
-      setError('Twilio SID not found for this phone number');
+      setError('Provider ID not found for this phone number');
       return;
     }
 
-    if (!window.confirm('Are you sure you want to release this Twilio number? This will remove it from your account and you will no longer be charged for it.')) {
+    if (!window.confirm('Are you sure you want to release this number? This will remove it from your account and you will no longer be charged for it.')) {
       return;
     }
 
@@ -184,12 +184,12 @@ export default function PhoneNumberSettings() {
 
     try {
       await releaseTwilioNumber(phoneNumber.twilioSid).unwrap();
-      setSuccess('Twilio number released successfully');
+      setSuccess('Phone number released successfully');
       setTimeout(() => {
         navigate('/phone-numbers');
       }, 1500);
     } catch (err) {
-      setError(err?.data?.error?.message || err?.data?.message || 'Failed to release Twilio number');
+      setError(err?.data?.error?.message || err?.data?.message || 'Failed to release phone number');
     }
   };
 
@@ -318,9 +318,9 @@ export default function PhoneNumberSettings() {
               }`}>
                 {phoneNumber.status === 'assigned' ? 'Assigned' : phoneNumber.status || 'Active'}
               </span>
-              {/* Provider Badge */}
+              {/* Type Badge */}
               <span className="px-2.5 py-1 text-xs font-medium rounded bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-white border border-gray-200 dark:border-zinc-700">
-                {(phoneNumber.provider || 'vapi').toUpperCase()}
+                {phoneNumber.provider === 'twilio' ? 'Premium' : 'Standard'}
               </span>
             </div>
           </div>
@@ -405,21 +405,21 @@ export default function PhoneNumberSettings() {
               )}
             </div>
 
-            {/* Provider (readonly) */}
+            {/* Type (readonly) */}
             <div>
-              <label className="block text-sm text-gray-500 dark:text-zinc-400 mb-1">Provider</label>
+              <label className="block text-sm text-gray-500 dark:text-zinc-400 mb-1">Type</label>
               <input
                 type="text"
-                value={(phoneNumber.provider || 'vapi').toUpperCase()}
+                value={phoneNumber.provider === 'twilio' ? 'Premium' : 'Standard'}
                 readOnly
                 className="w-full bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white cursor-not-allowed"
               />
             </div>
 
-            {/* Vapi Phone ID (readonly) */}
+            {/* Phone ID (readonly) */}
             {phoneNumber.vapiPhoneId && (
               <div>
-                <label className="block text-sm text-gray-500 dark:text-zinc-400 mb-1">Vapi Phone ID</label>
+                <label className="block text-sm text-gray-500 dark:text-zinc-400 mb-1">Phone ID</label>
                 <input
                   type="text"
                   value={phoneNumber.vapiPhoneId}
@@ -429,10 +429,10 @@ export default function PhoneNumberSettings() {
               </div>
             )}
 
-            {/* Twilio SID (readonly) */}
+            {/* Provider ID (readonly) */}
             {phoneNumber.twilioSid && (
               <div>
-                <label className="block text-sm text-gray-500 dark:text-zinc-400 mb-1">Twilio SID</label>
+                <label className="block text-sm text-gray-500 dark:text-zinc-400 mb-1">Provider ID</label>
                 <input
                   type="text"
                   value={phoneNumber.twilioSid}
@@ -442,14 +442,14 @@ export default function PhoneNumberSettings() {
               </div>
             )}
 
-            {/* Twilio Release Button */}
+            {/* Release Number Button (Premium only) */}
             {phoneNumber.provider === 'twilio' && (
               <div className="pt-4 border-t border-gray-200 dark:border-[#303030]">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">Release Twilio Number</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">Release Number</p>
                     <p className="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">
-                      Remove this number from your Twilio account and stop billing.
+                      Remove this number from your account and stop billing.
                     </p>
                   </div>
                   <button
