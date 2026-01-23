@@ -2,9 +2,8 @@ import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
-import { selectIsAuthenticated, selectIsAuthChecked, setCredentials, setAuthChecked, logout } from './slices/authSlice';
+import { selectIsAuthenticated, selectIsAuthChecked, setCredentials, setAuthChecked } from './slices/authSlice';
 import { useGetMeQuery } from './slices/apiSlice/authApiSlice';
-import { getIsRefreshing } from './slices/customBaseQuery';
 import ErrorBoundary from './components/ErrorBoundary';
 import { SocketProvider } from './contexts/SocketContext';
 import Login from './pages/auth/Login';
@@ -62,14 +61,13 @@ function AuthInitializer({ children }) {
     if (userData) {
       // User is authenticated - cookie is valid
       dispatch(setCredentials({ user: userData }));
-    } else if (isError) {
-      // Don't logout if a token refresh is in progress
-      // The refresh will handle authentication
-      if (!getIsRefreshing()) {
-        // Cookie is invalid or expired - clear any stale user data
-        dispatch(logout());
-      }
     }
+    // Note: We don't call logout() here on isError anymore.
+    // customBaseQuery handles all 401/403 errors and token refresh.
+    // Calling logout() here caused race conditions where:
+    // 1. Token refresh completes successfully
+    // 2. But this effect runs with stale error state
+    // 3. logout() is called, triggering redirect chain to /overview
 
     dispatch(setAuthChecked(true));
   }, [userData, isLoading, isError, dispatch]);

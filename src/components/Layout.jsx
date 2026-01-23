@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Menu, Loader2 } from 'lucide-react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useGetMeQuery, useLogoutMutation } from '../slices/apiSlice/authApiSlice';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useGetMeQuery } from '../slices/apiSlice/authApiSlice';
 import { useGetBusinessesQuery } from '../slices/apiSlice/businessApiSlice';
 import { useGetPhoneNumberQuery } from '../slices/apiSlice/phoneApiSlice';
-import { getIsRefreshing } from '../slices/customBaseQuery';
 import Sidebar from './Sidebar';
 import CreateBusinessModal from './CreateBusinessModal';
 import NotificationBell from './NotificationBell';
@@ -18,7 +17,7 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
   });
   const location = useLocation();
   const navigate = useNavigate();
-  const { data: userData, isLoading: isLoadingUser, error: meError, refetch: refetchUser } = useGetMeQuery(undefined, {
+  const { data: userData, isLoading: isLoadingUser, refetch: refetchUser } = useGetMeQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
   const { data: businesses, isLoading: businessesLoading } = useGetBusinessesQuery(undefined, {
@@ -29,7 +28,6 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
   useEffect(() => {
     refetchUser();
   }, [location.pathname, refetchUser]);
-  const [logout] = useLogoutMutation();
 
   // Extract phone number ID from route if on phone number detail page
   const phoneNumberIdMatch = location.pathname.match(/^\/phone-numbers\/([^/]+)$/);
@@ -95,22 +93,15 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
     };
   }, []);
 
-  // Handle authentication errors
-  useEffect(() => {
-    if (meError) {
-      // Check if it's a 401 Unauthorized error
-      if (meError.status === 401 || meError.status === 'FETCH_ERROR') {
-        // Don't logout if a token refresh is in progress
-        // The refresh will handle authentication
-        if (!getIsRefreshing()) {
-          // Logout and redirect to login
-          // Backend clears httpOnly cookies on logout API call
-          logout();
-          navigate('/login', { replace: true });
-        }
-      }
-    }
-  }, [meError, logout, navigate]);
+  // Note: We no longer handle 401 errors here.
+  // customBaseQuery handles all 401/403 errors, token refresh, and redirects.
+  // Handling 401s here caused race conditions where:
+  // 1. Token refresh completes successfully
+  // 2. But this effect runs with stale error state
+  // 3. logout() is called, triggering redirect chain to /overview
+  //
+  // If customBaseQuery detects an unrecoverable auth error, it will
+  // redirect to /auth/login directly via window.location.href
 
   // Check subscription status and redirect if needed
   useEffect(() => {
