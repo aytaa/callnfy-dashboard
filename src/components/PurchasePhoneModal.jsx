@@ -1,8 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Modal from './ui/Modal';
-import { Phone, Globe, AlertCircle, Loader2, Info, Search, Check, DollarSign } from 'lucide-react';
-import { usePurchasePhoneNumberMutation, useSearchTwilioNumbersMutation, useBuyTwilioNumberMutation } from '../slices/apiSlice/phoneApiSlice';
+import { Phone, Globe, AlertCircle, Loader2, Info, Search, Check, DollarSign, ExternalLink } from 'lucide-react';
+import { usePurchasePhoneNumberMutation, useSearchTwilioNumbersMutation, useCreatePhoneNumberCheckoutMutation } from '../slices/apiSlice/phoneApiSlice';
 import { useGetBusinessesQuery } from '../slices/apiSlice/businessApiSlice';
+
+// Error code mappings for user-friendly messages
+const ERROR_MESSAGES = {
+  PHONE_ORDER_DUPLICATE: 'You already have a pending order for this phone number. Please complete or cancel the existing order first.',
+  PHONE_NOT_AVAILABLE: 'This phone number is no longer available. Please search for a different number.',
+};
 
 const PHONE_OPTIONS = [
   {
@@ -56,11 +63,13 @@ const formatPhoneNumber = (number) => {
 };
 
 export default function PurchasePhoneModal({ isOpen, onClose }) {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedOption, setSelectedOption] = useState('vapi-number');
   const [selectedBusiness, setSelectedBusiness] = useState('');
   const [areaCode, setAreaCode] = useState('');
   const [sipUri, setSipUri] = useState('');
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Twilio-specific state
   const [twilioCountry, setTwilioCountry] = useState('US');
@@ -71,10 +80,30 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
   const [selectedTwilioNumber, setSelectedTwilioNumber] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const { data: businesses } = useGetBusinessesQuery();
+  const { data: businesses, refetch: refetchBusinesses } = useGetBusinessesQuery();
   const [purchaseNumber, { isLoading: isCreating }] = usePurchasePhoneNumberMutation();
   const [searchTwilioNumbers, { isLoading: isSearching }] = useSearchTwilioNumbersMutation();
-  const [buyTwilioNumber, { isLoading: isBuyingTwilio }] = useBuyTwilioNumberMutation();
+  const [createPhoneCheckout, { isLoading: isCreatingCheckout }] = useCreatePhoneNumberCheckoutMutation();
+
+  // Handle Stripe checkout success/cancel via URL params
+  useEffect(() => {
+    const phoneCheckoutStatus = searchParams.get('phone_checkout');
+    const phoneCheckoutCanceled = searchParams.get('phone_checkout_canceled');
+
+    if (phoneCheckoutStatus === 'success') {
+      setSuccessMessage('Phone number purchase successful! Your number will be provisioned shortly.');
+      // Clear the URL params
+      searchParams.delete('phone_checkout');
+      setSearchParams(searchParams, { replace: true });
+      // Refetch to show the new number
+      refetchBusinesses();
+    } else if (phoneCheckoutCanceled === 'true') {
+      setError('Phone number purchase was canceled. You can try again when ready.');
+      // Clear the URL params
+      searchParams.delete('phone_checkout_canceled');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams, refetchBusinesses]);
 
   const handleReset = () => {
     setSelectedOption('vapi-number');
@@ -82,6 +111,7 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
     setAreaCode('');
     setSipUri('');
     setError('');
+    setSuccessMessage('');
     // Reset Twilio state
     setTwilioCountry('US');
     setTwilioType('local');
@@ -124,13 +154,21 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
     }
   };
 
+  const getErrorMessage = (err) => {
+    const errorCode = err?.data?.error?.code;
+    if (errorCode && ERROR_MESSAGES[errorCode]) {
+      return ERROR_MESSAGES[errorCode];
+    }
+    return err?.data?.error?.details || err?.data?.error?.message || err?.data?.message || 'An error occurred';
+  };
+
   const handleCreate = async () => {
     if (!selectedBusiness) {
       setError('Please select a business');
       return;
     }
 
-    // Handle Twilio purchase
+    // Handle Premium number purchase via Stripe checkout
     if (selectedOption === 'twilio-number') {
       if (!selectedTwilioNumber) {
         setError('Please search and select a phone number first');
@@ -138,23 +176,31 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
       }
 
       setError('');
+      setSuccessMessage('');
 
       try {
-        await buyTwilioNumber({
+        // Create Stripe checkout session
+        const result = await createPhoneCheckout({
           phoneNumber: selectedTwilioNumber.phoneNumber,
           businessId: selectedBusiness,
-          friendlyName: selectedTwilioNumber.friendlyName || selectedTwilioNumber.phoneNumber,
         }).unwrap();
-        handleClose();
+
+        // Redirect to Stripe checkout
+        if (result?.url) {
+          window.location.href = result.url;
+        } else if (result?.data?.url) {
+          window.location.href = result.data.url;
+        } else {
+          setError('Failed to create checkout session. Please try again.');
+        }
       } catch (err) {
-        console.error('Twilio purchase error:', err);
-        const errorMessage = err?.data?.error?.details || err?.data?.error?.message || err?.data?.message || 'Failed to purchase phone number';
-        setError(errorMessage);
+        console.error('Checkout creation error:', err);
+        setError(getErrorMessage(err));
       }
       return;
     }
 
-    // Validate based on selected option (Vapi)
+    // Validate based on selected option (Standard/Vapi)
     if (selectedOption === 'vapi-number') {
       if (!areaCode || areaCode.length !== 3) {
         setError('Please enter a valid 3-digit area code');
@@ -163,9 +209,10 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
     }
 
     setError('');
+    setSuccessMessage('');
 
     try {
-      // Direct creation - backend assigns the number
+      // Direct creation for free numbers - backend assigns the number
       const payload = {
         provider: 'vapi',
         businessId: selectedBusiness,
@@ -183,12 +230,11 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
       handleClose();
     } catch (err) {
       console.error('Create phone number error:', err);
-      const errorMessage = err?.data?.error?.details || err?.data?.error?.message || err?.data?.message || 'Failed to create phone number';
-      setError(errorMessage);
+      setError(getErrorMessage(err));
     }
   };
 
-  const isLoading = isCreating || isBuyingTwilio;
+  const isLoading = isCreating || isCreatingCheckout;
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="Phone Number" size="lg">
@@ -239,6 +285,15 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
 
         {/* Right Side - Configuration */}
         <div className="flex-1 pl-4">
+          {/* Success Message */}
+          {successMessage && (
+            <div className="mb-4 p-2.5 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md flex items-start gap-2">
+              <Check className="w-4 h-4 text-green-500 dark:text-green-400 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-green-600 dark:text-green-400">{successMessage}</p>
+            </div>
+          )}
+
+          {/* Error Message */}
           {error && (
             <div className="mb-4 p-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md flex items-start gap-2">
               <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-400 mt-0.5 flex-shrink-0" />
@@ -469,7 +524,7 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
                   <Info className="w-4 h-4 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
                   <div className="space-y-1">
                     <p className="text-xs text-gray-600 dark:text-gray-400">Premium phone numbers</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">Monthly fees apply.</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">You'll be redirected to secure checkout to complete your purchase.</p>
                   </div>
                 </div>
               </div>
@@ -492,10 +547,15 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  {selectedOption === 'twilio-number' ? 'Purchasing...' : 'Creating...'}
+                  {selectedOption === 'twilio-number' ? 'Redirecting to checkout...' : 'Creating...'}
                 </>
               ) : (
-                selectedOption === 'twilio-number' ? 'Purchase Number' : 'Create'
+                selectedOption === 'twilio-number' ? (
+                  <>
+                    <ExternalLink className="w-4 h-4" />
+                    Continue to Checkout
+                  </>
+                ) : 'Create'
               )}
             </button>
           </div>

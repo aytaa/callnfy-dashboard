@@ -149,6 +149,18 @@ export const phoneApiSlice = apiSlice.injectEndpoints({
             transformResponse: (response) => response?.data || null,
             providesTags: (result, error, sid) => [{type: 'PhoneNumber', id: sid}],
         }),
+        // Phone number checkout (Stripe)
+        createPhoneNumberCheckout: builder.mutation({
+            query: ({ phoneNumber, businessId, assistantId }) => ({
+                url: '/billing/phone-number/checkout',
+                method: 'POST',
+                body: {
+                    phoneNumber,
+                    businessId,
+                    ...(assistantId && { assistantId }),
+                },
+            }),
+        }),
     }),
 });
 
@@ -170,4 +182,6 @@ export const {
     useBuyTwilioNumberMutation,
     useReleaseTwilioNumberMutation,
     useGetTwilioNumberDetailsQuery,
+    // Checkout
+    useCreatePhoneNumberCheckoutMutation,
 } = phoneApiSlice;
