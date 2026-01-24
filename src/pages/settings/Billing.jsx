@@ -53,9 +53,11 @@ export default function Billing() {
     });
   };
 
-  const formatAmount = (cents) => {
-    if (typeof cents !== 'number') return '$0.00';
-    return `$${(cents / 100).toFixed(2)}`;
+  const formatAmount = (amount, currency = 'USD') => {
+    if (typeof amount !== 'number') return '$0.00';
+    // Amount is already in dollars/pounds from backend (not cents)
+    const symbol = currency === 'GBP' ? '£' : currency === 'EUR' ? '€' : '$';
+    return `${symbol}${amount.toFixed(2)}`;
   };
 
   const getDaysRemaining = (endDate) => {
@@ -280,7 +282,7 @@ export default function Billing() {
                   <tr key={invoice.id} className="border-t border-gray-200 dark:border-[#303030]">
                     <td className="px-3 py-2 text-gray-900 dark:text-white text-xs">{formatDate(invoice.date)}</td>
                     <td className="px-3 py-2 text-gray-900 dark:text-white text-xs">{invoice.description}</td>
-                    <td className="px-3 py-2 text-gray-900 dark:text-white text-xs">{formatAmount(invoice.amount)}</td>
+                    <td className="px-3 py-2 text-gray-900 dark:text-white text-xs">{formatAmount(invoice.amount, invoice.currency)}</td>
                     <td className="px-3 py-2">{getStatusBadge(invoice.status)}</td>
                     <td className="px-3 py-2 text-right">
                       {invoice.hostedUrl && (
