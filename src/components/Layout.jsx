@@ -146,14 +146,8 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
     // This allows new users to access the dashboard immediately
   }, [userData, isLoadingUser, skipSubscriptionCheck, navigate]);
 
-  // Show loading while checking subscription and businesses
-  if (!skipSubscriptionCheck && (isLoadingUser || businessesLoading)) {
-    return (
-      <div className="flex h-screen bg-gray-50 dark:bg-[#111114] items-center justify-center">
-        <Loader2 className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin" />
-      </div>
-    );
-  }
+  // Check if layout data is still loading
+  const isLayoutLoading = !skipSubscriptionCheck && (isLoadingUser || businessesLoading);
 
   // Check if user has no business (after loading is complete)
   const hasBusiness = businesses && businesses.length > 0;
@@ -205,7 +199,13 @@ export default function Layout({ children, skipSubscriptionCheck = false }) {
         </div>
 
         <main className="flex-1 overflow-y-auto pt-20 lg:pt-0 bg-gray-50 dark:bg-[#111114]">
-          {children}
+          {isLayoutLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <Loader2 className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin" />
+            </div>
+          ) : (
+            children
+          )}
         </main>
       </div>
     </div>
