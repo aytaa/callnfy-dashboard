@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Phone, Plus, Copy, Check, Trash2, ChevronRight, AlertTriangle, Bot, Loader2 } from 'lucide-react';
 import {
   useGetPhoneNumbersQuery,
@@ -34,7 +34,21 @@ export default function PhoneNumbers() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
+  const [checkoutResult, setCheckoutResult] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+
+  // Check for checkout result URL params on mount
+  useEffect(() => {
+    const phoneCheckout = searchParams.get('phone_checkout');
+    if (phoneCheckout === 'success' || phoneCheckout === 'canceled') {
+      setCheckoutResult(phoneCheckout);
+      setIsPurchaseModalOpen(true);
+      // Clear the URL param
+      searchParams.delete('phone_checkout');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const { data: phoneNumbersData, isLoading: isLoadingPhones, error: phonesError } = useGetPhoneNumbersQuery(undefined, {
     refetchOnMountOrArgChange: true,
@@ -277,7 +291,11 @@ export default function PhoneNumbers() {
         {/* Purchase Phone Modal */}
         <PurchasePhoneModal
           isOpen={isPurchaseModalOpen}
-          onClose={() => setIsPurchaseModalOpen(false)}
+          onClose={() => {
+            setIsPurchaseModalOpen(false);
+            setCheckoutResult(null);
+          }}
+          checkoutResult={checkoutResult}
         />
       </div>
     </div>

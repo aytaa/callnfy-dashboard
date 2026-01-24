@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import Modal from './ui/Modal';
-import { Phone, Globe, AlertCircle, Loader2, Info, Search, Check, DollarSign } from 'lucide-react';
+import { Phone, Globe, AlertCircle, Loader2, Info, Search, Check, DollarSign, CheckCircle, XCircle } from 'lucide-react';
 import { usePurchasePhoneNumberMutation, useSearchTwilioNumbersMutation, useCreatePhoneNumberCheckoutMutation } from '../slices/apiSlice/phoneApiSlice';
 import { useGetBusinessesQuery } from '../slices/apiSlice/businessApiSlice';
 
@@ -62,8 +61,7 @@ const formatPhoneNumber = (number) => {
   return number;
 };
 
-export default function PurchasePhoneModal({ isOpen, onClose }) {
-  const [searchParams, setSearchParams] = useSearchParams();
+export default function PurchasePhoneModal({ isOpen, onClose, checkoutResult }) {
   const [selectedOption, setSelectedOption] = useState('vapi-number');
   const [selectedBusiness, setSelectedBusiness] = useState('');
   const [areaCode, setAreaCode] = useState('');
@@ -85,25 +83,12 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
   const [searchTwilioNumbers, { isLoading: isSearching }] = useSearchTwilioNumbersMutation();
   const [createPhoneCheckout, { isLoading: isCreatingCheckout }] = useCreatePhoneNumberCheckoutMutation();
 
-  // Handle Stripe checkout success/cancel via URL params
+  // Refetch businesses when checkout was successful
   useEffect(() => {
-    const phoneCheckoutStatus = searchParams.get('phone_checkout');
-    const phoneCheckoutCanceled = searchParams.get('phone_checkout_canceled');
-
-    if (phoneCheckoutStatus === 'success') {
-      setSuccessMessage('Phone number purchase successful! Your number will be provisioned shortly.');
-      // Clear the URL params
-      searchParams.delete('phone_checkout');
-      setSearchParams(searchParams, { replace: true });
-      // Refetch to show the new number
+    if (checkoutResult === 'success') {
       refetchBusinesses();
-    } else if (phoneCheckoutCanceled === 'true') {
-      setError('Phone number purchase was canceled. You can try again when ready.');
-      // Clear the URL params
-      searchParams.delete('phone_checkout_canceled');
-      setSearchParams(searchParams, { replace: true });
     }
-  }, [searchParams, setSearchParams, refetchBusinesses]);
+  }, [checkoutResult, refetchBusinesses]);
 
   const handleReset = () => {
     setSelectedOption('vapi-number');
@@ -236,6 +221,48 @@ export default function PurchasePhoneModal({ isOpen, onClose }) {
 
   const isLoading = isCreating || isCreatingCheckout;
   const isRedirectingToCheckout = isCreatingCheckout;
+
+  // If showing checkout result, render a simplified view
+  if (checkoutResult) {
+    const isSuccess = checkoutResult === 'success';
+    return (
+      <Modal isOpen={isOpen} onClose={handleClose} title="Phone Number" size="md">
+        <div className="flex flex-col items-center justify-center py-8 px-4">
+          {isSuccess ? (
+            <>
+              <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
+                <CheckCircle className="w-8 h-8 text-green-500 dark:text-green-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2 text-center">
+                Purchase Successful
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">
+                Phone number purchased successfully! It will be ready in a few moments.
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
+                <XCircle className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2 text-center">
+                Checkout Canceled
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">
+                Checkout was canceled. You can try again.
+              </p>
+            </>
+          )}
+          <button
+            onClick={handleClose}
+            className="px-6 py-2 text-sm bg-gray-900 dark:bg-white text-white dark:text-black font-medium rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </Modal>
+    );
+  }
 
   return (
     <Modal isOpen={isOpen} onClose={isRedirectingToCheckout ? undefined : handleClose} title="Phone Number" size="lg">
