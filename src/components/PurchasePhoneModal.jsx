@@ -589,7 +589,13 @@ export default function PurchasePhoneModal({ isOpen, onClose, checkoutResult }) 
             </button>
             <button
               onClick={handleCreate}
-              disabled={isLoading || !selectedBusiness || (selectedOption === 'twilio-number' && !selectedTwilioNumber)}
+              disabled={
+                isLoading ||
+                !selectedBusiness ||
+                (selectedOption === 'vapi-number' && (!areaCode || areaCode.length !== 3)) ||
+                (selectedOption === 'vapi-sip' && !sipUri?.trim()) ||
+                (selectedOption === 'twilio-number' && !selectedTwilioNumber)
+              }
               className="px-4 py-2 text-sm bg-gray-900 dark:bg-white text-white dark:text-black font-medium rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors disabled:opacity-50"
             >
               {isLoading ? (
