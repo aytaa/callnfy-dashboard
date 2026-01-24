@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Modal from './ui/Modal';
-import { Phone, Globe, AlertCircle, Loader2, Info, Search, Check, DollarSign, CheckCircle, XCircle } from 'lucide-react';
+import { Phone, AlertCircle, Loader2, Info, Search, Check, DollarSign, CheckCircle, XCircle } from 'lucide-react';
 import { usePurchasePhoneNumberMutation, useSearchTwilioNumbersMutation, useCreatePhoneNumberCheckoutMutation } from '../slices/apiSlice/phoneApiSlice';
 import { useGetBusinessesQuery } from '../slices/apiSlice/businessApiSlice';
 
@@ -17,13 +17,6 @@ const PHONE_OPTIONS = [
     label: 'Standard Number',
     description: 'Free US phone number',
     icon: Phone,
-  },
-  {
-    id: 'vapi-sip',
-    type: 'vapi-sip',
-    label: 'Standard SIP',
-    description: 'SIP URI for VoIP',
-    icon: Globe,
   },
   {
     id: 'twilio-number',
@@ -65,7 +58,6 @@ export default function PurchasePhoneModal({ isOpen, onClose, checkoutResult }) 
   const [selectedOption, setSelectedOption] = useState('vapi-number');
   const [selectedBusiness, setSelectedBusiness] = useState('');
   const [areaCode, setAreaCode] = useState('');
-  const [sipUri, setSipUri] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -94,7 +86,6 @@ export default function PurchasePhoneModal({ isOpen, onClose, checkoutResult }) 
     setSelectedOption('vapi-number');
     setSelectedBusiness('');
     setAreaCode('');
-    setSipUri('');
     setError('');
     setSuccessMessage('');
     // Reset Twilio state
@@ -193,17 +184,6 @@ export default function PurchasePhoneModal({ isOpen, onClose, checkoutResult }) 
       }
     }
 
-    if (selectedOption === 'vapi-sip') {
-      if (!sipUri || !sipUri.trim()) {
-        setError('Please enter a valid SIP URI (e.g., sip:user@domain.com)');
-        return;
-      }
-      if (!sipUri.startsWith('sip:')) {
-        setError('SIP URI must start with sip:');
-        return;
-      }
-    }
-
     setError('');
     setSuccessMessage('');
 
@@ -217,9 +197,6 @@ export default function PurchasePhoneModal({ isOpen, onClose, checkoutResult }) 
       if (selectedOption === 'vapi-number') {
         payload.areaCode = areaCode;
         payload.numberType = 'phone';
-      } else if (selectedOption === 'vapi-sip') {
-        payload.numberType = 'sip';
-        payload.sipUri = sipUri;
       }
 
       await purchaseNumber(payload).unwrap();
@@ -400,35 +377,6 @@ export default function PurchasePhoneModal({ isOpen, onClose, checkoutResult }) 
             </div>
           )}
 
-          {/* Vapi SIP Configuration */}
-          {selectedOption === 'vapi-sip' && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs text-gray-500 mb-1.5">
-                  SIP URI
-                </label>
-                <input
-                  type="text"
-                  value={sipUri}
-                  onChange={(e) => setSipUri(e.target.value)}
-                  placeholder="sip:user@domain.com"
-                  className="w-full bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
-                />
-              </div>
-
-              {/* Info Box */}
-              <div className="bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md p-3">
-                <div className="flex items-start gap-2">
-                  <Info className="w-4 h-4 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
-                  <div className="space-y-1">
-                    <p className="text-xs text-gray-600 dark:text-gray-400">Free SIP endpoint</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">Works with any VoIP provider</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Twilio Number Configuration */}
           {selectedOption === 'twilio-number' && (
             <div className="space-y-4">
@@ -593,7 +541,6 @@ export default function PurchasePhoneModal({ isOpen, onClose, checkoutResult }) 
                 isLoading ||
                 !selectedBusiness ||
                 (selectedOption === 'vapi-number' && (!areaCode || areaCode.length !== 3)) ||
-                (selectedOption === 'vapi-sip' && !sipUri?.trim()) ||
                 (selectedOption === 'twilio-number' && !selectedTwilioNumber)
               }
               className="px-4 py-2 text-sm bg-gray-900 dark:bg-white text-white dark:text-black font-medium rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors disabled:opacity-50"
