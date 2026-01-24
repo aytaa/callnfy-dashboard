@@ -193,6 +193,17 @@ export default function PurchasePhoneModal({ isOpen, onClose, checkoutResult }) 
       }
     }
 
+    if (selectedOption === 'vapi-sip') {
+      if (!sipUri || !sipUri.trim()) {
+        setError('Please enter a valid SIP URI (e.g., sip:user@domain.com)');
+        return;
+      }
+      if (!sipUri.startsWith('sip:')) {
+        setError('SIP URI must start with sip:');
+        return;
+      }
+    }
+
     setError('');
     setSuccessMessage('');
 
@@ -208,7 +219,7 @@ export default function PurchasePhoneModal({ isOpen, onClose, checkoutResult }) 
         payload.numberType = 'phone';
       } else if (selectedOption === 'vapi-sip') {
         payload.numberType = 'sip';
-        if (sipUri) payload.sipUri = sipUri;
+        payload.sipUri = sipUri;
       }
 
       await purchaseNumber(payload).unwrap();
@@ -394,7 +405,7 @@ export default function PurchasePhoneModal({ isOpen, onClose, checkoutResult }) 
             <div className="space-y-4">
               <div>
                 <label className="block text-xs text-gray-500 mb-1.5">
-                  SIP URI (Optional)
+                  SIP URI
                 </label>
                 <input
                   type="text"
