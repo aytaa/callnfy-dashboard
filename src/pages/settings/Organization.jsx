@@ -92,7 +92,7 @@ export default function Organization() {
           </div>
           <div className="flex-1">
             <p className="text-gray-900 dark:text-white text-sm font-medium">{name || 'Organization'}</p>
-            <p className="text-gray-500 text-xs">{industry || 'Business'}</p>
+            <p className="text-gray-500 text-xs capitalize">{industry || 'Business'}</p>
           </div>
         </div>
 
