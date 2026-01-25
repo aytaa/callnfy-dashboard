@@ -29,7 +29,7 @@ export const onboardingApiSlice = apiSlice.injectEndpoints({
       query: (data) => ({
         url: '/billing/subscribe',
         method: 'POST',
-        body: data, // { plan, billingPeriod }
+        body: data, // { businessId, plan, billingPeriod }
       }),
       transformResponse: (response) => response?.data || response,
     }),

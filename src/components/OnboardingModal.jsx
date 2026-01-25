@@ -206,8 +206,16 @@ export default function OnboardingModal({ onComplete }) {
 
   // Step 2: Create Subscription (redirect to Stripe Checkout)
   const handleStartTrial = async () => {
+    // Get businessId from state or onboardingStatus
+    const currentBusinessId = businessId || onboardingStatus?.businessId;
+    if (!currentBusinessId) {
+      toast.error('Business not found. Please go back and create a business first.');
+      return;
+    }
+
     try {
       const result = await createSubscription({
+        businessId: currentBusinessId,
         plan: selectedPlan,
         billingPeriod,
       }).unwrap();
