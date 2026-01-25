@@ -129,7 +129,14 @@ export default function OnboardingModal({ onComplete }) {
   // Set current step based on onboarding status
   useEffect(() => {
     if (onboardingStatus) {
-      const nextStep = onboardingStatus.nextStep || 1;
+      let nextStep = onboardingStatus.nextStep || 1;
+
+      // Skip Step 2 if user already has active subscription
+      const subStatus = onboardingStatus.subscriptionStatus;
+      if (nextStep === 2 && (subStatus === 'active' || subStatus === 'trialing')) {
+        nextStep = 3;
+      }
+
       setCurrentStep(nextStep);
 
       // Pre-fill business name and ID if available
@@ -171,6 +178,12 @@ export default function OnboardingModal({ onComplete }) {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Check if user has active subscription
+  const hasActiveSubscription = () => {
+    const status = onboardingStatus?.subscriptionStatus;
+    return status === 'active' || status === 'trialing';
+  };
+
   // Step 1: Save Business Info
   const handleSaveBusiness = async () => {
     if (!validateStep(1)) return;
@@ -195,7 +208,14 @@ export default function OnboardingModal({ onComplete }) {
         if (result.data.businessId) {
           setBusinessId(result.data.businessId);
         }
-        setCurrentStep(result.data.nextStep || 2);
+
+        // Skip Step 2 if user already has active subscription
+        const subStatus = result.data.subscriptionStatus;
+        if (subStatus === 'active' || subStatus === 'trialing') {
+          setCurrentStep(3); // Skip to "Your AI Number"
+        } else {
+          setCurrentStep(result.data.nextStep || 2);
+        }
       } else {
         setCurrentStep(2);
       }
@@ -227,6 +247,14 @@ export default function OnboardingModal({ onComplete }) {
         toast.error('Failed to create checkout session');
       }
     } catch (err) {
+      // Handle SUBSCRIPTION_ALREADY_EXISTS error (code 8008)
+      const errorCode = err?.data?.error?.code || err?.data?.code;
+      if (errorCode === 8008 || errorCode === 'SUBSCRIPTION_ALREADY_EXISTS') {
+        // User already has subscription, proceed to Step 3
+        await refetchStatus();
+        setCurrentStep(3);
+        return;
+      }
       toast.error(err?.data?.error?.message || err?.data?.message || 'Failed to start trial');
     }
   };
@@ -473,7 +501,7 @@ export default function OnboardingModal({ onComplete }) {
 
               <div className="pt-3">
                 <button
-                  onClick={hasBusiness ? () => setCurrentStep(2) : handleSaveBusiness}
+                  onClick={hasBusiness ? () => setCurrentStep(hasActiveSubscription() ? 3 : 2) : handleSaveBusiness}
                   disabled={isLoading}
                   className="w-full bg-white text-black text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-white/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
