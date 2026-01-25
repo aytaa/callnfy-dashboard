@@ -32,14 +32,16 @@ const INDUSTRIES = [
   { value: 'other', label: 'Other' },
 ];
 
-// Voice options
+// Voice options - providers must be: azure, elevenlabs, openai, cartesia, deepgram, playht, rime-ai, lmnt
 const VOICE_OPTIONS = [
-  { value: 'jennifer-playht', label: 'Jennifer (Female - US)', provider: 'vapi' },
-  { value: 'melissa-playht', label: 'Melissa (Female - US)', provider: 'vapi' },
-  { value: 'emma-british', label: 'Emma (Female - British)', provider: 'vapi' },
-  { value: 'will-playht', label: 'Will (Male - US)', provider: 'vapi' },
-  { value: 'chris-playht', label: 'Chris (Male - US)', provider: 'vapi' },
-  { value: 'james-british', label: 'James (Male - British)', provider: 'vapi' },
+  { value: 's3://voice-cloning-zero-shot/775ae416-49bb-4fb6-bd45-740f205d20a1/jennifersaad/manifest.json', label: 'Jennifer (Female - US)', provider: 'playht' },
+  { value: 's3://voice-cloning-zero-shot/e5df2eb3-5153-40fa-9f6e-6e27bbb7a38e/original/manifest.json', label: 'Melissa (Female - US)', provider: 'playht' },
+  { value: 's3://voice-cloning-zero-shot/801a663f-efd0-4254-98d0-5c175514c3e8/jennifer/manifest.json', label: 'Charlotte (Female - US)', provider: 'playht' },
+  { value: 's3://voice-cloning-zero-shot/d9ff78ba-d016-47f6-b0ef-dd630f59414e/adriansaad/manifest.json', label: 'Adrian (Male - US)', provider: 'playht' },
+  { value: 'rachel', label: 'Rachel (Female - US)', provider: 'elevenlabs' },
+  { value: 'adam', label: 'Adam (Male - US)', provider: 'elevenlabs' },
+  { value: 'bella', label: 'Bella (Female - British)', provider: 'elevenlabs' },
+  { value: 'josh', label: 'Josh (Male - US)', provider: 'elevenlabs' },
   { value: 'nova', label: 'Nova (Female)', provider: 'openai' },
   { value: 'shimmer', label: 'Shimmer (Female)', provider: 'openai' },
   { value: 'echo', label: 'Echo (Male)', provider: 'openai' },
@@ -66,7 +68,7 @@ export default function OnboardingModal({ onComplete }) {
 
   // Step 4: Assistant Setup
   const [assistantName, setAssistantName] = useState('Sarah');
-  const [selectedVoice, setSelectedVoice] = useState('jennifer-playht');
+  const [selectedVoice, setSelectedVoice] = useState('rachel'); // Default to ElevenLabs Rachel
   const [greetingMessage, setGreetingMessage] = useState('');
   const [services, setServices] = useState('');
   const [workingHours, setWorkingHours] = useState('Mon-Fri: 9am-5pm');
@@ -276,7 +278,7 @@ export default function OnboardingModal({ onComplete }) {
         businessId: currentBusinessId,
         name: assistantName.trim(),
         voiceId: selectedVoice,
-        voiceProvider: voice?.provider || 'vapi',
+        voiceProvider: voice?.provider || 'elevenlabs', // Default to elevenlabs
         greeting: greetingMessage.trim(),
         services: services.trim(),
         workingHours: workingHours.trim(),
