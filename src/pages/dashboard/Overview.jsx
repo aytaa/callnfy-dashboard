@@ -1,11 +1,12 @@
 import React from 'react';
-import { Phone, TrendingUp, Plus, Loader2 } from 'lucide-react';
+import { Phone, TrendingUp, Plus, Loader2, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../slices/authSlice';
 import { useGetBusinessesQuery } from '../../slices/apiSlice/businessApiSlice';
 import { useGetCallsQuery } from '../../slices/apiSlice/callsApiSlice';
 import { useGetBookingsQuery } from '../../slices/apiSlice/bookingsApiSlice';
+import { useGetUsageQuery } from '../../slices/apiSlice/onboardingApiSlice';
 import DataTable from '../../components/ui/DataTable';
 
 export default function Overview() {
@@ -24,6 +25,9 @@ export default function Overview() {
     { businessId, page: 1, limit: 10 },
     { skip: !businessId, refetchOnMountOrArgChange: true }
   );
+
+  // Usage data for minutes tracking
+  const { data: usage } = useGetUsageQuery();
 
   const userName = user?.name || 'User';
   const userEmail = user?.email || '';
@@ -168,9 +172,40 @@ export default function Overview() {
     );
   }
 
+  // Calculate usage percentages
+  const minutesUsed = usage?.minutesUsed || 0;
+  const minutesLimit = usage?.minutesLimit || 100;
+  const percentUsed = Math.min(100, Math.round((minutesUsed / minutesLimit) * 100));
+  const trialDaysRemaining = usage?.trialDaysRemaining;
+
   return (
     <div className="px-8 py-6 bg-gray-50 dark:bg-transparent">
       <div className="max-w-7xl mx-auto space-y-6">
+        {/* Trial Banner */}
+        {trialDaysRemaining > 0 && (
+          <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-3">
+            <div className="flex items-center gap-3">
+              <div className="bg-gray-100 dark:bg-[#111114] p-2 rounded-lg">
+                <Clock className="w-4 h-4 text-gray-900 dark:text-white" strokeWidth={1.5} />
+              </div>
+              <div className="flex-1">
+                <p className="text-gray-900 dark:text-white text-sm font-medium">
+                  Free trial - {trialDaysRemaining} day{trialDaysRemaining !== 1 ? 's' : ''} remaining
+                </p>
+                <p className="text-gray-500 dark:text-gray-400 text-xs">
+                  Your trial will end soon. Upgrade to continue using Callnfy.
+                </p>
+              </div>
+              <Link
+                to="/settings/billing"
+                className="bg-gray-900 dark:bg-white text-white dark:text-black px-3 py-1.5 text-xs font-medium rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+              >
+                Upgrade now
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* Welcome Section */}
         <div>
           <p className="text-gray-500 dark:text-gray-400 text-sm">Welcome back, {userName}! Here's your {business.name} dashboard.</p>
@@ -199,8 +234,19 @@ export default function Overview() {
             {/* Card 2: Minutes Used */}
             <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-4">
               <p className="text-xs text-gray-500 mb-2">Minutes Used</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{minutesFormatted}</p>
-              <p className="text-xs text-gray-500">Total call duration</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                {minutesUsed}<span className="text-gray-500 dark:text-gray-400 font-normal">/{minutesLimit}</span>
+              </p>
+              {/* Progress Bar */}
+              <div className="w-full bg-gray-200 dark:bg-[#303030] rounded-full h-1.5 mb-1">
+                <div
+                  className={`h-1.5 rounded-full transition-all ${
+                    percentUsed >= 90 ? 'bg-red-500' : percentUsed >= 70 ? 'bg-yellow-500' : 'bg-gray-900 dark:bg-white'
+                  }`}
+                  style={{ width: `${percentUsed}%` }}
+                />
+              </div>
+              <p className="text-xs text-gray-500">{percentUsed}% of monthly limit</p>
             </div>
 
             {/* Card 3: Today's Appointments */}

@@ -9,6 +9,59 @@ export const onboardingApiSlice = apiSlice.injectEndpoints({
       providesTags: ['Onboarding'],
     }),
 
+    // Save business info (Step 1)
+    saveOnboardingBusiness: builder.mutation({
+      query: (data) => ({
+        url: '/businesses',
+        method: 'POST',
+        body: {
+          name: data.businessName, // Map businessName to name
+          industry: data.industry,
+          country: data.country,
+        },
+      }),
+      transformResponse: (response) => response?.data || response,
+      invalidatesTags: ['Onboarding', 'Business'],
+    }),
+
+    // Create subscription with Stripe Checkout (Step 2)
+    createOnboardingSubscription: builder.mutation({
+      query: (data) => ({
+        url: '/billing/subscribe',
+        method: 'POST',
+        body: data, // { plan, billingPeriod }
+      }),
+      transformResponse: (response) => response?.data || response,
+    }),
+
+    // Get assigned phone number after subscription (Step 3)
+    getAssignedPhoneNumber: builder.query({
+      query: () => '/billing/phone-info',
+      transformResponse: (response) => response?.data || response,
+      providesTags: ['PhoneNumber', 'Onboarding'],
+    }),
+
+    // Save assistant configuration (Step 4)
+    saveOnboardingAssistant: builder.mutation({
+      query: (data) => ({
+        url: '/assistants',
+        method: 'POST',
+        body: data, // { businessId, name, voiceId, voiceProvider, greeting, services, workingHours }
+      }),
+      transformResponse: (response) => response?.data || response,
+      invalidatesTags: ['Onboarding', 'Assistant'],
+    }),
+
+    // Initiate test call (Step 6)
+    initiateOnboardingTestCall: builder.mutation({
+      query: (data) => ({
+        url: '/calls/test',
+        method: 'POST',
+        body: data, // { businessId, phoneNumber }
+      }),
+      transformResponse: (response) => response?.data || response,
+    }),
+
     // Skip calendar step
     skipCalendarStep: builder.mutation({
       query: () => ({
@@ -26,11 +79,31 @@ export const onboardingApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Onboarding', 'User'],
     }),
+
+    // Get available plans
+    getPlans: builder.query({
+      query: () => '/billing/plans',
+      transformResponse: (response) => response?.data || response,
+    }),
+
+    // Get usage data (minutes used/limit)
+    getUsage: builder.query({
+      query: () => '/billing/usage',
+      transformResponse: (response) => response?.data || response,
+      providesTags: ['Usage'],
+    }),
   }),
 });
 
 export const {
   useGetOnboardingStatusQuery,
+  useSaveOnboardingBusinessMutation,
+  useCreateOnboardingSubscriptionMutation,
+  useGetAssignedPhoneNumberQuery,
+  useSaveOnboardingAssistantMutation,
+  useInitiateOnboardingTestCallMutation,
   useSkipCalendarStepMutation,
   useCompleteOnboardingMutation,
+  useGetPlansQuery,
+  useGetUsageQuery,
 } = onboardingApiSlice;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CreditCard, Calendar, Eye, AlertCircle, Loader2, Clock } from 'lucide-react';
+import { CreditCard, Calendar, Eye, AlertCircle, Loader2, Clock, Phone } from 'lucide-react';
 import {
   useGetSubscriptionQuery,
   useGetPaymentMethodQuery,
@@ -7,6 +7,7 @@ import {
   useGetPortalUrlMutation,
   useCancelSubscriptionMutation,
 } from '../../slices/apiSlice/billingApiSlice';
+import { useGetPhoneNumbersQuery } from '../../slices/apiSlice/phoneApiSlice';
 import toast from 'react-hot-toast';
 
 export default function Billing() {
@@ -16,6 +17,10 @@ export default function Billing() {
   const { data: subscription, isLoading: isLoadingSubscription, error: subscriptionError } = useGetSubscriptionQuery();
   const { data: paymentMethod, isLoading: isLoadingPayment } = useGetPaymentMethodQuery();
   const { data: invoices, isLoading: isLoadingInvoices } = useGetInvoicesQuery();
+  const { data: phoneNumbers } = useGetPhoneNumbersQuery();
+
+  // Get primary phone number for cancel warning
+  const primaryPhone = phoneNumbers?.[0]?.phoneNumber || phoneNumbers?.[0]?.number;
 
   // Mutations
   const [getPortalUrl, { isLoading: isLoadingPortal }] = useGetPortalUrlMutation();
@@ -312,9 +317,25 @@ export default function Billing() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg p-4 max-w-sm w-full mx-4">
             <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">Cancel Subscription</h3>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">
+            <p className="text-gray-500 dark:text-gray-400 text-sm mb-3">
               Are you sure? You'll have access until {formatDate(plan.currentPeriodEnd)}.
             </p>
+            {/* Phone Number Warning */}
+            {primaryPhone && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 rounded-md p-3 mb-4">
+                <div className="flex items-start gap-2">
+                  <Phone className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-red-800 dark:text-red-300 text-xs font-medium mb-1">
+                      You will lose your phone number
+                    </p>
+                    <p className="text-red-600 dark:text-red-400 text-xs font-mono">
+                      {primaryPhone}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowCancelModal(false)}
@@ -326,7 +347,7 @@ export default function Billing() {
               <button
                 onClick={handleCancelSubscription}
                 disabled={isCanceling}
-                className="px-3 py-1.5 text-xs bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white border border-gray-200 dark:border-white/20 rounded-md hover:bg-gray-200 dark:hover:bg-white/20 transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                className="px-3 py-1.5 text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800/30 rounded-md hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors disabled:opacity-50 flex items-center gap-1.5"
               >
                 {isCanceling && <Loader2 className="w-3 h-3 animate-spin" />}
                 Cancel Subscription
