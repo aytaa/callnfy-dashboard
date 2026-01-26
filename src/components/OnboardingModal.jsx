@@ -9,6 +9,7 @@ import {
   useCreateOnboardingSubscriptionMutation,
   useGetAssignedPhoneNumberQuery,
   useSaveOnboardingAssistantMutation,
+  useUpdateOnboardingAssistantMutation,
   useInitiateOnboardingTestCallMutation,
   useCompleteOnboardingMutation,
 } from '../slices/apiSlice/onboardingApiSlice';
@@ -101,6 +102,7 @@ export default function OnboardingModal({ onComplete }) {
   const [saveBusiness, { isLoading: isSavingBusiness }] = useSaveOnboardingBusinessMutation();
   const [createSubscription, { isLoading: isCreatingSubscription }] = useCreateOnboardingSubscriptionMutation();
   const [saveAssistant, { isLoading: isSavingAssistant }] = useSaveOnboardingAssistantMutation();
+  const [updateAssistant, { isLoading: isUpdatingAssistant }] = useUpdateOnboardingAssistantMutation();
   const [connectGoogleCalendar, { isLoading: isConnectingCalendar }] = useConnectGoogleCalendarMutation();
   const [initiateTestCall] = useInitiateOnboardingTestCallMutation();
   const [completeOnboarding, { isLoading: isCompletingOnboarding }] = useCompleteOnboardingMutation();
@@ -150,6 +152,16 @@ export default function OnboardingModal({ onComplete }) {
       }
       if (onboardingStatus.businessId) {
         setBusinessId(onboardingStatus.businessId);
+      }
+
+      // Pre-fill assistant data if exists
+      const assistant = onboardingStatus.assistant;
+      if (assistant) {
+        if (assistant.name) setAssistantName(assistant.name);
+        if (assistant.voiceId) setSelectedVoice(assistant.voiceId);
+        if (assistant.greeting || assistant.firstMessage) {
+          setGreetingMessage(assistant.greeting || assistant.firstMessage);
+        }
       }
     }
   }, [onboardingStatus]);
@@ -277,17 +289,33 @@ export default function OnboardingModal({ onComplete }) {
 
     try {
       const voice = VOICE_OPTIONS.find(v => v.value === selectedVoice);
-      await saveAssistant({
+      const assistantData = {
         businessId: currentBusinessId,
         name: assistantName.trim(),
         voiceId: selectedVoice,
-        voiceProvider: voice?.provider || 'elevenlabs', // Default to elevenlabs
+        voiceProvider: voice?.provider || 'elevenlabs',
         greeting: greetingMessage.trim(),
         services: services.trim(),
         workingHours: workingHours.trim(),
-      }).unwrap();
+      };
 
-      toast.success('Assistant configured!');
+      // Check if assistant already exists
+      const existingAssistant = onboardingStatus?.assistant;
+      const existingAssistantId = existingAssistant?.id || onboardingStatus?.assistantId;
+
+      if (existingAssistantId) {
+        // UPDATE existing assistant
+        await updateAssistant({
+          assistantId: existingAssistantId,
+          ...assistantData,
+        }).unwrap();
+        toast.success('Assistant updated!');
+      } else {
+        // CREATE new assistant
+        await saveAssistant(assistantData).unwrap();
+        toast.success('Assistant configured!');
+      }
+
       const result = await refetchStatus();
       setCurrentStep(result.data?.nextStep || 5);
     } catch (err) {
@@ -387,7 +415,7 @@ export default function OnboardingModal({ onComplete }) {
     return `*21${cleanNumber}#`;
   };
 
-  const isLoading = isSavingBusiness || isCreatingSubscription || isSavingAssistant || isConnectingCalendar || isCompletingOnboarding;
+  const isLoading = isSavingBusiness || isCreatingSubscription || isSavingAssistant || isUpdatingAssistant || isConnectingCalendar || isCompletingOnboarding;
 
   // Loading state
   if (isLoadingStatus) {
@@ -796,8 +824,8 @@ export default function OnboardingModal({ onComplete }) {
                   disabled={isLoading}
                   className="flex-[2] bg-white text-black text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-white/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {isSavingAssistant ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                  Next
+                  {(isSavingAssistant || isUpdatingAssistant) ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                  {onboardingStatus?.assistant || onboardingStatus?.assistantId ? 'Update & Continue' : 'Next'}
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>

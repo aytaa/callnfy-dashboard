@@ -41,12 +41,23 @@ export const onboardingApiSlice = apiSlice.injectEndpoints({
       providesTags: ['PhoneNumber', 'Onboarding'],
     }),
 
-    // Save assistant configuration (Step 4)
+    // Save assistant configuration (Step 4) - CREATE new assistant
     saveOnboardingAssistant: builder.mutation({
       query: (data) => ({
         url: '/assistants',
         method: 'POST',
         body: data, // { businessId, name, voiceId, voiceProvider, greeting, services, workingHours }
+      }),
+      transformResponse: (response) => response?.data || response,
+      invalidatesTags: ['Onboarding', 'Assistant'],
+    }),
+
+    // Update existing assistant (Step 4) - UPDATE existing assistant
+    updateOnboardingAssistant: builder.mutation({
+      query: ({ assistantId, ...data }) => ({
+        url: `/assistants/${assistantId}`,
+        method: 'PUT',
+        body: data,
       }),
       transformResponse: (response) => response?.data || response,
       invalidatesTags: ['Onboarding', 'Assistant'],
@@ -101,6 +112,7 @@ export const {
   useCreateOnboardingSubscriptionMutation,
   useGetAssignedPhoneNumberQuery,
   useSaveOnboardingAssistantMutation,
+  useUpdateOnboardingAssistantMutation,
   useInitiateOnboardingTestCallMutation,
   useSkipCalendarStepMutation,
   useCompleteOnboardingMutation,
