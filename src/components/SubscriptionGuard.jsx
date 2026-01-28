@@ -1,7 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 import { useGetSubscriptionQuery } from '../slices/apiSlice/billingApiSlice';
 import { useGetMeQuery } from '../slices/apiSlice/authApiSlice';
+import { getIsRefreshing } from '../slices/customBaseQuery';
 import OnboardingModal from './OnboardingModal';
 
 /**
@@ -89,10 +91,17 @@ export default function SubscriptionGuard({ children }) {
   // For other errors, we show an error state or redirect to login
   if (isUserError) {
     console.error('[SubscriptionGuard] User API error:', userError);
-    // If it's not a 401 (which is handled by customBaseQuery), show error or redirect
     const errorStatus = userError?.status || userError?.originalStatus;
     if (errorStatus === 401 || errorStatus === 403) {
-      // Auth errors should redirect to login (customBaseQuery may have already done this)
+      // Don't redirect if token refresh is in progress - it will retry automatically
+      if (getIsRefreshing()) {
+        return (
+          <div className="min-h-screen bg-gray-50 dark:bg-[#111114] flex items-center justify-center">
+            <Loader2 className="w-8 h-8 text-gray-400 dark:text-zinc-500 animate-spin" />
+          </div>
+        );
+      }
+      // Auth errors should redirect to login (customBaseQuery handles this after refresh fails)
       return <Navigate to="/auth/login" state={{ from: location }} replace />;
     }
     // For other errors (500, network, etc), show a simple error state
@@ -116,6 +125,14 @@ export default function SubscriptionGuard({ children }) {
     console.error('[SubscriptionGuard] Subscription API error:', subscriptionError);
     const errorStatus = subscriptionError?.status || subscriptionError?.originalStatus;
     if (errorStatus === 401 || errorStatus === 403) {
+      // Don't redirect if token refresh is in progress - it will retry automatically
+      if (getIsRefreshing()) {
+        return (
+          <div className="min-h-screen bg-gray-50 dark:bg-[#111114] flex items-center justify-center">
+            <Loader2 className="w-8 h-8 text-gray-400 dark:text-zinc-500 animate-spin" />
+          </div>
+        );
+      }
       return <Navigate to="/auth/login" state={{ from: location }} replace />;
     }
     // For subscription errors, redirect to plan page (they may not have a subscription)
