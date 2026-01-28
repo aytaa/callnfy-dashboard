@@ -292,11 +292,25 @@ export default function AIAssistantDetail() {
 
               {/* Basic Info Section */}
               <Section title="Basic Info" icon={Info}>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                   <InfoField label="Name" value={assistant.name} />
                   <InfoField label="Business Name" value={assistant.businessName} />
                   <InfoField label="Created" value={formatDate(assistant.createdAt)} />
                   <InfoField label="Updated" value={formatDate(assistant.updatedAt)} />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs text-gray-500 dark:text-zinc-500 mb-1">Services Offered</p>
+                    <p className="text-sm text-gray-900 dark:text-white">
+                      {assistant.services || 'Not configured'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 dark:text-zinc-500 mb-1">Working Hours</p>
+                    <p className="text-sm text-gray-900 dark:text-white">
+                      {assistant.workingHours || 'Not configured'}
+                    </p>
+                  </div>
                 </div>
               </Section>
 

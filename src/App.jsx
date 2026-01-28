@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
+import { Loader2 } from 'lucide-react';
 import { selectIsAuthenticated, selectIsAuthChecked, selectForceLogout, setCredentials, setAuthChecked } from './slices/authSlice';
 import { useGetMeQuery } from './slices/apiSlice/authApiSlice';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -76,8 +77,18 @@ function AuthInitializer({ children }) {
   return children;
 }
 
+// Loading Spinner Component
+function LoadingScreen() {
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-[#111114] flex items-center justify-center">
+      <Loader2 className="w-8 h-8 text-gray-400 dark:text-zinc-500 animate-spin" />
+    </div>
+  );
+}
+
 // Protected Route Component
 function ProtectedRoute({ children }) {
+  const location = useLocation();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const isAuthChecked = useSelector(selectIsAuthChecked);
   const forceLogout = useSelector(selectForceLogout);
@@ -85,13 +96,17 @@ function ProtectedRoute({ children }) {
   // If forceLogout is true, always redirect to login
   // This handles the case where a forced logout was triggered
   if (forceLogout) {
-    return <Navigate to="/auth/login" replace />;
+    return <Navigate to="/auth/login" state={{ from: location }} replace />;
   }
 
-  // While auth is being checked, render children (pages handle their own loading)
-  // Only redirect after auth check confirms user is not authenticated
-  if (isAuthChecked && !isAuthenticated) {
-    return <Navigate to="/auth/login" replace />;
+  // Show loading while auth is being checked to prevent flash of content
+  if (!isAuthChecked) {
+    return <LoadingScreen />;
+  }
+
+  // After auth check, redirect if not authenticated
+  if (!isAuthenticated) {
+    return <Navigate to="/auth/login" state={{ from: location }} replace />;
   }
 
   return children;
@@ -108,9 +123,13 @@ function AuthRoute({ children }) {
     return children;
   }
 
-  // While auth is being checked, render children (pages handle their own loading)
-  // Only redirect after auth check confirms user is authenticated
-  if (isAuthChecked && isAuthenticated) {
+  // Show loading while auth is being checked to prevent flash of login page
+  if (!isAuthChecked) {
+    return <LoadingScreen />;
+  }
+
+  // After auth check, redirect if already authenticated
+  if (isAuthenticated) {
     return <Navigate to="/overview" replace />;
   }
 

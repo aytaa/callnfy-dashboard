@@ -39,7 +39,9 @@ function Login() {
         user: result.data.user,
       }));
 
-      navigate('/overview');
+      // Redirect to the originally intended page, or default to /overview
+      const from = location.state?.from?.pathname || '/overview';
+      navigate(from, { replace: true });
     } catch (err) {
       // Provide user-friendly error messages for common auth errors
       if (err?.status === 401 || err?.data?.error?.code === 'INVALID_CREDENTIALS') {

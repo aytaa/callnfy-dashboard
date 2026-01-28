@@ -430,6 +430,8 @@ export default function OnboardingModal({ onComplete }) {
 
   const { hasBusiness, hasSubscription, hasPhoneNumber, hasAssistant, hasCalendarConnected } = onboardingStatus || {};
   const phoneNumber = assignedPhone?.phoneNumber || assignedPhone?.number;
+  const isPhoneActivating = assignedPhone?.status === 'activating';
+  const phoneProvider = assignedPhone?.provider;
   const planInfo = PLANS[selectedPlan];
   const yearlyDiscount = planInfo ? Math.round((planInfo.monthlyPrice * 12 - planInfo.yearlyPrice) / planInfo.monthlyPrice) : 2;
 
@@ -666,12 +668,20 @@ export default function OnboardingModal({ onComplete }) {
               </div>
 
               {/* Phone Number Display */}
-              <div className="bg-[#111114] border border-[#303030] rounded-lg p-6 text-center">
-                <p className="text-white/40 text-sm mb-2">Your phone number:</p>
-                <p className="text-2xl font-bold text-white tracking-wide">
-                  {phoneNumber || 'Loading...'}
-                </p>
-              </div>
+              {isPhoneActivating ? (
+                <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-6 text-center">
+                  <Loader2 className="w-6 h-6 text-yellow-500 animate-spin mx-auto mb-2" />
+                  <p className="text-yellow-500 font-medium">Your phone number is being activated...</p>
+                  <p className="text-yellow-500/70 text-sm mt-1">This usually takes 1-2 minutes</p>
+                </div>
+              ) : (
+                <div className="bg-[#111114] border border-[#303030] rounded-lg p-6 text-center">
+                  <p className="text-white/40 text-sm mb-2">Your phone number:</p>
+                  <p className="text-2xl font-bold text-white tracking-wide">
+                    {phoneNumber || 'Loading...'}
+                  </p>
+                </div>
+              )}
 
               {/* Forwarding Instructions */}
               <div className="bg-[#111114] border border-[#303030] rounded-lg p-4 space-y-3">
@@ -933,6 +943,12 @@ export default function OnboardingModal({ onComplete }) {
                     <Phone className="w-4 h-4" />
                     Call me now
                   </button>
+
+                  {country !== 'US' && phoneProvider === 'vapi' && (
+                    <p className="text-yellow-500/70 text-xs text-center">
+                      Note: Free US numbers cannot call international numbers. You can skip this step and test by calling your Callnfy number directly.
+                    </p>
+                  )}
 
                   <button
                     onClick={() => setCurrentStep(7)}
