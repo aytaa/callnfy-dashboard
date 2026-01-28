@@ -48,12 +48,21 @@ export default function ModelTab({ assistant, onUpdate }) {
         businessId: assistant.businessId,
       }).unwrap();
 
-      if (result.prompt) {
-        handleChange('systemPrompt', result.prompt);
-        // Also trigger save
+      // API response is wrapped: { success: true, data: { prompt: '...' } }
+      const prompt = result?.data?.prompt || result?.prompt;
+
+      if (prompt) {
+        // Update local state
+        setFormData(prev => ({
+          ...prev,
+          systemPrompt: prompt
+        }));
+        // Also trigger save to backend
         if (onUpdate) {
-          onUpdate({ systemPrompt: result.prompt });
+          onUpdate({ systemPrompt: prompt });
         }
+      } else {
+        console.error('No prompt in response:', result);
       }
     } catch (err) {
       console.error('Failed to generate prompt:', err);
