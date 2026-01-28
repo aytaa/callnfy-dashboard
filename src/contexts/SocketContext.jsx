@@ -4,6 +4,20 @@ import { selectIsAuthenticated } from '../slices/authSlice';
 
 const SocketContext = createContext(null);
 
+// Global reconnect function - can be called from outside React components
+let globalReconnectFn = null;
+
+/**
+ * Trigger WebSocket reconnection from outside React components
+ * Used after token refresh to re-authenticate the WebSocket connection
+ */
+export function triggerSocketReconnect() {
+  if (globalReconnectFn) {
+    log('Triggering reconnect from external call (token refresh)');
+    globalReconnectFn();
+  }
+}
+
 // WebSocket ready states
 const CONNECTING = 0;
 const OPEN = 1;
@@ -206,6 +220,34 @@ export function SocketProvider({ children }) {
     reconnectAttemptsRef.current = 0;
   }, [stopHeartbeat]);
 
+  // Force reconnect - used after token refresh
+  const forceReconnect = useCallback(() => {
+    log('Force reconnecting (token refresh)');
+    // Close existing connection without triggering auto-reconnect
+    if (wsRef.current) {
+      wsRef.current.close(1000, 'Token refresh');
+      wsRef.current = null;
+    }
+    stopHeartbeat();
+    setIsConnected(false);
+    reconnectAttemptsRef.current = 0;
+
+    // Small delay to ensure cookies are updated before reconnecting
+    setTimeout(() => {
+      if (isAuthenticated) {
+        connect();
+      }
+    }, 200);
+  }, [isAuthenticated, connect, stopHeartbeat]);
+
+  // Set global reconnect function for external access
+  useEffect(() => {
+    globalReconnectFn = forceReconnect;
+    return () => {
+      globalReconnectFn = null;
+    };
+  }, [forceReconnect]);
+
   // Connect when authenticated, disconnect when not
   useEffect(() => {
     if (isAuthenticated) {
@@ -234,6 +276,7 @@ export function SocketProvider({ children }) {
     addEventListener,
     disconnect,
     reconnect: connect,
+    forceReconnect, // Use after token refresh
   };
 
   return (

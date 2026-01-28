@@ -1,6 +1,7 @@
 import {fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {logout, setCredentials, setForceLogout} from './authSlice';
 import toast from 'react-hot-toast';
+import { triggerSocketReconnect } from '../contexts/SocketContext';
 
 const baseQuery = fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_URL || 'https://api.callnfy.com/v1',
@@ -158,6 +159,14 @@ export const customBaseQuery = async (args, api, extraOptions) => {
 
                 // Wait for browser to process the new Set-Cookie header
                 await waitForCookies();
+
+                // Trigger WebSocket reconnection to use new auth cookies
+                try {
+                    triggerSocketReconnect();
+                } catch (wsError) {
+                    // Don't fail the request if WebSocket reconnect fails
+                    console.warn('[Auth] WebSocket reconnect failed:', wsError);
+                }
 
                 // Retry the original request with new cookie
                 result = await baseQuery(args, api, extraOptions);
