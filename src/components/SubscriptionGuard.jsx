@@ -13,6 +13,7 @@ export default function SubscriptionGuard({ children }) {
   const location = useLocation();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const hasCheckedOnboarding = useRef(false);
+  const [isWaitingForRefresh, setIsWaitingForRefresh] = useState(false);
 
   // Fetch subscription - NO automatic refetching
   const {
@@ -20,6 +21,7 @@ export default function SubscriptionGuard({ children }) {
     isLoading: isLoadingSubscription,
     isError: isSubscriptionError,
     error: subscriptionError,
+    refetch: refetchSubscription,
   } = useGetSubscriptionQuery(undefined, {
     refetchOnMountOrArgChange: false,
     refetchOnFocus: false,
@@ -81,6 +83,53 @@ export default function SubscriptionGuard({ children }) {
     hasCheckedOnboarding.current = false;
   };
 
+  // Check if we have a 401/403 error while refresh might be in progress
+  const userErrorStatus = userError?.status || userError?.originalStatus;
+  const subscriptionErrorStatus = subscriptionError?.status || subscriptionError?.originalStatus;
+  const hasAuthError = (isUserError && (userErrorStatus === 401 || userErrorStatus === 403)) ||
+                       (isSubscriptionError && (subscriptionErrorStatus === 401 || subscriptionErrorStatus === 403));
+
+  // Detect when we need to start waiting for refresh
+  useEffect(() => {
+    if (hasAuthError && getIsRefreshing() && !isWaitingForRefresh) {
+      console.log('[SubscriptionGuard] Auth error detected during refresh, starting to wait');
+      setIsWaitingForRefresh(true);
+    }
+  }, [hasAuthError, isWaitingForRefresh]);
+
+  // Poll for token refresh completion and refetch when done
+  useEffect(() => {
+    if (!isWaitingForRefresh) return;
+
+    const checkRefreshStatus = () => {
+      if (!getIsRefreshing()) {
+        console.log('[SubscriptionGuard] Token refresh completed, refetching data');
+        setIsWaitingForRefresh(false);
+        // Refetch both queries to get fresh data with new token
+        refetchUser();
+        refetchSubscription();
+      }
+    };
+
+    // Check immediately
+    checkRefreshStatus();
+
+    // Then poll every 100ms until refresh is done
+    const interval = setInterval(checkRefreshStatus, 100);
+
+    // Cleanup after 10 seconds max to prevent infinite polling
+    const timeout = setTimeout(() => {
+      console.log('[SubscriptionGuard] Refresh polling timeout, giving up');
+      clearInterval(interval);
+      setIsWaitingForRefresh(false);
+    }, 10000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [isWaitingForRefresh, refetchUser, refetchSubscription]);
+
   // During loading, render children - each page handles its own loading state
   if (isLoadingSubscription || isLoadingUser) {
     return children;
@@ -91,10 +140,9 @@ export default function SubscriptionGuard({ children }) {
   // For other errors, we show an error state or redirect to login
   if (isUserError) {
     console.error('[SubscriptionGuard] User API error:', userError);
-    const errorStatus = userError?.status || userError?.originalStatus;
-    if (errorStatus === 401 || errorStatus === 403) {
-      // Don't redirect if token refresh is in progress - it will retry automatically
-      if (getIsRefreshing()) {
+    if (userErrorStatus === 401 || userErrorStatus === 403) {
+      // If refresh is in progress or we're waiting for it, show loading
+      if (getIsRefreshing() || isWaitingForRefresh) {
         return (
           <div className="min-h-screen bg-gray-50 dark:bg-[#111114] flex items-center justify-center">
             <Loader2 className="w-8 h-8 text-gray-400 dark:text-zinc-500 animate-spin" />
@@ -123,10 +171,9 @@ export default function SubscriptionGuard({ children }) {
   // Handle subscription API errors similarly
   if (isSubscriptionError) {
     console.error('[SubscriptionGuard] Subscription API error:', subscriptionError);
-    const errorStatus = subscriptionError?.status || subscriptionError?.originalStatus;
-    if (errorStatus === 401 || errorStatus === 403) {
-      // Don't redirect if token refresh is in progress - it will retry automatically
-      if (getIsRefreshing()) {
+    if (subscriptionErrorStatus === 401 || subscriptionErrorStatus === 403) {
+      // If refresh is in progress or we're waiting for it, show loading
+      if (getIsRefreshing() || isWaitingForRefresh) {
         return (
           <div className="min-h-screen bg-gray-50 dark:bg-[#111114] flex items-center justify-center">
             <Loader2 className="w-8 h-8 text-gray-400 dark:text-zinc-500 animate-spin" />

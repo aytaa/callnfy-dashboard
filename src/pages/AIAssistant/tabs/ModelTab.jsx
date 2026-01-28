@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Loader2 } from 'lucide-react';
+import { useGeneratePromptMutation } from '../../../slices/apiSlice/assistantApiSlice';
 
 export default function ModelTab({ assistant, onUpdate }) {
+  const [generatePromptApi, { isLoading: isGenerating }] = useGeneratePromptMutation();
   // Use direct API fields
   const model = assistant?.model;
 
@@ -35,9 +37,27 @@ export default function ModelTab({ assistant, onUpdate }) {
     }
   };
 
-  const handleGeneratePrompt = () => {
-    // TODO: Implement AI prompt generation
-    console.log('Generate prompt clicked');
+  const handleGeneratePrompt = async () => {
+    if (!assistant?.businessId) {
+      console.error('No businessId available');
+      return;
+    }
+
+    try {
+      const result = await generatePromptApi({
+        businessId: assistant.businessId,
+      }).unwrap();
+
+      if (result.prompt) {
+        handleChange('systemPrompt', result.prompt);
+        // Also trigger save
+        if (onUpdate) {
+          onUpdate({ systemPrompt: result.prompt });
+        }
+      }
+    } catch (err) {
+      console.error('Failed to generate prompt:', err);
+    }
   };
 
   return (
@@ -162,10 +182,15 @@ export default function ModelTab({ assistant, onUpdate }) {
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">System Prompt</h3>
           <button
             onClick={handleGeneratePrompt}
-            className="flex items-center gap-1.5 bg-gray-900 dark:bg-white text-white dark:text-black text-xs font-medium px-3 py-1.5 rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+            disabled={isGenerating}
+            className="flex items-center gap-1.5 bg-gray-900 dark:bg-white text-white dark:text-black text-xs font-medium px-3 py-1.5 rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            Generate
+            {isGenerating ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Sparkles className="w-3.5 h-3.5" />
+            )}
+            {isGenerating ? 'Generating...' : 'Generate'}
           </button>
         </div>
         <textarea

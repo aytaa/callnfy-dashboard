@@ -18,6 +18,10 @@ export default function VoiceTab({ assistant, onUpdate }) {
       onUpdate({
         voiceProvider: formData.voiceProvider,
         voiceId: formData.voiceId,
+        // Note: voiceSpeed and voicePitch may need backend support
+        // These are passed to Vapi voice config if supported
+        voiceSpeed: formData.speed,
+        voicePitch: formData.pitch,
       });
     }
   };

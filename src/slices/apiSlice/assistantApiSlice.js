@@ -53,6 +53,13 @@ export const assistantApiSlice = apiSlice.injectEndpoints({
         { type: 'Assistant', id: 'LIST' },
       ],
     }),
+    generatePrompt: builder.mutation({
+      query: (data) => ({
+        url: '/assistants/generate-prompt',
+        method: 'POST',
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -63,4 +70,5 @@ export const {
   useCreateAssistantMutation,
   useUpdateAssistantMutation,
   usePatchAssistantMutation,
+  useGeneratePromptMutation,
 } = assistantApiSlice;

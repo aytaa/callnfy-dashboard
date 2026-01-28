@@ -53,27 +53,56 @@ export default function Appointments() {
   ];
 
   const columns = [
-    { header: 'Customer', accessor: 'customerName', render: (row) => row.customerName || 'N/A' },
-    { header: 'Phone', accessor: 'customerPhone', render: (row) => row.customerPhone || 'N/A' },
-    { header: 'Service', accessor: 'service', render: (row) => row.service || 'N/A' },
     {
-      header: 'Date',
-      accessor: 'date',
-      render: (row) => row.date ? new Date(row.date).toLocaleDateString('en-US', {
+      key: 'customerName',
+      label: 'Customer',
+      sortable: true,
+      render: (value, row) => row.customerName || 'N/A'
+    },
+    {
+      key: 'customerPhone',
+      label: 'Phone',
+      render: (value, row) => row.customerPhone || 'N/A'
+    },
+    {
+      key: 'service',
+      label: 'Service',
+      sortable: true,
+      render: (value, row) => row.service || 'N/A'
+    },
+    {
+      key: 'date',
+      label: 'Date',
+      sortable: true,
+      render: (value, row) => row.date ? new Date(row.date).toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
         year: 'numeric'
       }) : 'N/A'
     },
-    { header: 'Time', accessor: 'time', render: (row) => row.time || 'N/A' },
     {
-      header: 'Status',
-      accessor: 'status',
-      render: (row) => (
-        <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-[#262626] text-gray-900 dark:text-white text-xs font-medium rounded capitalize">
-          {row.status || 'pending'}
-        </span>
-      ),
+      key: 'time',
+      label: 'Time',
+      render: (value, row) => row.time || 'N/A'
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      sortable: true,
+      render: (value, row) => {
+        const status = row.status || 'pending';
+        const statusColors = {
+          pending: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400',
+          confirmed: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400',
+          completed: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400',
+          cancelled: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400',
+        };
+        return (
+          <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded capitalize ${statusColors[status] || 'bg-gray-100 dark:bg-[#262626] text-gray-900 dark:text-white'}`}>
+            {status}
+          </span>
+        );
+      },
     },
   ];
 
@@ -289,6 +318,23 @@ export default function Appointments() {
           <DataTable
             columns={columns}
             data={appointments.filter(apt => apt.status !== 'cancelled')}
+            loading={isLoading}
+            emptyState={
+              <div className="text-center py-12">
+                <CalendarIcon className="w-12 h-12 text-gray-300 dark:text-zinc-600 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No appointments yet</h3>
+                <p className="text-sm text-gray-500 dark:text-zinc-400 mb-4">
+                  Get started by scheduling your first appointment
+                </p>
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="inline-flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-black px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Appointment
+                </button>
+              </div>
+            }
           />
         )}
 
