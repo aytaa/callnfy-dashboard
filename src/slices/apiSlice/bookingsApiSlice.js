@@ -14,9 +14,13 @@ export const bookingsApiSlice = apiSlice.injectEndpoints({
           ...(endDate && { endDate }),
         },
       }),
-      transformResponse: (response) => response?.data || { bookings: [], pagination: {} },
+      transformResponse: (response) => {
+        const bookings = Array.isArray(response?.data) ? response.data : response?.data?.bookings || [];
+        const pagination = response?.meta || {};
+        return { bookings, pagination };
+      },
       providesTags: (result) =>
-        result?.bookings
+        result?.bookings?.length
           ? [
               ...result.bookings.map(({ id }) => ({ type: 'Booking', id })),
               { type: 'Booking', id: 'LIST' },
