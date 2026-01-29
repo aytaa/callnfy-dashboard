@@ -170,7 +170,9 @@ export default function Appointments() {
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     return appointments.filter(apt => {
       if (!apt.date || apt.status === 'cancelled') return false;
-      const aptDate = new Date(apt.date).toISOString().split('T')[0];
+      // Compare date strings directly — apt.date is "yyyy-MM-dd"
+      // Avoid new Date() parsing which shifts dates across timezones
+      const aptDate = apt.date.slice(0, 10);
       return aptDate === dateStr;
     });
   };
@@ -397,7 +399,7 @@ export default function Appointments() {
                   <div
                     key={index}
                     onClick={() => handleDayClick(day)}
-                    className={`min-h-[100px] p-1.5 border-b border-r border-gray-200 dark:border-[#303030] transition-colors ${
+                    className={`min-h-[140px] p-1.5 border-b border-r border-gray-200 dark:border-[#303030] transition-colors ${
                       day
                         ? 'hover:bg-violet-50 dark:hover:bg-violet-500/10 cursor-pointer'
                         : 'bg-gray-50/50 dark:bg-[#0f0f11]'
@@ -416,20 +418,25 @@ export default function Appointments() {
                             <span className="text-sm text-gray-700 dark:text-gray-300 pl-0.5">{day}</span>
                           )}
                         </div>
-                        <div className="space-y-0.5 overflow-hidden">
-                          {dayAppointments.slice(0, 3).map((apt) => (
-                            <div
-                              key={apt.id}
-                              className={`text-[11px] leading-tight px-1.5 py-0.5 rounded truncate ${getStatusColor(apt.status)}`}
-                              title={`${apt.time || ''} ${apt.customerName || ''} — ${apt.service || ''}`}
-                            >
-                              <span className="font-medium">{apt.time?.slice(0, 5)}</span>
-                              {' '}
-                              <span className="opacity-80">{apt.customerName}</span>
-                            </div>
-                          ))}
+                        <div className="mt-1 space-y-1 min-w-0">
+                          {dayAppointments.slice(0, 3).map((apt) => {
+                            const displayTime = (apt.time || '').slice(0, 5);
+                            const displayName = (apt.customerName || apt.customer?.name || '').trim();
+                            return (
+                              <div
+                                key={apt.id}
+                                onClick={(e) => e.stopPropagation()}
+                                className={`block text-xs px-2 py-1 rounded truncate ${getStatusColor(apt.status)}`}
+                                title={`${displayTime}${displayName ? ' — ' + displayName : ''}${apt.service ? ' — ' + apt.service : ''}`}
+                              >
+                                {displayTime && <span className="font-semibold">{displayTime}</span>}
+                                {displayTime && displayName && ' '}
+                                {displayName}
+                              </div>
+                            );
+                          })}
                           {dayAppointments.length > 3 && (
-                            <div className="text-[11px] text-gray-500 dark:text-gray-400 px-1.5">
+                            <div className="text-xs text-gray-500 dark:text-gray-400 pl-2">
                               +{dayAppointments.length - 3} more
                             </div>
                           )}
