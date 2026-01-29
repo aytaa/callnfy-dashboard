@@ -28,6 +28,7 @@ export default function Integrations() {
 
   const [syncMode, setSyncMode] = useState('one-way'); // 'one-way' or 'two-way'
   const [showApiKey, setShowApiKey] = useState(false);
+  const [disconnectModal, setDisconnectModal] = useState({ open: false, integration: null });
 
   // Extract integration data
   const googleCalendar = integrationStatus?.googleCalendar || {};
@@ -60,20 +61,8 @@ export default function Integrations() {
     }
   };
 
-  const handleDisconnectGoogle = async () => {
-    if (!window.confirm('Are you sure you want to disconnect Google Calendar?')) return;
-    if (!businessId) {
-      toast.error('Business not found');
-      return;
-    }
-
-    try {
-      await disconnectGoogle(businessId).unwrap();
-      toast.success('Google Calendar disconnected');
-    } catch (err) {
-      console.error('Google disconnect error:', err);
-      toast.error('Failed to disconnect Google Calendar');
-    }
+  const handleDisconnectGoogle = () => {
+    setDisconnectModal({ open: true, integration: 'google' });
   };
 
   const handleUpdateSyncMode = async (mode) => {
@@ -108,19 +97,35 @@ export default function Integrations() {
     }
   };
 
-  const handleRevokeZapierKey = async () => {
-    if (!window.confirm('Are you sure? This will break existing Zapier integrations.')) return;
+  const handleRevokeZapierKey = () => {
+    setDisconnectModal({ open: true, integration: 'zapier' });
+  };
+
+  const handleConfirmDisconnect = async () => {
+    const integration = disconnectModal.integration;
+    setDisconnectModal({ open: false, integration: null });
+
     if (!businessId) {
       toast.error('Business not found');
       return;
     }
 
-    try {
-      await revokeZapierKey(businessId).unwrap();
-      toast.success('Zapier API key revoked');
-    } catch (err) {
-      console.error('Zapier key revoke error:', err);
-      toast.error('Failed to revoke API key');
+    if (integration === 'google') {
+      try {
+        await disconnectGoogle(businessId).unwrap();
+        toast.success('Google Calendar disconnected');
+      } catch (err) {
+        console.error('Google disconnect error:', err);
+        toast.error('Failed to disconnect Google Calendar');
+      }
+    } else if (integration === 'zapier') {
+      try {
+        await revokeZapierKey(businessId).unwrap();
+        toast.success('Zapier API key revoked');
+      } catch (err) {
+        console.error('Zapier key revoke error:', err);
+        toast.error('Failed to revoke API key');
+      }
     }
   };
 
@@ -364,6 +369,42 @@ export default function Integrations() {
           )}
         </div>
       </div>
+
+      {/* Disconnect Confirmation Modal */}
+      {disconnectModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setDisconnectModal({ open: false, integration: null })}
+          />
+          <div className="relative bg-white dark:bg-[#1a1a1d] rounded-lg shadow-xl w-full max-w-sm mx-4 p-5">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              {disconnectModal.integration === 'google'
+                ? 'Disconnect Google Calendar?'
+                : 'Revoke Zapier API Key?'}
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">
+              {disconnectModal.integration === 'google'
+                ? 'Are you sure you want to disconnect Google Calendar? You can reconnect it anytime.'
+                : 'Are you sure? This will break existing Zapier integrations.'}
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setDisconnectModal({ open: false, integration: null })}
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-[#262626] hover:bg-gray-200 dark:hover:bg-[#303030] rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDisconnect}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
+              >
+                {disconnectModal.integration === 'google' ? 'Disconnect' : 'Revoke'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

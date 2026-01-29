@@ -500,7 +500,7 @@ export default function NotificationSettings() {
           disabled={isSaving || !hasChanges}
           className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors disabled:opacity-50 flex items-center gap-2 ${
             hasChanges
-              ? 'bg-orange-500 text-white hover:bg-orange-600'
+              ? 'bg-violet-500 text-white hover:bg-violet-600'
               : 'bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200'
           }`}
         >
