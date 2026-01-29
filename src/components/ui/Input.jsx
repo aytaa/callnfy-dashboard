@@ -29,7 +29,13 @@ export default function Input({
 }) {
   const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
 
+  const isPickerType = type === 'date' || type === 'time';
+
   const baseStyles = 'w-full px-3 py-2 rounded-md border transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed';
+
+  const pickerStyles = isPickerType
+    ? ' [&::-webkit-calendar-picker-indicator]:dark:invert [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-60 [&::-webkit-calendar-picker-indicator]:hover:opacity-100'
+    : '';
 
   const normalStyles = 'border-gray-200 dark:border-[#303030] bg-white dark:bg-[#111114] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:border-gray-300 dark:focus:border-[#404040]';
 
@@ -55,7 +61,7 @@ export default function Input({
         required={required}
         disabled={disabled}
         className={clsx(
-          baseStyles,
+          baseStyles + pickerStyles,
           error ? errorStyles : normalStyles,
           className
         )}

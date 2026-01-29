@@ -141,6 +141,29 @@ export default function Appointments() {
     });
   };
 
+  const isToday = (day) => {
+    if (!day) return false;
+    const now = new Date();
+    return (
+      day === now.getDate() &&
+      currentDate.getMonth() === now.getMonth() &&
+      currentDate.getFullYear() === now.getFullYear()
+    );
+  };
+
+  const handleDayClick = (day) => {
+    if (!day) return;
+    const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    setFormData(prev => ({
+      ...prev,
+      date: `${yyyy}-${mm}-${dd}`,
+    }));
+    setIsModalOpen(true);
+  };
+
   const handlePrevMonth = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
   };
@@ -295,9 +318,12 @@ export default function Appointments() {
               {getDaysInMonth(currentDate).map((day, index) => (
                 <div
                   key={index}
-                  className={`aspect-square p-2 border rounded-lg ${
-                    day ? 'border-gray-200 dark:border-[#303030] bg-gray-50 dark:bg-[#212121] hover:bg-gray-100 dark:hover:bg-[#262626] cursor-pointer' : 'border-transparent'
-                  } ${day === 14 ? 'border-gray-900 dark:border-white' : ''}`}
+                  onClick={() => handleDayClick(day)}
+                  className={`aspect-square p-2 border rounded-lg transition-colors ${
+                    day
+                      ? 'border-gray-200 dark:border-[#303030] bg-gray-50 dark:bg-[#212121] hover:bg-violet-50 dark:hover:bg-violet-500/10 cursor-pointer'
+                      : 'border-transparent'
+                  } ${isToday(day) ? 'border-gray-900 dark:border-white' : ''}`}
                 >
                   {day && (
                     <>
