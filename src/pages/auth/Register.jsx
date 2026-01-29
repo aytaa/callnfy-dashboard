@@ -1,53 +1,64 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Phone } from 'lucide-react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import { useRegisterMutation } from '../../slices/apiSlice/authApiSlice';
 
+const validationSchema = Yup.object({
+  name: Yup.string()
+    .min(2, 'Name must be at least 2 characters')
+    .required('Name is required'),
+  email: Yup.string()
+    .email('Invalid email address')
+    .required('Email is required'),
+  password: Yup.string()
+    .min(8, 'Password must be at least 8 characters')
+    .matches(/[a-z]/, 'Password must contain a lowercase letter')
+    .matches(/[A-Z]/, 'Password must contain an uppercase letter')
+    .matches(/[0-9]/, 'Password must contain a number')
+    .required('Password is required'),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref('password'), null], 'Passwords must match')
+    .required('Confirm password is required'),
+});
+
 function Register() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: ''
+  const [register] = useRegisterMutation();
+
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+    validationSchema,
+    onSubmit: async (values, { setSubmitting, setStatus }) => {
+      setStatus(null);
+
+      try {
+        await register({
+          email: values.email,
+          name: values.name,
+          password: values.password,
+        }).unwrap();
+
+        setStatus({ success: true, email: values.email });
+      } catch (err) {
+        setStatus({ error: err?.data?.error?.message || err?.data?.message || 'Failed to create account. Please try again.' });
+      } finally {
+        setSubmitting(false);
+      }
+    },
   });
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
-  const [register, { isLoading }] = useRegisterMutation();
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-    if (error) setError('');
-  };
+  const inputBaseClass = 'w-full px-3 py-2 border rounded-lg bg-white dark:bg-[#1a1a1d] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none transition-all text-sm';
+  const inputNormalClass = `${inputBaseClass} border-gray-200 dark:border-[#303030] focus:border-gray-400 dark:focus:border-[#404040]`;
+  const inputErrorClass = `${inputBaseClass} border-red-400 dark:border-red-600 focus:border-red-500 dark:focus:border-red-500`;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-
-    if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters');
-      return;
-    }
-
-    try {
-      await register({
-        email: formData.email,
-        name: formData.name,
-        password: formData.password,
-      }).unwrap();
-
-      setSuccess(true);
-    } catch (err) {
-      setError(err?.data?.error?.message || err?.data?.message || 'Failed to create account. Please try again.');
-    }
-  };
-
-  if (success) {
+  if (formik.status?.success) {
     return (
       <div className="text-center">
         <div className="flex items-center justify-center space-x-2 text-gray-900 dark:text-white mb-6">
-          <Phone className="w-6 h-6" />
           <span className="text-xl" style={{fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700}}>Callnfy</span>
         </div>
         <div className="mb-8">
@@ -63,7 +74,7 @@ function Register() {
             We've sent a verification link to
           </p>
           <p className="text-gray-900 dark:text-white font-semibold mt-1">
-            {formData.email}
+            {formik.status.email}
           </p>
         </div>
 
@@ -87,7 +98,6 @@ function Register() {
     <div>
       <div className="mb-6 text-center">
         <div className="flex items-center justify-center space-x-2 text-gray-900 dark:text-white mb-4">
-          <Phone className="w-6 h-6" />
           <span className="text-xl" style={{fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700}}>Callnfy</span>
         </div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
@@ -98,10 +108,10 @@ function Register() {
         </p>
       </div>
 
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        {error && (
+      <form className="space-y-4" onSubmit={formik.handleSubmit}>
+        {formik.status?.error && (
           <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            <p className="text-sm text-red-600 dark:text-red-400">{formik.status.error}</p>
           </div>
         )}
 
@@ -112,12 +122,15 @@ function Register() {
           <input
             type="text"
             name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-200 dark:border-[#303030] rounded-lg bg-white dark:bg-[#1a1a1d] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-gray-400 dark:focus:border-[#404040] focus:outline-none transition-all text-sm"
+            value={formik.values.name}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className={formik.touched.name && formik.errors.name ? inputErrorClass : inputNormalClass}
             placeholder="John Doe"
-            required
           />
+          {formik.touched.name && formik.errors.name && (
+            <span className="text-red-500 text-sm mt-1 block">{formik.errors.name}</span>
+          )}
         </div>
 
         <div>
@@ -127,12 +140,15 @@ function Register() {
           <input
             type="email"
             name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-200 dark:border-[#303030] rounded-lg bg-white dark:bg-[#1a1a1d] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-gray-400 dark:focus:border-[#404040] focus:outline-none transition-all text-sm"
+            value={formik.values.email}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className={formik.touched.email && formik.errors.email ? inputErrorClass : inputNormalClass}
             placeholder="you@example.com"
-            required
           />
+          {formik.touched.email && formik.errors.email && (
+            <span className="text-red-500 text-sm mt-1 block">{formik.errors.email}</span>
+          )}
         </div>
 
         <div>
@@ -142,24 +158,41 @@ function Register() {
           <input
             type="password"
             name="password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-200 dark:border-[#303030] rounded-lg bg-white dark:bg-[#1a1a1d] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-gray-400 dark:focus:border-[#404040] focus:outline-none transition-all text-sm"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className={formik.touched.password && formik.errors.password ? inputErrorClass : inputNormalClass}
             placeholder="••••••••"
-            required
-            minLength={8}
           />
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Must be at least 8 characters
-          </p>
+          {formik.touched.password && formik.errors.password && (
+            <span className="text-red-500 text-sm mt-1 block">{formik.errors.password}</span>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+            Confirm password
+          </label>
+          <input
+            type="password"
+            name="confirmPassword"
+            value={formik.values.confirmPassword}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className={formik.touched.confirmPassword && formik.errors.confirmPassword ? inputErrorClass : inputNormalClass}
+            placeholder="••••••••"
+          />
+          {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+            <span className="text-red-500 text-sm mt-1 block">{formik.errors.confirmPassword}</span>
+          )}
         </div>
 
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={formik.isSubmitting || !formik.isValid}
           className="w-full bg-gray-900 dark:bg-white text-white dark:text-black py-2 rounded-lg font-medium text-sm hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? 'Creating account...' : 'Create account'}
+          {formik.isSubmitting ? 'Creating account...' : 'Create account'}
         </button>
       </form>
 
