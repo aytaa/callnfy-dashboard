@@ -163,15 +163,26 @@ export default function Appointments() {
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  const hasAppointment = (day) => {
-    if (!day) return false;
-    const checkDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-    const checkDateStr = checkDate.toISOString().split('T')[0];
-    return appointments.some(apt => {
+  const getAppointmentsForDay = (day) => {
+    if (!day) return [];
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    return appointments.filter(apt => {
       if (!apt.date || apt.status === 'cancelled') return false;
       const aptDate = new Date(apt.date).toISOString().split('T')[0];
-      return aptDate === checkDateStr;
+      return aptDate === dateStr;
     });
+  };
+
+  const getStatusColor = (status) => {
+    const colors = {
+      confirmed: 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400',
+      pending: 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400',
+      completed: 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400',
+      cancelled: 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400',
+    };
+    return colors[status] || 'bg-gray-100 dark:bg-[#262626] text-gray-700 dark:text-gray-300';
   };
 
   const isToday = (day) => {
@@ -374,32 +385,60 @@ export default function Appointments() {
               </div>
             </div>
 
-            <div className="grid grid-cols-7 gap-2">
+            <div className="grid grid-cols-7">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                <div key={day} className="text-center text-sm font-semibold text-gray-500 dark:text-gray-400 py-2">
+                <div key={day} className="text-center text-xs font-semibold text-gray-500 dark:text-gray-400 py-2 border-b border-gray-200 dark:border-[#303030]">
                   {day}
                 </div>
               ))}
-              {getDaysInMonth(currentDate).map((day, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleDayClick(day)}
-                  className={`aspect-square p-2 border rounded-lg transition-colors ${
-                    day
-                      ? 'border-gray-200 dark:border-[#303030] bg-gray-50 dark:bg-[#212121] hover:bg-violet-50 dark:hover:bg-violet-500/10 cursor-pointer'
-                      : 'border-transparent'
-                  } ${isToday(day) ? 'border-gray-900 dark:border-white' : ''}`}
-                >
-                  {day && (
-                    <>
-                      <div className="text-sm text-gray-900 dark:text-white mb-1">{day}</div>
-                      {hasAppointment(day) && (
-                        <div className="w-2 h-2 bg-gray-900 dark:bg-white rounded-full mx-auto" />
-                      )}
-                    </>
-                  )}
-                </div>
-              ))}
+              {getDaysInMonth(currentDate).map((day, index) => {
+                const dayAppointments = getAppointmentsForDay(day);
+                return (
+                  <div
+                    key={index}
+                    onClick={() => handleDayClick(day)}
+                    className={`min-h-[100px] p-1.5 border-b border-r border-gray-200 dark:border-[#303030] transition-colors ${
+                      day
+                        ? 'hover:bg-violet-50 dark:hover:bg-violet-500/10 cursor-pointer'
+                        : 'bg-gray-50/50 dark:bg-[#0f0f11]'
+                    } ${isToday(day) ? 'bg-violet-50/50 dark:bg-violet-500/5' : ''} ${
+                      index % 7 === 0 ? 'border-l' : ''
+                    }`}
+                  >
+                    {day && (
+                      <>
+                        <div className="mb-1">
+                          {isToday(day) ? (
+                            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-900 dark:bg-white text-white dark:text-black text-xs font-semibold">
+                              {day}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-gray-700 dark:text-gray-300 pl-0.5">{day}</span>
+                          )}
+                        </div>
+                        <div className="space-y-0.5 overflow-hidden">
+                          {dayAppointments.slice(0, 3).map((apt) => (
+                            <div
+                              key={apt.id}
+                              className={`text-[11px] leading-tight px-1.5 py-0.5 rounded truncate ${getStatusColor(apt.status)}`}
+                              title={`${apt.time || ''} ${apt.customerName || ''} — ${apt.service || ''}`}
+                            >
+                              <span className="font-medium">{apt.time?.slice(0, 5)}</span>
+                              {' '}
+                              <span className="opacity-80">{apt.customerName}</span>
+                            </div>
+                          ))}
+                          {dayAppointments.length > 3 && (
+                            <div className="text-[11px] text-gray-500 dark:text-gray-400 px-1.5">
+                              +{dayAppointments.length - 3} more
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </Card>
         )}
