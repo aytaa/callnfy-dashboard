@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Calendar as CalendarIcon, List, Plus, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import DataTable from '../../components/ui/DataTable';
 import Badge from '../../components/ui/Badge';
@@ -10,20 +10,32 @@ import Textarea from '../../components/ui/Textarea';
 import Card from '../../components/ui/Card';
 import { useGetBookingsQuery, useCreateBookingMutation } from '../../slices/apiSlice/bookingsApiSlice';
 import { useGetBusinessesQuery } from '../../slices/apiSlice/businessApiSlice';
+import { useGetCustomersQuery } from '../../slices/apiSlice/customersApiSlice';
+
+const INITIAL_FORM_DATA = {
+  customer: '',
+  customerPhone: '',
+  customerEmail: '',
+  service: '',
+  date: '',
+  time: '',
+  notes: '',
+};
 
 export default function Appointments() {
   const [view, setView] = useState('calendar'); // 'calendar' or 'list'
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [page, setPage] = useState(1);
-  const [formData, setFormData] = useState({
-    customer: '',
-    service: '',
-    date: '',
-    time: '',
-    notes: '',
-  });
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const [error, setError] = useState('');
+
+  // Customer autocomplete state
+  const [customerSearch, setCustomerSearch] = useState('');
+  const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const customerInputRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   // Fetch business first to get businessId
   const { data: businessData } = useGetBusinessesQuery(undefined, {
@@ -42,8 +54,29 @@ export default function Appointments() {
   );
   const [createBooking, { isLoading: isCreating }] = useCreateBookingMutation();
 
+  // Fetch customers for autocomplete
+  const { data: customersData } = useGetCustomersQuery(
+    { businessId, search: customerSearch, limit: 10 },
+    { skip: !businessId || !customerSearch || customerSearch.length < 2 }
+  );
+  const customers = customersData?.customers || [];
+
   // Extract appointments from API response
   const appointments = bookingsData?.bookings || [];
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        dropdownRef.current && !dropdownRef.current.contains(e.target) &&
+        customerInputRef.current && !customerInputRef.current.contains(e.target)
+      ) {
+        setShowCustomerDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const serviceOptions = [
     { value: 'consultation', label: 'Consultation' },
@@ -177,6 +210,38 @@ export default function Appointments() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const resetForm = () => {
+    setFormData(INITIAL_FORM_DATA);
+    setSelectedCustomer(null);
+    setCustomerSearch('');
+    setShowCustomerDropdown(false);
+    setError('');
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    resetForm();
+  };
+
+  const handleSelectCustomer = (customer) => {
+    setFormData(prev => ({
+      ...prev,
+      customer: customer.name,
+      customerPhone: customer.phone || '',
+      customerEmail: customer.email || '',
+    }));
+    setSelectedCustomer(customer);
+    setShowCustomerDropdown(false);
+  };
+
+  const handleCustomerInputChange = (e) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, customer: value }));
+    setCustomerSearch(value);
+    setShowCustomerDropdown(true);
+    setSelectedCustomer(null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -193,7 +258,7 @@ export default function Appointments() {
         'education': 'appointment',
         'retail': 'appointment',
       };
-      return typeMap[industry] || 'appointment'; // Default to 'appointment'
+      return typeMap[industry] || 'appointment';
     };
 
     const businessIndustry = businessData?.[0]?.industry;
@@ -204,13 +269,16 @@ export default function Appointments() {
         businessId,
         type: bookingType,
         customerName: formData.customer,
+        customerPhone: formData.customerPhone || undefined,
+        customerEmail: formData.customerEmail || undefined,
+        ...(selectedCustomer?.id && { customerId: selectedCustomer.id }),
         service: formData.service,
         date: formData.date,
         time: formData.time,
         notes: formData.notes,
       }).unwrap();
       setIsModalOpen(false);
-      setFormData({ customer: '', service: '', date: '', time: '', notes: '' });
+      resetForm();
     } catch (err) {
       setError(err?.data?.error?.message || err?.data?.message || 'Failed to create appointment');
     }
@@ -367,20 +435,12 @@ export default function Appointments() {
         {/* Add Appointment Modal */}
         <Modal
           isOpen={isModalOpen}
-          onClose={() => {
-            setIsModalOpen(false);
-            setError('');
-            setFormData({ customer: '', service: '', date: '', time: '', notes: '' });
-          }}
+          onClose={closeModal}
           title="Add New Appointment"
           footer={
             <>
               <button
-                onClick={() => {
-                  setIsModalOpen(false);
-                  setError('');
-                  setFormData({ customer: '', service: '', date: '', time: '', notes: '' });
-                }}
+                onClick={closeModal}
                 className="border border-gray-200 dark:border-[#303030] text-gray-900 dark:text-white px-3 py-1.5 text-sm rounded-lg hover:border-gray-300 dark:hover:border-[#3a3a3a] transition-colors"
               >
                 Cancel
@@ -402,44 +462,115 @@ export default function Appointments() {
               </div>
             )}
             <div className="space-y-3">
-            <Input
-              label="Customer Name"
-              name="customer"
-              value={formData.customer}
-              onChange={handleInputChange}
-              placeholder="Enter customer name"
-            />
-            <Select
-              label="Service"
-              name="service"
-              options={serviceOptions}
-              value={formData.service}
-              onChange={handleInputChange}
-            />
-            <div className="grid grid-cols-2 gap-3">
-              <Input
-                label="Date"
-                name="date"
-                type="date"
-                value={formData.date}
+              {/* Customer autocomplete */}
+              <div className="relative">
+                <label className="block text-xs text-gray-500 mb-1">
+                  Customer
+                </label>
+                <input
+                  ref={customerInputRef}
+                  type="text"
+                  value={formData.customer}
+                  onChange={handleCustomerInputChange}
+                  onFocus={() => { if (customerSearch.length >= 2) setShowCustomerDropdown(true); }}
+                  placeholder="Search or enter new customer name"
+                  className="w-full px-3 py-2 bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:border-gray-300 dark:focus:border-[#404040] transition-all duration-200"
+                  required
+                />
+
+                {showCustomerDropdown && customerSearch.length >= 2 && (
+                  <div
+                    ref={dropdownRef}
+                    className="absolute z-50 w-full mt-1 bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-lg shadow-lg max-h-48 overflow-y-auto"
+                  >
+                    {customers.length > 0 ? (
+                      customers.map((customer) => (
+                        <button
+                          key={customer.id}
+                          type="button"
+                          onClick={() => handleSelectCustomer(customer)}
+                          className="w-full px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-[#262626] transition-colors"
+                        >
+                          <div className="text-sm text-gray-900 dark:text-white">{customer.name}</div>
+                          {customer.phone && (
+                            <div className="text-xs text-gray-500">{customer.phone}</div>
+                          )}
+                        </button>
+                      ))
+                    ) : (
+                      <div className="px-3 py-2 text-sm text-gray-500">
+                        No existing customers found
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedCustomer(null);
+                        setShowCustomerDropdown(false);
+                      }}
+                      className="w-full px-3 py-2 text-left border-t border-gray-200 dark:border-[#303030] hover:bg-gray-50 dark:hover:bg-[#262626] transition-colors"
+                    >
+                      <div className="text-sm text-gray-900 dark:text-white font-medium">
+                        + Add &ldquo;{customerSearch}&rdquo; as new customer
+                      </div>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Phone and Email */}
+              <div className="grid grid-cols-2 gap-3">
+                <Input
+                  label="Phone"
+                  name="customerPhone"
+                  type="tel"
+                  value={formData.customerPhone}
+                  onChange={handleInputChange}
+                  placeholder="+1 234 567 8900"
+                  disabled={!!(selectedCustomer?.phone)}
+                />
+                <Input
+                  label="Email"
+                  name="customerEmail"
+                  type="email"
+                  value={formData.customerEmail}
+                  onChange={handleInputChange}
+                  placeholder="customer@email.com"
+                  disabled={!!(selectedCustomer?.email)}
+                />
+              </div>
+
+              <Select
+                label="Service"
+                name="service"
+                options={serviceOptions}
+                value={formData.service}
                 onChange={handleInputChange}
               />
-              <Input
-                label="Time"
-                name="time"
-                type="time"
-                value={formData.time}
+              <div className="grid grid-cols-2 gap-3">
+                <Input
+                  label="Date"
+                  name="date"
+                  type="date"
+                  value={formData.date}
+                  onChange={handleInputChange}
+                />
+                <Input
+                  label="Time"
+                  name="time"
+                  type="time"
+                  value={formData.time}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <Textarea
+                label="Notes (Optional)"
+                name="notes"
+                value={formData.notes}
                 onChange={handleInputChange}
+                placeholder="Add any additional notes"
+                rows={2}
               />
-            </div>
-            <Textarea
-              label="Notes (Optional)"
-              name="notes"
-              value={formData.notes}
-              onChange={handleInputChange}
-              placeholder="Add any additional notes"
-              rows={2}
-            />
             </div>
           </form>
         </Modal>
