@@ -246,37 +246,21 @@ export default function Appointments() {
     e.preventDefault();
     setError('');
 
-    // Get booking type based on business industry
-    const getBookingType = (industry) => {
-      const typeMap = {
-        'healthcare': 'appointment',
-        'hospitality': 'reservation',
-        'consulting': 'appointment',
-        'legal': 'appointment',
-        'real-estate': 'appointment',
-        'finance': 'appointment',
-        'education': 'appointment',
-        'retail': 'appointment',
-      };
-      return typeMap[industry] || 'appointment';
-    };
-
-    const businessIndustry = businessData?.[0]?.industry;
-    const bookingType = getBookingType(businessIndustry);
-
     try {
-      await createBooking({
+      const bookingData = {
         businessId,
-        type: bookingType,
         customerName: formData.customer,
-        customerPhone: formData.customerPhone || undefined,
-        customerEmail: formData.customerEmail || undefined,
-        ...(selectedCustomer?.id && { customerId: selectedCustomer.id }),
         service: formData.service,
         date: formData.date,
         time: formData.time,
-        notes: formData.notes,
-      }).unwrap();
+      };
+
+      if (formData.customerPhone) bookingData.customerPhone = formData.customerPhone;
+      if (formData.customerEmail) bookingData.customerEmail = formData.customerEmail;
+      if (selectedCustomer?.id) bookingData.customerId = selectedCustomer.id;
+      if (formData.notes && formData.notes.trim()) bookingData.notes = formData.notes.trim();
+
+      await createBooking(bookingData).unwrap();
       setIsModalOpen(false);
       resetForm();
     } catch (err) {
