@@ -53,6 +53,16 @@ export const callsApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'Call', id: 'LIST' }, { type: 'Call', id: 'STATS' }],
     }),
+    markCallbackComplete: builder.mutation({
+      query: (callId) => ({
+        url: `/calls/${callId}/callback-complete`,
+        method: 'PATCH',
+      }),
+      invalidatesTags: (result, error, callId) => [
+        { type: 'Call', id: callId },
+        { type: 'Call', id: 'LIST' },
+      ],
+    }),
   }),
 });
 
@@ -62,4 +72,5 @@ export const {
   useGetCallStatsQuery,
   useTestCallMutation,
   useSyncVapiCallsMutation,
+  useMarkCallbackCompleteMutation,
 } = callsApiSlice;

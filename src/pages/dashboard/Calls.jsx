@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Phone, MoreVertical, Loader2, RefreshCw } from 'lucide-react';
+import { Phone, MoreVertical, Loader2, RefreshCw, MessageSquare, AlertTriangle, PhoneCallback, Check } from 'lucide-react';
 import { toast } from 'sonner';
-import { useGetCallsQuery, useGetCallStatsQuery, useSyncVapiCallsMutation } from '../../slices/apiSlice/callsApiSlice';
+import { useGetCallsQuery, useGetCallStatsQuery, useSyncVapiCallsMutation, useMarkCallbackCompleteMutation } from '../../slices/apiSlice/callsApiSlice';
 import { useGetBusinessesQuery } from '../../slices/apiSlice/businessApiSlice';
 import DataTable from '../../components/ui/DataTable';
 import Select from '../../components/ui/Select';
@@ -36,6 +36,7 @@ export default function Calls() {
   );
 
   const [syncVapiCalls, { isLoading: isSyncing }] = useSyncVapiCallsMutation();
+  const [markCallbackComplete, { isLoading: isMarkingCallback }] = useMarkCallbackCompleteMutation();
 
   const handleSync = async () => {
     if (!businessId) return;
@@ -62,7 +63,8 @@ export default function Calls() {
     { value: 'all', label: 'All Status' },
     { value: 'completed', label: 'Completed' },
     { value: 'missed', label: 'Missed' },
-    { value: 'voicemail', label: 'Voicemail' },
+    { value: 'has_message', label: 'Has Message' },
+    { value: 'callback_needed', label: 'Callback Needed' },
   ];
 
   // Helper to calculate duration from timestamps if duration is 0/null
@@ -129,9 +131,27 @@ export default function Calls() {
       key: 'status',
       label: 'Status',
       render: (_, row) => (
-        <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded capitalize ${getStatusStyle(row.status)}`}>
-          {row.status?.replace(/-/g, ' ') || 'Unknown'}
-        </span>
+        <div className="flex items-center gap-1.5">
+          <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded capitalize ${getStatusStyle(row.status)}`}>
+            {row.status?.replace(/-/g, ' ') || 'Unknown'}
+          </span>
+          {row.hasMessage && (
+            <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 text-xs font-medium rounded ${
+              row.isUrgent
+                ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
+            }`}>
+              {row.isUrgent ? <AlertTriangle className="w-3 h-3" /> : <MessageSquare className="w-3 h-3" />}
+              {row.isUrgent ? 'Urgent' : 'Msg'}
+            </span>
+          )}
+          {row.callbackRequested && !row.callbackCompleted && (
+            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-xs font-medium rounded bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400">
+              <PhoneCallback className="w-3 h-3" />
+              Callback
+            </span>
+          )}
+        </div>
       ),
     },
     {
@@ -184,6 +204,17 @@ export default function Calls() {
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedCall(null);
+  };
+
+  const handleMarkCallbackComplete = async () => {
+    if (!selectedCall?.id) return;
+    try {
+      await markCallbackComplete(selectedCall.id).unwrap();
+      toast.success('Callback marked as complete');
+      setSelectedCall(prev => ({ ...prev, callbackCompleted: true, callbackCompletedAt: new Date().toISOString() }));
+    } catch (error) {
+      toast.error(error?.data?.message || 'Failed to mark callback complete');
+    }
   };
 
   if (callsLoading && page === 1) {
@@ -388,6 +419,76 @@ export default function Calls() {
                   </div>
                 )}
               </div>
+
+              {/* Message Section */}
+              {selectedCall.hasMessage && (
+                <div className={`p-3 rounded-md border ${
+                  selectedCall.isUrgent
+                    ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                    : 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800'
+                }`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      {selectedCall.isUrgent ? (
+                        <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                      ) : (
+                        <MessageSquare className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                      )}
+                      <span className={`text-sm font-medium ${
+                        selectedCall.isUrgent ? 'text-red-700 dark:text-red-400' : 'text-purple-700 dark:text-purple-400'
+                      }`}>
+                        {selectedCall.isUrgent ? 'Urgent Message' : 'Message'}
+                      </span>
+                    </div>
+                    {selectedCall.callbackRequested && (
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded ${
+                        selectedCall.callbackCompleted
+                          ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                          : 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400'
+                      }`}>
+                        {selectedCall.callbackCompleted ? (
+                          <>
+                            <Check className="w-3 h-3" />
+                            Called Back
+                          </>
+                        ) : (
+                          <>
+                            <PhoneCallback className="w-3 h-3" />
+                            Callback Requested
+                          </>
+                        )}
+                      </span>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div>
+                        <span className="text-gray-500 dark:text-gray-400">From: </span>
+                        <span className="text-gray-900 dark:text-white">{selectedCall.messageFrom || 'Unknown'}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 dark:text-gray-400">Phone: </span>
+                        <span className="text-gray-900 dark:text-white">{selectedCall.messagePhone || selectedCall.callerPhone || 'N/A'}</span>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-900 dark:text-white">{selectedCall.messageText}</p>
+                    {selectedCall.callbackRequested && !selectedCall.callbackCompleted && (
+                      <button
+                        onClick={handleMarkCallbackComplete}
+                        disabled={isMarkingCallback}
+                        className="mt-2 flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium px-3 py-1.5 rounded-md transition-colors disabled:opacity-50"
+                      >
+                        {isMarkingCallback ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Check className="w-3.5 h-3.5" />
+                        )}
+                        Mark Callback Complete
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {selectedCall.transcriptText && (
                 <div>
