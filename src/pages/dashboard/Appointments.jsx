@@ -247,8 +247,21 @@ export default function Appointments() {
     setError('');
 
     try {
+      // Map industry to booking type, default to 'appointment'
+      const industryTypeMap = {
+        hair_salon: 'appointment',
+        beauty_salon: 'appointment',
+        clinic: 'appointment',
+        plumber: 'job_request',
+        electrician: 'job_request',
+        hotel: 'reservation',
+      };
+      const industry = businessData?.[0]?.industry;
+      const type = industryTypeMap[industry] || 'appointment';
+
       const bookingData = {
         businessId,
+        type,
         customerName: formData.customer,
         service: formData.service,
         date: formData.date,
