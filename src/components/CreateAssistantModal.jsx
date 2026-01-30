@@ -15,6 +15,17 @@ const VOICE_OPTIONS = {
     { value: 'en-GB-SoniaNeural', label: 'Sonia (Female, UK)' },
     { value: 'en-GB-RyanNeural', label: 'Ryan (Male, UK)' },
   ],
+  elevenlabs: [
+    { value: 'rachel', label: 'Rachel (Female)' },
+    { value: 'domi', label: 'Domi (Female)' },
+    { value: 'bella', label: 'Bella (Female)' },
+    { value: 'elli', label: 'Elli (Female)' },
+    { value: 'antoni', label: 'Antoni (Male)' },
+    { value: 'josh', label: 'Josh (Male)' },
+    { value: 'arnold', label: 'Arnold (Male)' },
+    { value: 'adam', label: 'Adam (Male)' },
+    { value: 'sam', label: 'Sam (Male)' },
+  ],
   openai: [
     { value: 'alloy', label: 'Alloy' },
     { value: 'echo', label: 'Echo' },
@@ -52,7 +63,6 @@ export default function CreateAssistantModal({ isOpen, onClose, onCreate, isCrea
   const [firstMessage, setFirstMessage] = useState('Hello! Thanks for calling. How can I help you today?');
   const [voiceProvider, setVoiceProvider] = useState('vapi');
   const [voiceId, setVoiceId] = useState('jennifer-playht');
-  const [customVoiceId, setCustomVoiceId] = useState('');
   const [llmProvider, setLlmProvider] = useState('openai');
   const [llmModel, setLlmModel] = useState('gpt-4o-mini');
   const [systemPrompt, setSystemPrompt] = useState(
@@ -71,7 +81,6 @@ Be friendly, concise, and helpful.`
       setFirstMessage('Hello! Thanks for calling. How can I help you today?');
       setVoiceProvider('vapi');
       setVoiceId('jennifer-playht');
-      setCustomVoiceId('');
       setLlmProvider('openai');
       setLlmModel('gpt-4o-mini');
       setSystemPrompt(
@@ -92,7 +101,7 @@ Be friendly, concise, and helpful.`
     } else if (voiceProvider === 'openai') {
       setVoiceId('alloy');
     } else if (voiceProvider === 'elevenlabs') {
-      setVoiceId('');
+      setVoiceId('rachel');
     }
   }, [voiceProvider]);
 
@@ -123,14 +132,8 @@ Be friendly, concise, and helpful.`
       if (!voiceProvider) {
         newErrors.voiceProvider = 'Voice provider is required';
       }
-      if (voiceProvider === 'elevenlabs') {
-        if (!customVoiceId.trim()) {
-          newErrors.voiceId = 'Voice ID is required for ElevenLabs';
-        }
-      } else {
-        if (!voiceId) {
-          newErrors.voiceId = 'Voice selection is required';
-        }
+      if (!voiceId) {
+        newErrors.voiceId = 'Voice selection is required';
       }
     }
 
@@ -166,7 +169,7 @@ Be friendly, concise, and helpful.`
         systemPrompt: systemPrompt.trim() || `You are a helpful AI receptionist for ${businessName}. Answer calls professionally and assist with inquiries.`,
         voice: {
           provider: voiceProvider,
-          voiceId: voiceProvider === 'elevenlabs' ? customVoiceId.trim() : voiceId,
+          voiceId: voiceId,
         },
         model: {
           provider: llmProvider,
@@ -295,44 +298,19 @@ Be friendly, concise, and helpful.`
                 <label className="block text-sm text-gray-500 dark:text-zinc-400 mb-2">
                   Voice <span className="text-red-500 dark:text-red-400">*</span>
                 </label>
-                {voiceProvider === 'elevenlabs' ? (
-                  <div>
-                    <input
-                      type="text"
-                      value={customVoiceId}
-                      onChange={(e) => setCustomVoiceId(e.target.value)}
-                      className={`w-full bg-white dark:bg-zinc-800 border ${
-                        errors.voiceId ? 'border-red-500' : 'border-gray-200 dark:border-zinc-700'
-                      } rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-zinc-500 focus:border-gray-300 dark:focus:border-zinc-600 focus:outline-none`}
-                      placeholder="Enter ElevenLabs voice ID"
-                    />
-                    <p className="text-xs text-gray-400 dark:text-zinc-500 mt-1">
-                      Get voice IDs from{' '}
-                      <a
-                        href="https://elevenlabs.io"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white underline"
-                      >
-                        elevenlabs.io
-                      </a>
-                    </p>
-                  </div>
-                ) : (
-                  <select
-                    value={voiceId}
-                    onChange={(e) => setVoiceId(e.target.value)}
-                    className={`w-full bg-white dark:bg-zinc-800 border ${
-                      errors.voiceId ? 'border-red-500' : 'border-gray-200 dark:border-zinc-700'
-                    } rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-300 dark:focus:border-zinc-600 focus:outline-none`}
-                  >
-                    {VOICE_OPTIONS[voiceProvider]?.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                )}
+                <select
+                  value={voiceId}
+                  onChange={(e) => setVoiceId(e.target.value)}
+                  className={`w-full bg-white dark:bg-zinc-800 border ${
+                    errors.voiceId ? 'border-red-500' : 'border-gray-200 dark:border-zinc-700'
+                  } rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-300 dark:focus:border-zinc-600 focus:outline-none`}
+                >
+                  {VOICE_OPTIONS[voiceProvider]?.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
                 {errors.voiceId && <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.voiceId}</p>}
               </div>
             </div>
