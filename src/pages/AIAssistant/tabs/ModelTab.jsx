@@ -4,36 +4,11 @@ import { useGeneratePromptMutation } from '../../../slices/apiSlice/assistantApi
 
 export default function ModelTab({ assistant, onUpdate }) {
   const [generatePromptApi, { isLoading: isGenerating }] = useGeneratePromptMutation();
-  // Use direct API fields
-  const model = assistant?.model;
+  const [greeting, setGreeting] = useState(assistant?.greeting || '');
 
-  const [formData, setFormData] = useState({
-    provider: model?.provider || 'openai',
-    model: model?.model || 'gpt-4o-mini',
-    firstMessageMode: assistant?.firstMessageMode || 'assistant-speaks-first',
-    greeting: assistant?.greeting || '',
-    systemPrompt: assistant?.systemPrompt || '',
-    maxTokens: model?.maxTokens || 1000,
-    temperature: model?.temperature || 0.7,
-  });
-
-  const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleBlur = () => {
+  const handleGreetingBlur = () => {
     if (onUpdate) {
-      onUpdate({
-        greeting: formData.greeting,
-        firstMessageMode: formData.firstMessageMode,
-        systemPrompt: formData.systemPrompt,
-        model: {
-          provider: formData.provider,
-          model: formData.model,
-          maxTokens: formData.maxTokens,
-          temperature: formData.temperature,
-        },
-      });
+      onUpdate({ greeting });
     }
   };
 
@@ -48,16 +23,9 @@ export default function ModelTab({ assistant, onUpdate }) {
         businessId: assistant.businessId,
       }).unwrap();
 
-      // API response is wrapped: { success: true, data: { prompt: '...' } }
       const prompt = result?.data?.prompt || result?.prompt;
 
       if (prompt) {
-        // Update local state
-        setFormData(prev => ({
-          ...prev,
-          systemPrompt: prompt
-        }));
-        // Also trigger save to backend
         if (onUpdate) {
           onUpdate({ systemPrompt: prompt });
         }
@@ -71,116 +39,61 @@ export default function ModelTab({ assistant, onUpdate }) {
 
   return (
     <div className="space-y-4">
-      {/* Cost & Latency Display */}
-      <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-md p-3">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Estimated Cost</p>
-            <p className="text-sm text-gray-900 dark:text-white font-medium">~$0.11/min</p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Latency</p>
-            <p className="text-sm text-gray-900 dark:text-white font-medium">~1200ms</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Provider & Model */}
-      <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-md p-3">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Model Configuration</h3>
-        <div className="space-y-3">
-          <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Provider</label>
-            <select
-              value={formData.provider}
-              onChange={(e) => handleChange('provider', e.target.value)}
-              onBlur={handleBlur}
-              className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
-            >
-              <option value="openai">OpenAI</option>
-              <option value="anthropic">Anthropic</option>
-              <option value="google">Google</option>
-              <option value="groq">Groq</option>
-              <option value="together-ai">Together AI</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Model</label>
-            <select
-              value={formData.model}
-              onChange={(e) => handleChange('model', e.target.value)}
-              onBlur={handleBlur}
-              className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
-            >
-              {formData.provider === 'openai' && (
-                <>
-                  <option value="gpt-4o-mini">GPT-4o Mini</option>
-                  <option value="gpt-4o">GPT-4o</option>
-                  <option value="gpt-4">GPT-4</option>
-                  <option value="gpt-4-turbo">GPT-4 Turbo</option>
-                  <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                </>
-              )}
-              {formData.provider === 'anthropic' && (
-                <>
-                  <option value="claude-3-opus">Claude 3 Opus</option>
-                  <option value="claude-3-sonnet">Claude 3 Sonnet</option>
-                  <option value="claude-3-haiku">Claude 3 Haiku</option>
-                </>
-              )}
-              {formData.provider === 'google' && (
-                <>
-                  <option value="gemini-pro">Gemini Pro</option>
-                  <option value="gemini-ultra">Gemini Ultra</option>
-                </>
-              )}
-              {formData.provider === 'groq' && (
-                <>
-                  <option value="llama3-70b">Llama 3 70B</option>
-                  <option value="llama3-8b">Llama 3 8B</option>
-                  <option value="mixtral-8x7b">Mixtral 8x7B</option>
-                </>
-              )}
-              {formData.provider === 'together-ai' && (
-                <>
-                  <option value="llama-2-70b">Llama 2 70B</option>
-                  <option value="mistral-7b">Mistral 7B</option>
-                </>
-              )}
-            </select>
-          </div>
-        </div>
+      {/* Optimized Banner */}
+      <div className="bg-gray-900/5 dark:bg-white/5 border border-gray-200 dark:border-[#303030] rounded-md p-4">
+        <p className="text-sm text-gray-600 dark:text-gray-300">
+          All settings are optimized for the best call quality. Want custom settings? Contact support.
+        </p>
       </div>
 
       {/* First Message */}
       <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-md p-3">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">First Message</h3>
-        <div className="space-y-3">
+        <div>
+          <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Greeting Message</label>
+          <textarea
+            value={greeting}
+            onChange={(e) => setGreeting(e.target.value)}
+            onBlur={handleGreetingBlur}
+            rows={2}
+            placeholder="Hello! Thanks for calling. How can I help you today?"
+            className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none resize-none"
+          />
+        </div>
+      </div>
+
+      {/* Model Configuration (disabled) */}
+      <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-md p-3">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Model Configuration</h3>
+        <div className="space-y-3 opacity-60">
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Mode</label>
-            <select
-              value={formData.firstMessageMode}
-              onChange={(e) => handleChange('firstMessageMode', e.target.value)}
-              onBlur={handleBlur}
-              className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
-            >
-              <option value="assistant-speaks-first">Assistant speaks first</option>
-              <option value="assistant-waits">Assistant waits for user</option>
-              <option value="assistant-speaks-first-with-model-generated-message">
-                Assistant speaks first (AI generated)
-              </option>
-            </select>
+            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Provider</label>
+            <input
+              type="text"
+              value="OpenAI"
+              disabled
+              className="w-full bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white cursor-not-allowed"
+            />
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Optimized for speed & quality</p>
           </div>
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Greeting Message</label>
-            <textarea
-              value={formData.greeting}
-              onChange={(e) => handleChange('greeting', e.target.value)}
-              onBlur={handleBlur}
-              rows={2}
-              placeholder="Hello! Thanks for calling. How can I help you today?"
-              className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none resize-none"
+            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Model</label>
+            <input
+              type="text"
+              value="GPT-4o Mini"
+              disabled
+              className="w-full bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white cursor-not-allowed"
             />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Temperature</label>
+            <input
+              type="text"
+              value="0.7"
+              disabled
+              className="w-full bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white cursor-not-allowed"
+            />
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Optimized for natural conversation</p>
           </div>
         </div>
       </div>
@@ -199,55 +112,49 @@ export default function ModelTab({ assistant, onUpdate }) {
             ) : (
               <Sparkles className="w-3.5 h-3.5" />
             )}
-            {isGenerating ? 'Generating...' : 'Generate'}
+            {isGenerating ? 'Generating...' : 'Regenerate'}
           </button>
         </div>
-        <textarea
-          value={formData.systemPrompt}
-          onChange={(e) => handleChange('systemPrompt', e.target.value)}
-          onBlur={handleBlur}
-          rows={6}
-          placeholder="You are a helpful AI assistant. Your role is to..."
-          className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none resize-none"
-        />
+        <div className="bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md p-3 mb-3">
+          <p className="text-xs text-gray-600 dark:text-gray-300">
+            We've crafted the perfect prompt for your AI receptionist. It handles angry customers, books appointments, and sounds natural.
+          </p>
+        </div>
+        <div className="space-y-2">
+          <p className="text-xs text-gray-500 dark:text-gray-400">Your prompt handles:</p>
+          <ul className="text-xs text-gray-600 dark:text-gray-300 space-y-1 list-disc list-inside">
+            <li>Professional call answering & greetings</li>
+            <li>Appointment booking, rescheduling & cancellations</li>
+            <li>Business info (hours, services, location)</li>
+            <li>Difficult callers & de-escalation</li>
+            <li>Message taking & callback requests</li>
+          </ul>
+        </div>
+        {assistant?.systemPrompt && (
+          <details className="mt-3">
+            <summary className="text-xs text-gray-400 dark:text-gray-500 cursor-pointer hover:text-gray-600 dark:hover:text-gray-300">
+              View current prompt
+            </summary>
+            <div className="bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md p-3 mt-2">
+              <pre className="text-xs text-gray-700 dark:text-zinc-300 whitespace-pre-wrap font-mono">
+                {assistant.systemPrompt}
+              </pre>
+            </div>
+          </details>
+        )}
       </div>
 
-      {/* Advanced Settings */}
+      {/* Transcriber (disabled) */}
       <div className="bg-white dark:bg-[#1a1a1d] border border-gray-200 dark:border-[#303030] rounded-md p-3">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Advanced Settings</h3>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">Max Tokens</label>
-            <input
-              type="number"
-              value={formData.maxTokens}
-              onChange={(e) => handleChange('maxTokens', parseInt(e.target.value))}
-              onBlur={handleBlur}
-              min="100"
-              max="4000"
-              className="w-full bg-white dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
-            />
-          </div>
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs text-gray-500 dark:text-gray-400">Temperature</label>
-              <span className="text-xs text-gray-500 dark:text-gray-400">{formData.temperature}</span>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              value={formData.temperature}
-              onChange={(e) => handleChange('temperature', parseFloat(e.target.value))}
-              onMouseUp={handleBlur}
-              onTouchEnd={handleBlur}
-              className="w-full h-1.5 bg-gray-200 dark:bg-zinc-700 rounded-md appearance-none cursor-pointer slider"
-              style={{
-                background: `linear-gradient(to right, #6b7280 0%, #6b7280 ${formData.temperature * 100}%, #d1d5db ${formData.temperature * 100}%, #d1d5db 100%)`
-              }}
-            />
-          </div>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Transcriber</h3>
+        <div className="opacity-60">
+          <input
+            type="text"
+            value="Deepgram Nova-2"
+            disabled
+            className="w-full bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white cursor-not-allowed"
+          />
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Industry-leading accuracy</p>
         </div>
       </div>
     </div>
