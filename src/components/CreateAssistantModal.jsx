@@ -17,14 +17,9 @@ const VOICE_OPTIONS = {
   ],
   elevenlabs: [
     { value: 'rachel', label: 'Rachel (Female)' },
-    { value: 'domi', label: 'Domi (Female)' },
     { value: 'bella', label: 'Bella (Female)' },
-    { value: 'elli', label: 'Elli (Female)' },
-    { value: 'antoni', label: 'Antoni (Male)' },
-    { value: 'josh', label: 'Josh (Male)' },
-    { value: 'arnold', label: 'Arnold (Male)' },
     { value: 'adam', label: 'Adam (Male)' },
-    { value: 'sam', label: 'Sam (Male)' },
+    { value: 'josh', label: 'Josh (Male)' },
   ],
   openai: [
     { value: 'alloy', label: 'Alloy' },

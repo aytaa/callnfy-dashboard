@@ -32,14 +32,9 @@ export default function VoiceTab({ assistant, onUpdate }) {
       case 'elevenlabs':
         return [
           { value: 'rachel', label: 'Rachel (Female)' },
-          { value: 'domi', label: 'Domi (Female)' },
           { value: 'bella', label: 'Bella (Female)' },
-          { value: 'elli', label: 'Elli (Female)' },
-          { value: 'antoni', label: 'Antoni (Male)' },
-          { value: 'josh', label: 'Josh (Male)' },
-          { value: 'arnold', label: 'Arnold (Male)' },
           { value: 'adam', label: 'Adam (Male)' },
-          { value: 'sam', label: 'Sam (Male)' },
+          { value: 'josh', label: 'Josh (Male)' },
         ];
       case 'playht':
         return [
