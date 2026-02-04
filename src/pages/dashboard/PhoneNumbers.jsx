@@ -192,8 +192,12 @@ export default function PhoneNumbers() {
                                 {phoneNumber.status === 'assigned' ? 'Assigned' : phoneNumber.status || 'Active'}
                               </span>
                               {/* Type Badge */}
-                              <span className="px-2 py-0.5 text-xs font-medium rounded bg-gray-100 dark:bg-[#262626] text-gray-900 dark:text-white border border-gray-200 dark:border-[#303030]">
-                                {phoneNumber.provider === 'twilio' ? 'Premium' : 'Standard'}
+                              <span className={`px-2 py-0.5 text-xs font-medium rounded border ${
+                                phoneNumber.provider === 'byo-sip'
+                                  ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-700/50'
+                                  : 'bg-gray-100 dark:bg-[#262626] text-gray-900 dark:text-white border-gray-200 dark:border-[#303030]'
+                              }`}>
+                                {phoneNumber.provider === 'twilio' ? 'Premium' : phoneNumber.provider === 'byo-sip' ? 'BYO' : 'Standard'}
                               </span>
                             </div>
 

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Modal from './ui/Modal';
-import { Phone, AlertCircle, Loader2, Info, Search, Check, DollarSign, CheckCircle, XCircle } from 'lucide-react';
+import { Phone, AlertCircle, Loader2, Info, Search, Check, DollarSign, CheckCircle, XCircle, Wifi } from 'lucide-react';
 import { usePurchasePhoneNumberMutation, useSearchTwilioNumbersMutation, useCreatePhoneNumberCheckoutMutation } from '../slices/apiSlice/phoneApiSlice';
 import { useGetBusinessesQuery } from '../slices/apiSlice/businessApiSlice';
+import { useGetSipTrunksQuery } from '../slices/apiSlice/sipTrunkApiSlice';
 
 // Error code mappings for user-friendly messages
 const ERROR_MESSAGES = {
@@ -24,6 +26,13 @@ const PHONE_OPTIONS = [
     label: 'Premium Number',
     description: 'Paid phone number',
     icon: DollarSign,
+  },
+  {
+    id: 'byo-sip',
+    type: 'byo',
+    label: 'BYO (SIP)',
+    description: 'Your own number',
+    icon: Wifi,
   },
 ];
 
@@ -55,6 +64,7 @@ const formatPhoneNumber = (number) => {
 };
 
 export default function PurchasePhoneModal({ isOpen, onClose, checkoutResult }) {
+  const navigate = useNavigate();
   const [selectedOption, setSelectedOption] = useState('vapi-number');
   const [selectedBusiness, setSelectedBusiness] = useState('');
   const [areaCode, setAreaCode] = useState('');
@@ -70,10 +80,21 @@ export default function PurchasePhoneModal({ isOpen, onClose, checkoutResult }) 
   const [selectedTwilioNumber, setSelectedTwilioNumber] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
 
+  // BYO SIP state
+  const [selectedSipTrunk, setSelectedSipTrunk] = useState('');
+  const [byoPhoneNumber, setByoPhoneNumber] = useState('');
+  const [byoCountryCode, setByoCountryCode] = useState('+90');
+  const [byoDisplayName, setByoDisplayName] = useState('');
+
   const { data: businesses, refetch: refetchBusinesses } = useGetBusinessesQuery();
   const [purchaseNumber, { isLoading: isCreating }] = usePurchasePhoneNumberMutation();
   const [searchTwilioNumbers, { isLoading: isSearching }] = useSearchTwilioNumbersMutation();
   const [createPhoneCheckout, { isLoading: isCreatingCheckout }] = useCreatePhoneNumberCheckoutMutation();
+
+  // Fetch SIP trunks for selected business
+  const { data: sipTrunks } = useGetSipTrunksQuery(selectedBusiness, {
+    skip: !selectedBusiness || selectedOption !== 'byo-sip',
+  });
 
   // Refetch businesses when checkout was successful
   useEffect(() => {
@@ -96,6 +117,11 @@ export default function PurchasePhoneModal({ isOpen, onClose, checkoutResult }) 
     setTwilioSearchResults([]);
     setSelectedTwilioNumber(null);
     setHasSearched(false);
+    // Reset BYO state
+    setSelectedSipTrunk('');
+    setByoPhoneNumber('');
+    setByoCountryCode('+90');
+    setByoDisplayName('');
   };
 
   const handleClose = () => {
@@ -171,6 +197,38 @@ export default function PurchasePhoneModal({ isOpen, onClose, checkoutResult }) 
         }
       } catch (err) {
         console.error('Checkout creation error:', err);
+        setError(getErrorMessage(err));
+      }
+      return;
+    }
+
+    // Handle BYO SIP number
+    if (selectedOption === 'byo-sip') {
+      if (!selectedSipTrunk) {
+        setError('Please select a SIP trunk');
+        return;
+      }
+      if (!byoPhoneNumber.trim()) {
+        setError('Please enter a phone number');
+        return;
+      }
+
+      setError('');
+      setSuccessMessage('');
+
+      try {
+        const payload = {
+          provider: 'byo-sip',
+          businessId: selectedBusiness,
+          sipTrunkId: selectedSipTrunk,
+          phoneNumber: `${byoCountryCode}${byoPhoneNumber.replace(/\D/g, '')}`,
+          ...(byoDisplayName.trim() && { name: byoDisplayName.trim() }),
+        };
+
+        await purchaseNumber(payload).unwrap();
+        handleClose();
+      } catch (err) {
+        console.error('BYO number error:', err);
         setError(getErrorMessage(err));
       }
       return;
@@ -526,6 +584,102 @@ export default function PurchasePhoneModal({ isOpen, onClose, checkoutResult }) 
             </div>
           )}
 
+          {/* BYO SIP Number Configuration */}
+          {selectedOption === 'byo-sip' && (
+            <div className="space-y-4">
+              {/* SIP Trunk Selection */}
+              <div>
+                <label className="block text-xs text-gray-500 mb-1.5">
+                  SIP Trunk <span className="text-red-500">*</span>
+                </label>
+                {sipTrunks && sipTrunks.length > 0 ? (
+                  <select
+                    value={selectedSipTrunk}
+                    onChange={(e) => setSelectedSipTrunk(e.target.value)}
+                    className="w-full bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
+                  >
+                    <option value="">Select a SIP trunk...</option>
+                    {sipTrunks.map((trunk) => (
+                      <option key={trunk.id} value={trunk.id}>
+                        {trunk.name} ({trunk.sipHost})
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="p-3 bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md">
+                    <p className="text-xs text-gray-500 mb-2">No SIP trunks connected yet.</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleClose();
+                        navigate('/settings/sip-trunks');
+                      }}
+                      className="inline-flex items-center gap-1.5 text-xs text-gray-900 dark:text-white font-medium hover:underline"
+                    >
+                      <Wifi className="w-3.5 h-3.5" />
+                      Connect your SIP provider first
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Phone Number */}
+              <div>
+                <label className="block text-xs text-gray-500 mb-1.5">
+                  Phone Number <span className="text-red-500">*</span>
+                </label>
+                <div className="flex gap-2">
+                  <select
+                    value={byoCountryCode}
+                    onChange={(e) => setByoCountryCode(e.target.value)}
+                    className="w-24 bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
+                  >
+                    <option value="+90">+90</option>
+                    <option value="+1">+1</option>
+                    <option value="+44">+44</option>
+                    <option value="+49">+49</option>
+                    <option value="+33">+33</option>
+                    <option value="+61">+61</option>
+                  </select>
+                  <input
+                    type="tel"
+                    value={byoPhoneNumber}
+                    onChange={(e) => setByoPhoneNumber(e.target.value.replace(/[^\d\s-]/g, ''))}
+                    placeholder="555 123 4567"
+                    className="flex-1 bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Display Name */}
+              <div>
+                <label className="block text-xs text-gray-500 mb-1.5">
+                  Display Name (optional)
+                </label>
+                <input
+                  type="text"
+                  value={byoDisplayName}
+                  onChange={(e) => setByoDisplayName(e.target.value)}
+                  placeholder="e.g., Reception Line"
+                  className="w-full bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:border-gray-300 dark:focus:border-[#404040] focus:outline-none"
+                />
+              </div>
+
+              {/* Info Box */}
+              <div className="bg-gray-50 dark:bg-[#111114] border border-gray-200 dark:border-[#303030] rounded-md p-3">
+                <div className="flex items-start gap-2">
+                  <Info className="w-4 h-4 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
+                  <div className="space-y-1">
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Bring Your Own Number</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">
+                      Use a phone number from your SIP provider. Make sure the number is configured on your provider to route to the SIP trunk.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Action Buttons */}
           <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-gray-200 dark:border-[#303030]">
             <button
@@ -541,14 +695,15 @@ export default function PurchasePhoneModal({ isOpen, onClose, checkoutResult }) 
                 isLoading ||
                 !selectedBusiness ||
                 (selectedOption === 'vapi-number' && (!areaCode || areaCode.length !== 3)) ||
-                (selectedOption === 'twilio-number' && !selectedTwilioNumber)
+                (selectedOption === 'twilio-number' && !selectedTwilioNumber) ||
+                (selectedOption === 'byo-sip' && (!selectedSipTrunk || !byoPhoneNumber.trim()))
               }
               className="px-4 py-2 text-sm bg-gray-900 dark:bg-white text-white dark:text-black font-medium rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors disabled:opacity-50"
             >
               {isLoading ? (
                 selectedOption === 'twilio-number' ? 'Processing...' : 'Creating...'
               ) : (
-                selectedOption === 'twilio-number' ? 'Continue to Checkout' : 'Create'
+                selectedOption === 'twilio-number' ? 'Continue to Checkout' : selectedOption === 'byo-sip' ? 'Add Number' : 'Create'
               )}
             </button>
           </div>

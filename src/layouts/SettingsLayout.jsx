@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { Building2, CreditCard, Users, User, Puzzle, Bell, Clock } from 'lucide-react';
+import { Building2, CreditCard, Users, User, Puzzle, Bell, Clock, Phone } from 'lucide-react';
 
 export default function SettingsLayout() {
   const navItems = [
@@ -11,6 +11,7 @@ export default function SettingsLayout() {
         { icon: CreditCard, label: 'Billing & Add-Ons', path: '/settings/billing' },
         { icon: Users, label: 'Members', path: '/settings/members' },
         { icon: Puzzle, label: 'Integrations', path: '/settings/integrations' },
+        { icon: Phone, label: 'SIP Trunks', path: '/settings/sip-trunks' },
       ]
     },
     {

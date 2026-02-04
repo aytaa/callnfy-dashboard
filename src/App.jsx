@@ -36,6 +36,7 @@ import Billing from './pages/settings/Billing';
 import Members from './pages/settings/Members';
 import Profile from './pages/settings/Profile';
 import Integrations from './pages/settings/Integrations';
+import SipTrunks from './pages/settings/SipTrunks';
 import NotificationSettings from './pages/settings/NotificationSettings';
 
 // Other pages
@@ -436,6 +437,7 @@ function App() {
           <Route path="billing" element={<Billing />} />
           <Route path="members" element={<Members />} />
           <Route path="integrations" element={<Integrations />} />
+          <Route path="sip-trunks" element={<SipTrunks />} />
           <Route path="profile" element={<Profile />} />
           <Route path="notifications" element={<NotificationSettings />} />
         </Route>

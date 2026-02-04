@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Phone, Settings, Check, PhoneOutgoing, Calendar, AlertTriangle, Bot, RefreshCw, Clock, ExternalLink, Loader2 } from 'lucide-react';
+import { ArrowLeft, Phone, Settings, Check, PhoneOutgoing, Calendar, AlertTriangle, Bot, RefreshCw, Clock, ExternalLink, Loader2, Wifi } from 'lucide-react';
 import {
   useGetPhoneNumberQuery,
   useUpdatePhoneNumberMutation,
@@ -319,8 +319,12 @@ export default function PhoneNumberSettings() {
                 {phoneNumber.status === 'assigned' ? 'Assigned' : phoneNumber.status || 'Active'}
               </span>
               {/* Type Badge */}
-              <span className="px-2.5 py-1 text-xs font-medium rounded bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-white border border-gray-200 dark:border-zinc-700">
-                {phoneNumber.provider === 'twilio' ? 'Premium' : 'Standard'}
+              <span className={`px-2.5 py-1 text-xs font-medium rounded border ${
+                phoneNumber.provider === 'byo-sip'
+                  ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-700/50'
+                  : 'bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-white border-gray-200 dark:border-zinc-700'
+              }`}>
+                {phoneNumber.provider === 'twilio' ? 'Premium' : phoneNumber.provider === 'byo-sip' ? 'BYO (SIP)' : 'Standard'}
               </span>
             </div>
           </div>
@@ -410,11 +414,36 @@ export default function PhoneNumberSettings() {
               <label className="block text-sm text-gray-500 dark:text-zinc-400 mb-1">Type</label>
               <input
                 type="text"
-                value={phoneNumber.provider === 'twilio' ? 'Premium' : 'Standard'}
+                value={phoneNumber.provider === 'twilio' ? 'Premium' : phoneNumber.provider === 'byo-sip' ? 'BYO (SIP)' : 'Standard'}
                 readOnly
                 className="w-full bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-md px-3 py-2 text-sm text-gray-900 dark:text-white cursor-not-allowed"
               />
             </div>
+
+            {/* SIP Trunk Info (BYO only) */}
+            {phoneNumber.provider === 'byo-sip' && phoneNumber.sipTrunk && (
+              <div>
+                <label className="block text-sm text-gray-500 dark:text-zinc-400 mb-1">SIP Trunk</label>
+                <div className="flex items-center justify-between bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-md px-3 py-2">
+                  <div className="flex items-center gap-2">
+                    <Wifi className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-900 dark:text-white">
+                      {phoneNumber.sipTrunk.name}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      ({phoneNumber.sipTrunk.sipHost})
+                    </span>
+                  </div>
+                  <Link
+                    to="/settings/sip-trunks"
+                    className="text-xs text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white flex items-center gap-1 transition-colors"
+                  >
+                    Manage
+                    <ExternalLink className="w-3 h-3" />
+                  </Link>
+                </div>
+              </div>
+            )}
 
             {/* Phone ID (readonly) */}
             {phoneNumber.vapiPhoneId && (
@@ -442,8 +471,8 @@ export default function PhoneNumberSettings() {
               </div>
             )}
 
-            {/* Release Number Button (Premium only) */}
-            {phoneNumber.provider === 'twilio' && (
+            {/* Release Number Button (Premium only, not for BYO) */}
+            {phoneNumber.provider === 'twilio' && phoneNumber.provider !== 'byo-sip' && (
               <div className="pt-4 border-t border-gray-200 dark:border-[#303030]">
                 <div className="flex items-center justify-between">
                   <div>
